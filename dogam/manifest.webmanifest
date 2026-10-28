@@ -1,0 +1,31 @@
+{
+ "name": "카드 도감",
+ "short_name": "카드 도감",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "any",
+ "background_color": "#5B2A86",
+ "theme_color": "#5B2A86",
+ "icons": [
+  {
+   "src": "icon-65c68678-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-65c68678-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-65c68678-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}

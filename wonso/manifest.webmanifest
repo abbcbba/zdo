@@ -1,0 +1,31 @@
+{
+ "name": "원소 대탈출",
+ "short_name": "원소 대탈출",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "landscape",
+ "background_color": "#1F3B8C",
+ "theme_color": "#1F3B8C",
+ "icons": [
+  {
+   "src": "icon-df9d0c22-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-df9d0c22-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-df9d0c22-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
