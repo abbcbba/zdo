@@ -1,4 +1,4 @@
-const C='wonso-r3-d21680d8aa26', A='wonso-assets';
+const C='wonso-r3-20c68bfb803e', A='wonso-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-df9d0c22-180.png','icon-df9d0c22-192.png','icon-df9d0c22-512.png'];
 const ASSETS=[];
 let filling=null;

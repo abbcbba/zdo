@@ -1,4 +1,4 @@
-const C='dogam-r3-c144664dd067', A='dogam-assets';
+const C='dogam-r3-f3858f0a9619', A='dogam-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-65c68678-180.png','icon-65c68678-192.png','icon-65c68678-512.png'];
 const ASSETS=[];
 let filling=null;
