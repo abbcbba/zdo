@@ -1,18 +1,215 @@
 <!doctype html><html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>新 대동여지도 · 소개</title>
-<meta name="robots" content="noindex,nofollow">
+<title>신대동여지도(新 대동여지도) - 한국지리 · 한국사 · 한자를 배우는 지도 게임</title>
+<link rel="canonical" href="https://zdogame.com/about/">
+<meta name="description" content="우리 동네 동 이름, 시·도, 서울 지하철, 한강 다리, 고속도로, 국립공원, 이순신 해전, 한양 도성, 세계 바다를 지도에서 눌러 맞히는 지도 퀴즈 게임. 한국지리 · 한국사 · 한자. 아이패드 웹 브라우저에서 가입 없이 바로 실행.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="新 대동여지도 - 한국지리 · 한국사 · 한자를 배우는 지도 게임">
+<meta property="og:description" content="서울 지하철 · 고속도로 · 한양 도성 · 세계 바다 · 이순신 해전 · 국립공원까지! 지도를 콕콕 누르며 한국지리 · 한국사 · 한자를 배우는 게임">
+<meta property="og:image" content="https://zdogame.com/jido/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://zdogame.com/about/">
+<meta property="og:locale" content="ko_KR">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#F4ECDA">
+<link rel="icon" type="image/png" sizes="192x192" href="/jido/icon-c4291e77-192.png">
+<link rel="apple-touch-icon" href="/jido/icon-c4291e77-180.png">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"新 대동여지도","alternateName":["신대동여지도","신 대동여지도","zdogame"],"url":"https://zdogame.com/"}</script>
 <style>
-*{box-sizing:border-box}html,body{margin:0}
-body{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;padding:24px 16px;background:#FBF5E6;color:#3A1D12;font-family:system-ui,-apple-system,sans-serif;word-break:keep-all;text-align:center}
-.box{max-width:440px;width:100%;border:3px solid #8A5A36;border-radius:18px;padding:32px 20px;background:#FFFDF6;box-shadow:0 6px 0 #E9B21C}
-h1{margin:0 0 6px;font-size:32px;color:#16264F}h1 b{color:#C4161C}
-p{margin:0 0 26px;font-size:17px;color:#8A5A36}
-a{display:inline-block;background:#E23B3B;color:#fff;text-decoration:none;font-size:20px;font-weight:800;padding:14px 28px;border-radius:999px;box-shadow:0 5px 0 #C4161C}
-small{display:block;margin-top:28px;font-size:12px;color:#8A5A36}
-</style></head><body><div class="box">
-<h1><b>新</b> 대동여지도</h1>
-<p>소개 페이지를 준비하고 있어요.</p>
-<a href="/jido/">게임 하러 가기 ▶</a>
-<small>© 2026 zdogame</small>
-</div></body></html>
+@font-face{font-family:"Song Myung";src:url(/about/sm.woff) format("woff");font-display:swap}
+/* 105. 소개 페이지 (zdogame.com/about/) — 영상 → 게임 버튼 → 주소 읽는 법 → 작은 글(검색용): 소개 · 다섯 마당 · 하는 법 · 연혁 · 출처 · 문의 · 개인정보 */
+:root{--paper:#F4ECDA;--paper2:#EADFC6;--card:#FBF5E6;--ink:#2A2620;--ink2:#6B5E4B;--jjok:#24407A;--seal:#B8322A;--red:#E23B3B;--red2:#C4161C;--rule:#CDBE9E;
+--f-title:"Song Myung","AppleMyungjo","Noto Serif KR",serif;--f-body:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font:14px/1.7 var(--f-body);word-break:keep-all;overflow-wrap:anywhere}
+a{color:var(--jjok)}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:36px}
+.top{display:flex;flex-direction:column;align-items:center;gap:16px}
+header{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--rule);padding-top:20px}
+h1{font-family:var(--f-title);font-weight:400;font-size:22px;line-height:1.3;margin:0;color:var(--ink)}
+h1 .sin{color:var(--seal)}
+h1 .zdo{display:block;font:13px/1.5 var(--f-body);color:var(--ink2);margin-top:2px}
+.lead{margin:0;font-size:14px;line-height:1.7;color:var(--ink2)}
+.go{align-self:center;display:inline-flex;align-items:center;background:var(--red);color:#fff;text-decoration:none;font:22px/1 var(--f-title);padding:16px 30px;border-radius:999px;box-shadow:0 5px 0 var(--red2);margin-top:6px}
+.go:active{transform:translateY(3px);box-shadow:0 2px 0 var(--red2)}
+a:focus-visible{outline:3px solid var(--jjok);outline-offset:3px}
+.note{margin:0;font-size:13px;color:var(--ink2)}
+h2{font-family:var(--f-title);font-weight:400;font-size:19px;line-height:1.3;margin:0 0 10px;display:flex;align-items:center;gap:12px;text-wrap:balance}
+h2::before{content:"";width:9px;height:9px;background:var(--seal);border-radius:2px;transform:rotate(45deg);flex:none}
+h3{font-family:var(--f-title);font-weight:400;font-size:16px;line-height:1.35;margin:0;text-wrap:balance}
+p{margin:0}
+.yt{position:relative;display:block;width:100%;max-width:100%;aspect-ratio:16/9;border-radius:6px;overflow:hidden;background:url(https://i.ytimg.com/vi/Kwol4rJOup0/maxresdefault.jpg) center/cover,url(https://i.ytimg.com/vi/Kwol4rJOup0/hqdefault.jpg) center/cover,#2A2620;border:0;padding:0;cursor:pointer;font:inherit;color:#fff;text-decoration:none}
+.yt::before{content:"";position:absolute;inset:0;background:rgba(20,16,12,.45)}
+.yt .pl{position:absolute;left:50%;top:50%;transform:translate(-50%,-58%);width:84px;height:58px;border-radius:16px;background:var(--red)}
+.yt .pl::after{content:"";position:absolute;left:34px;top:17px;border-left:22px solid #fff;border-top:12px solid transparent;border-bottom:12px solid transparent}
+iframe.yt{cursor:auto}
+.yt:focus-visible{outline:3px solid var(--jjok);outline-offset:3px}
+.yt .cap{position:absolute;left:0;right:0;bottom:14%;text-align:center;font:20px/1.3 var(--f-title);text-shadow:0 1px 4px #000}
+.madang{display:grid;gap:8px}
+.madang article{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:10px 12px;display:grid;gap:2px;min-width:0}
+.madang .no{font-size:12px;color:var(--seal);font-weight:700;letter-spacing:.05em}
+dl.extra{margin:18px 0 0;display:grid;grid-template-columns:9em 1fr;gap:6px 16px}
+dl.extra dt{font-weight:700}dl.extra dd{margin:0;min-width:0}
+@media (max-width:540px){dl.extra{grid-template-columns:1fr;gap:0}dl.extra dd{margin-bottom:8px}}
+ol.how{margin:0;padding-left:1.4em;display:grid;gap:8px}
+ol.log{list-style:none;margin:0 0 0 6px;padding:0;border-left:2px solid var(--rule)}
+ol.log li{position:relative;padding:0 0 8px 22px}
+h2 .yr{font:13px var(--f-body);color:var(--ink2);margin-left:-4px}
+ol.log li::before{content:"";position:absolute;left:-6px;top:7px;width:10px;height:10px;border-radius:50%;background:var(--paper);border:2px solid var(--jjok)}
+ol.log li:first-child::before{background:var(--seal);border-color:var(--seal)}
+ol.log time{display:inline-block;min-width:3.4em;font-weight:700;color:var(--jjok);font-variant-numeric:tabular-nums}
+dl.src{margin:0;display:grid;grid-template-columns:8em 1fr;column-gap:16px;row-gap:10px;font-size:13px;line-height:1.6;color:var(--ink2)}
+dl.src dt{font-weight:700}
+dl.src dt.grp{grid-column:1/-1;font:700 13px var(--f-body);letter-spacing:.05em;color:var(--seal);border-bottom:1px solid var(--rule);padding-bottom:2px;margin-top:8px}
+dl.src dt.grp:first-child{margin-top:0}dl.src dd{margin:0;min-width:0}dl.src a{display:block;word-break:break-all}
+@media (max-width:540px){dl.src{grid-template-columns:1fr;row-gap:2px}dl.src dd{margin-bottom:12px}}
+.contact{background:var(--card);border:1px solid var(--rule);border-radius:6px;padding:16px;display:grid;gap:6px}
+.mail{font-size:16px;font-weight:700;color:var(--jjok)}
+.end{display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}.end .go{align-self:center}
+footer{border-top:1px solid var(--rule);padding-top:14px;color:var(--ink2);font-size:12.5px}
+@font-face{font-family:"Black Han Sans";src:url(/about/bhs.woff) format("woff");font-display:block}
+.gbtn{display:block;width:min(280px,100%);line-height:0;-webkit-tap-highlight-color:transparent;border-radius:6px}
+.gbtn svg{display:block;width:100%;height:auto;overflow:visible;animation:pulse 2.1s ease-in-out infinite;transform-origin:50% 50%}
+.gbtn text{font-family:"Black Han Sans","Apple SD Gothic Neo",sans-serif}
+.gbtn .face{transition:transform .08s}
+.gbtn:active .face{transform:translateY(5px)}
+.gbtn:focus-visible{outline:3px solid var(--jjok);outline-offset:4px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+@keyframes pulse{50%{transform:scale(1.015)}}
+@media (prefers-reduced-motion:reduce){.gbtn svg{animation:none}}
+.end .gbtn{margin:0 auto}
+.read{display:grid;justify-items:center;gap:8px;text-align:center}
+.cards{display:flex;align-items:flex-end;gap:clamp(3px,1.2vw,6px);flex-wrap:nowrap;justify-content:center;max-width:100%}
+.c{background:var(--card);border:2px solid #8A5A36;border-radius:4px;box-shadow:0 3px 0 #8A5A36;min-width:clamp(38px,11vw,54px);padding:6px clamp(5px,1.8vw,10px) 4px;display:grid;justify-items:center;line-height:1.1}
+.c b{font:400 clamp(22px,6.6vw,30px)/1.1 "Black Han Sans","Apple SD Gothic Neo",sans-serif;color:var(--ink)}
+.c:first-child b{color:var(--seal)}
+.c i{font:normal clamp(13px,3.6vw,16px)/1.4 var(--f-title);color:var(--jjok);border-top:1px solid var(--rule);padding-top:2px;margin-top:4px;align-self:stretch;text-align:center}
+.c.dot{background:transparent;border-color:var(--rule);box-shadow:0 3px 0 var(--rule)}
+.c.dot b{color:var(--ink2)}.c.dot i{color:var(--ink2)}
+.read .sub{margin:0;font-size:13px;color:var(--ink2)}.read .sub b{color:var(--ink)}
+</style>
+</head><body>
+<div class="wrap">
+
+
+<div class="top">
+  <button class="yt" type="button" data-id="Kwol4rJOup0" aria-label="新 대동여지도 소개 영상 재생 (유튜브)"><span class="pl"></span><span class="cap">新 대동여지도 · 45초 소개 영상</span></button>
+  <a class="gbtn" href="/jido/"><span class="sr">게임 하러 가기</span><svg viewBox="0 0 280 74" width="280" height="74" aria-hidden="true"><path d="M15,9 H265 L276,20 V60 L265,71 H15 L4,60 V20Z" fill="#7A2016"/><g class="face"><path d="M15,3 H265 L276,14 V54 L265,65 H15 L4,54 V14Z" fill="#C8402F" stroke="#7A2016" stroke-width="2.5"/><path d="M17,8 H263 L271,16 V52 L263,60 H17 L9,52 V16Z" fill="none" stroke="#F5D77A" stroke-width="1.2" opacity=".7"/><path d="M58.8,21.0 L81.8,34.0 L58.8,47.0Z" fill="#FFF6E0"/><text x="164" y="44.5" font-size="25" text-anchor="middle" fill="#3A1D12" stroke="#3A1D12" stroke-width="3.5" stroke-linejoin="round" opacity=".75">게임 하러 가기</text><text x="164" y="43.0" font-size="25" text-anchor="middle" fill="#FFF6E0" stroke="#3A1D12" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke">게임 하러 가기</text></g></svg></a>
+  <div class="read"><div class="cards" lang="en" aria-label="zdogame.com, 지도게임 닷컴">
+    <div class="c"><b>z</b><i lang="ko">지</i></div><div class="c"><b>do</b><i lang="ko">도</i></div><div class="c"><b>game</b><i lang="ko">게임</i></div><div class="c dot"><b>.com</b><i lang="ko">닷컴</i></div>
+  </div><p class="sub">주소는 <b>'지도 게임'</b>으로 기억해 주세요</p></div>
+  <p class="note">마당별 소개 영상 · 쇼츠: <a href="https://www.youtube.com/@zdogame">youtube.com/@zdogame</a></p>
+</div>
+
+<header>
+  <h1><span class="sin">新</span> 대동여지도 <span class="zdo">zdo · 신대동여지도 — zdo = '지도'를 소리 나는 대로 쓴 이름</span></h1>
+  <p class="lead">지도를 눌러 맞히며 한국지리 · 한국사 · 한자를 배우는 지도 게임. 우리 동네 동 이름, 시·도, 서울 지하철, 한강 다리, 고속도로, 국립공원, 이순신 해전, 한양 도성, 세계 바다, 역사 지도까지 다섯 마당. 아이패드 가로 화면 기준 · 가입 · 광고 없음 · 웹 브라우저에서 바로 실행.</p>
+</header>
+
+<section>
+  <h2>다섯 마당</h2>
+  <div class="madang">
+    <article><span class="no">첫째 마당</span><h3>우리 고을 탐험 — 시·도, 서울 25구, 동 이름</h3>
+      <p>대한민국 시·도, 서울 25구, 서울 · 성남 동 이름 맞히기. 법정동 · 행정동 골라서.</p></article>
+    <article><span class="no">둘째 마당</span><h3>땅길 대작전 — 한강 다리, 고속도로, 서울 지하철</h3>
+      <p>한강 다리 28개 이름 기억해서 맞히기 · 고속도로 번호의 비밀(홀수 남북, 짝수 동서) · 서울 지하철 노선별 역 이름.</p></article>
+    <article><span class="no">셋째 마당</span><h3>물길 대탐험 — 강, 이순신 해전, 세계 바다</h3>
+      <p>우리나라 강 이름 · 한산도대첩 · 명량대첩 · 노량해전 등 이순신 해전 자리 · 세계 바다 25곳.</p></article>
+    <article><span class="no">넷째 마당</span><h3>산길 옛길 탐방 — 국립공원, 한양 도성, 역사 지도</h3>
+      <p>국립공원 24곳 도장 · 깃대종 · 한양 도성 성문 · 궁궐 · 청와대 17곳 · 역사 지도로 그해의 나라 · 수도 · 전쟁 · 인물 찾기.</p></article>
+    <article><span class="no">다섯째 마당</span><h3>지도 과거 시험 — 곰돌이와 10문제 대결</h3>
+      <p>세종대왕 · 김정호 · 이순신 · 유생 곰 가운데 하나와 쉬움 · 보통 · 어려움 10문제.</p></article>
+  </div>
+  <dl class="extra">
+    <dt>오늘의 도전</dt><dd>하루 세 관문 · 넘을 때마다 거북선 돛 하나씩</dd>
+    <dt>규장각 책장</dt><dd>8급 · 7급 한자, 훈민정음, 조선 · 고려 임금 책</dd>
+    <dt>내 지도 · 복주머니</dt><dd>맞힌 곳 색칠 · 다 채우면 복주머니와 옷</dd>
+    <dt><a href="/dogam/">카드 도감</a></dt><dd>다리 · 강 · 국립공원 · 고속도로 · 한양 도성 카드 모음</dd>
+  </dl>
+</section>
+
+<section>
+  <h2>하는 법</h2>
+  <ol class="how">
+    <li>웹 브라우저에서 <a href="/">zdogame.com</a> 열기 (아이패드 · 태블릿 · 컴퓨터)</li>
+    <li>아이패드 사파리: 공유 → <b>홈 화면에 추가</b> → 앱처럼 실행 · 한 번 열면 인터넷 없이도 가능</li>
+    <li>기록은 그 기기 안에 저장 · 가입 없음</li>
+  </ol>
+</section>
+
+<section>
+  <h2>만들어 온 길 <small class="yr">2026</small></h2>
+  <ol class="log">
+    <li><time datetime="2026-11-03">11.03</time>목소리 전체 새 녹음 · 유튜브 채널 개설</li>
+    <li><time datetime="2026-11-02">11.02</time>시작 · 끝 장면 새로</li>
+    <li><time datetime="2026-11-01">11.01</time>오늘의 도전 거북선 · 숨은 송편 곰 · 카드 도감 개편</li>
+    <li><time datetime="2026-10-31">10.31</time>세계 바다 · 역사 지도 추가</li>
+    <li><time datetime="2026-10-30">10.30</time>한양 도성 · 8급 · 7급 한자 책 · 임금 책 추가</li>
+    <li><time datetime="2026-10-29">10.29</time>서울 지하철 게임 추가</li>
+    <li><time datetime="2026-10-28">10.28</time>zdogame.com 오픈 · 훈민정음 책 · 오늘의 도전</li>
+    <li><time datetime="2026-10-27">10.27</time>대한민국 시·도 · 이순신 해전 추가 · 국립공원 퀴즈</li>
+    <li><time datetime="2026-10-26">10.26</time>「新 대동여지도」로 이름 변경 · 다섯 마당</li>
+    <li><time datetime="2026-10-25">10.25</time>고속도로 48개 새 자료 · 아이패드 홈 화면 앱</li>
+    <li><time datetime="2026-10-24">10.24</time>첫 버전 (우리 동네 · 한강 다리 · 강 · 국립공원 · 고속도로)</li>
+    <li><time datetime="2026-10-23">10.23</time>무료 초등 패드 학습 게임 구상</li>
+  </ol>
+</section>
+
+<section>
+  <h2>자료 출처</h2>
+  <dl class="src">
+    <dt class="grp">첫째 마당</dt>
+    <dt>행정동 지도</dt><dd>통계청 통계지리정보서비스(SGIS)에서 공공누리 제1유형으로 개방한 행정동 경계를 가공한 vuski/admdongkor(CC BY 4.0)를 게임용으로 단순화했습니다.<a href="https://github.com/vuski/admdongkor">https://github.com/vuski/admdongkor</a></dd>
+    <dt>법정동 지도</dt><dd>국토교통부 법정구역정보(브이월드 공간정보 다운로드, CC BY, 2026-10-09 기준)를 단순화하여 사용했습니다.<a href="https://www.vworld.kr/dtmk/dtmk_ntads_s002.do?svcCde=NA&amp;dsId=21">https://www.vworld.kr</a></dd>
+    <dt>북한 지도</dt><dd>Made with Natural Earth (1:10m Admin-1, 퍼블릭 도메인). 경계는 사실상 경계(de facto) 기준이며 대한민국 정부의 공식 입장과 다를 수 있습니다.<a href="https://www.naturalearthdata.com">https://www.naturalearthdata.com</a></dd>
+    <dt class="grp">둘째 마당</dt>
+    <dt>한강 다리</dt><dd>서울특별시, 서울기록원 공개 자료를 참고하여 새로 작성했습니다.<a href="https://www.seoul.go.kr">https://www.seoul.go.kr</a><a href="https://archives.seoul.go.kr">https://archives.seoul.go.kr</a></dd>
+    <dt>고속도로</dt><dd>한국도로공사 공개 자료를 참고하여 새로 작성했습니다.<a href="https://www.ex.co.kr">https://www.ex.co.kr</a></dd>
+    <dt>서울 지하철</dt><dd>역 자리: 국가철도공단 도시광역철도 역사정보 표준데이터(2026-06-30, 공공데이터포털). 노선 순서는 서울교통공사 수도권 지하철 노선도(공공누리 제1유형)로 확인하고, 노선도 그림은 새로 그렸습니다.<a href="https://www.data.go.kr/data/15013205/standard.do">https://www.data.go.kr</a></dd>
+    <dt class="grp">셋째 마당</dt>
+    <dt>바다·지리·고속도로</dt><dd>[출처: 남해, 동해, 황해, 갯벌, 반도, 영동지방, 남해고속도로, 동해고속도로, 영동고속도로, 울산고속도로, 당진영덕고속도로 - 한국민족문화대백과사전] (한국학중앙연구원)<a href="https://encykorea.aks.ac.kr">https://encykorea.aks.ac.kr</a></dd>
+    <dt>이순신 해전</dt><dd>[출처: 옥포해전, 사천해전, 한산도대첩, 부산포해전, 명량대첩, 노량해전, 당항포해전, 안골포해전, 거북선, 판옥선, 천자총통 - 한국민족문화대백과사전], 위키백과 등 공개 자료를 참고하여 새로 작성했습니다.<a href="https://encykorea.aks.ac.kr">https://encykorea.aks.ac.kr</a></dd>
+    <dt>세계 바다</dt><dd>바다 · 호수 · 땅 모양은 Natural Earth(퍼블릭 도메인). 카드 내용은 CIA 월드 팩트북, NOAA, NASA 지구관측소, 한국민족문화대백과사전 등 공개 자료를 참고하여 새로 작성했습니다.<a href="https://www.naturalearthdata.com">https://www.naturalearthdata.com</a></dd>
+    <dt class="grp">넷째 마당</dt>
+    <dt>국립공원</dt><dd>국립공원공단, 한국자연공원협회 공개 자료를 참고하여 새로 작성했습니다.<a href="https://www.knps.or.kr">https://www.knps.or.kr</a></dd>
+    <dt>한양 도성</dt><dd>성곽: 서울특별시 한양도성 구간 위치정보(공공누리 제1유형). 백악 구간 성곽과 궁·종묘·사직 자리: 국가유산청 국가유산 공간정보(공공데이터포털)를 단순화. [출처: 서울 한양도성, 사대문, 사소문, 경복궁, 창덕궁, 창경궁, 덕수궁, 경희궁지, 종묘, 사직단, 청와대, 보신각 터 - 한국민족문화대백과사전] (한국학중앙연구원)<a href="https://data.seoul.go.kr/dataList/OA-15371/S/1/datasetView.do">https://data.seoul.go.kr</a></dd>
+    <dt>역사 지도</dt><dd>땅 모양은 Natural Earth(퍼블릭 도메인)이며 국경선은 그리지 않았습니다. 한국민족문화대백과사전, 동북아역사넷, 우리역사넷, 국가보훈부, 국가기록원 공개 자료를 참고하여 새로 작성했습니다.<a href="https://encykorea.aks.ac.kr">https://encykorea.aks.ac.kr</a></dd>
+    <dt class="grp">규장각 책장</dt>
+    <dt>한자 · 임금 책</dt><dd>8급 · 7급 한자와 훈음은 한국어문회 전국한자능력검정시험 배정한자를 따랐습니다. 임금 이름과 순서는 한국민족문화대백과사전, 『고려사』를 참고했습니다.</dd>
+    <dt class="grp">그 밖</dt>
+    <dt>목소리</dt><dd>게임과 영상의 목소리는 Vrew AI 목소리(메디아 · 혁 · 폼비 · 향기)로 만들었습니다.<a href="https://vrew.ai">https://vrew.ai</a></dd>
+    <dt>음악·소리·그림</dt><dd>배경음악 · 효과음 · 그림은 Claude(Anthropic)를 활용하여 제작했습니다.</dd>
+    <dt>글꼴</dt><dd>Song Myung, Jua, Black Han Sans, Lilita One, Noto Serif KR · SIL Open Font License 1.1 (Google Fonts). Lilita One은 원본 그대로, 나머지는 필요한 글자만 추려 사용했습니다.<a href="/fonts/">라이선스 원문 zdogame.com/fonts/</a></dd>
+    <dt>게임 이름</dt><dd>「新 대동여지도」는 김정호의 「대동여지도」에서 이름을 따온 비영리 교육용 게임으로, 해당 문화유산 및 관련 기관과 무관합니다.</dd>
+  </dl>
+</section>
+
+<section>
+  <h2>문의</h2>
+  <div class="contact">
+    <p>잘못된 내용이나 개선할 점, 그 밖의 문의 사항은 아래 이메일로 보내 주시면 확인 후 답변드리겠습니다.</p>
+    <a class="mail" href="mailto:hello@zdogame.com">hello@zdogame.com</a>
+  </div>
+</section>
+
+<section>
+  <h2>개인정보</h2>
+  <p>新 대동여지도는 이름, 연락처 등 어떠한 개인정보도 수집하지 않습니다. 게임 기록은 이용하시는 기기 안에만 저장되며 서버로 전송되지 않습니다. 카메라와 마이크를 사용하지 않으며, 방문자 통계나 광고 코드도 넣지 않았습니다.</p>
+</section>
+
+<div class="end">
+  <a class="gbtn" href="/jido/"><span class="sr">게임 하러 가기</span><svg viewBox="0 0 280 74" width="280" height="74" aria-hidden="true"><path d="M15,9 H265 L276,20 V60 L265,71 H15 L4,60 V20Z" fill="#7A2016"/><g class="face"><path d="M15,3 H265 L276,14 V54 L265,65 H15 L4,54 V14Z" fill="#C8402F" stroke="#7A2016" stroke-width="2.5"/><path d="M17,8 H263 L271,16 V52 L263,60 H17 L9,52 V16Z" fill="none" stroke="#F5D77A" stroke-width="1.2" opacity=".7"/><path d="M58.8,21.0 L81.8,34.0 L58.8,47.0Z" fill="#FFF6E0"/><text x="164" y="44.5" font-size="25" text-anchor="middle" fill="#3A1D12" stroke="#3A1D12" stroke-width="3.5" stroke-linejoin="round" opacity=".75">게임 하러 가기</text><text x="164" y="43.0" font-size="25" text-anchor="middle" fill="#FFF6E0" stroke="#3A1D12" stroke-width="3.5" stroke-linejoin="round" paint-order="stroke">게임 하러 가기</text></g></svg></a>
+  <p class="note">유튜브 <a href="https://www.youtube.com/@zdogame">youtube.com/@zdogame</a> · 카드 도감 <a href="/dogam/">zdogame.com/dogam</a></p>
+</div>
+
+<footer>© 2026 zdogame. All rights reserved.<br>지도 · 목소리 · 글꼴 자료는 위 출처의 라이선스를 따름</footer>
+</div>
+<script>
+document.querySelectorAll('button.yt').forEach(function(b){b.addEventListener('click',function(){
+  var f=document.createElement('iframe');f.className='yt';f.title='新 대동여지도 소개 영상';
+  f.src='https://www.youtube-nocookie.com/embed/'+b.dataset.id+'?autoplay=1&rel=0&playsinline=1';
+  f.allow='autoplay; encrypted-media; picture-in-picture; fullscreen';f.allowFullscreen=true;f.referrerPolicy='strict-origin-when-cross-origin';
+  b.replaceWith(f);});});
+</script>
+</body></html>
