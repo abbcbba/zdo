@@ -6194,7 +6194,7 @@ if(B.at!=null){ if(!B.found&&i<B.at+BEAR_DUR) return; G.bear=G.bearLeft>0?{qi:i+
 if(i<B.qi) return; if(G.ch!==5){ const q=curQ(); if(!q||q.type!=='tap'){ B.qi=i+1; return; } } B.at=i; }
 const bearPh=()=>G.ch===5?(W5&&W5.phase):(QZ&&QZ.phase);
 function bearPlace(){ const B=G.bear; B.pq=G.qi; B.pos=null;
-if(G.ch===5){ B.pos=pick([{x:1222,y:562},{x:226,y:588}]); }
+if(G.ch===5){ B.pos=pick([{x:1212,y:330},{x:226,y:588}]); }
 else { const R=G.ch===2?HAN_RECT:MAP_RECT, a=(()=>{ try{ return window.__game.answer(); }catch(e){ return null; } })(), P=[];
 for(let gx=0;gx<6;gx++) for(let gy=0;gy<4;gy++){ if(gx>0&&gx<5) continue;
 const x=R.x+70+gx*(R.w-140)/5, y=R.y+110+gy*(R.h-250)/3;
