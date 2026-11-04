@@ -5968,6 +5968,7 @@ if(done[i]){ const cx=X+TD_CX[i], cy=Y-150*S+12, pk=fr&&fr.i===i?(ft<1.1?0:ft<1.
 if(pk>0) g+=pk===1?todayCrew(i,cx,cy):`<g transform="translate(${cx},${cy}) scale(${pk.toFixed(3)}) translate(${-cx},${-cy})">${todayCrew(i,cx,cy)}</g>`; }
 if(open) BTN.push({x:sx-60,y:top-62+bob,w:120,h:Y-150*S-(top-62),cb:go(i)}); }
 g+=`</g>`;
+if(spPanel.gy!=null) g+=spGuide(952,spPanel.gy,256,spRec().n);
 for(let i=0;i<5;i++){ const k=(NOW*2+i)%1; g+=`<circle cx="${X+250+k*40+i*6}" cy="${Y-10-Math.sin(k*Math.PI)*30}" r="${6-i}" fill="#fff" opacity="${(0.8*(1-k)).toFixed(2)}"/>`; }
 { let d='M-80,640'; for(let x=-80;x<=1360;x+=80) d+=' q20,-16 40,0 t40,0'; g+=`<path transform="translate(${(NOW*30)%80},0)" d="${d} L1360,720 L-80,720Z" fill="#123E72" opacity=".85"/>`; }
 for(let i=0;i<3;i++){ const x=300+i*340, open=todayOpen(r,i), f=r.fill[i];
@@ -6186,7 +6187,7 @@ return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-17,6 Q-19,-6 
 +`<path d="M-12,-8 Q0,-15 12,-8" fill="none" stroke="${C[1]}" stroke-width="1.6" stroke-dasharray="2.5 3" stroke-linecap="round" opacity=".8"/><ellipse cx="-6" cy="-3" rx="4" ry="2.2" fill="#fff" opacity=".55"/></g>`; }
 function spRec(){ const r=store.get('songp',null); return r&&r.d===todayKey()?r:{d:todayKey(),n:0}; }
 const spCol=i=>SP_COL[i%SP_COL.length];
-function bearPlan(){ G.bear=null; G.bearLeft=0; if((G.ch===5||G.ta)&&G.today==null) return;
+function bearPlan(){ G.bear=null; G.bearLeft=0; if(G.ta&&G.today==null) return;
 G.bear={qi:1+rand(3),found:0}; G.bearLeft=BEAR_N-1; }
 function bearAsk(i){ const B=G&&G.bear; if(!B) return;
 if(B.at!=null){ if(!B.found&&i<B.at+BEAR_DUR) return; G.bear=G.bearLeft>0?{qi:i+1+rand(2),found:0}:null; if(G.bearLeft>0) G.bearLeft--; return; }
@@ -6225,7 +6226,17 @@ const by=y+h+10;
 if(n>=GH_N){ const k=1+0.04*Math.sin(NOW*4);
 g+=`<g transform="translate(${x+w/2},${by+28}) scale(${k}) translate(${-(x+w/2)},${-(by+28)})">`+btn3d(x,by,w,56,n>=JAN_N?'미니게임 열림!':'곰 학당 열림!','yellow',()=>{ SFX.tap(); GHASK={t0:NOW}; },{fam:'BHS',fs:26,dep:5})+`</g>`; }
 else if(n>0) g+=`<path d="${hanBoxD(x,by,w,40,8)}" fill="#FBF5E6" opacity=".9" stroke="#C9A46A" stroke-width="2"/><text x="${x+w/2}" y="${by+27}" font-size="18" text-anchor="middle" fill="#8A5A36">송편 ${GH_N}개면 곰 학당이 열려요 (${n}/${GH_N})</text>`;
-if(n>=GH_N&&n<JAN_N) g+=`<text x="${x+w/2}" y="${by+82}" font-size="17" text-anchor="middle" fill="#8A5A36">${JAN_N}개면 송편 잔치도! (${n}/${JAN_N})</text>`;
+spPanel.gy=n<JAN_N?by+(n>=GH_N?68:n>0?50:0):null;
+return g; }
+function spGuide(x,y,w,n){ const r=todayRec(), allDone=r.fill.every((f,i)=>f>=TD_N[i]), top=n>=GH_N?34:0, h=top+150+(allDone?66:0);
+let g=`<path d="${hanBoxD(x,y,w,h,12)}" fill="#FBF5E6" opacity=".95" stroke="#8A5A36" stroke-width="3"/>`;
+if(top) g+=`<text x="${x+w/2}" y="${y+25}" font-size="18" text-anchor="middle" fill="#8A5A36">${JAN_N}개면 송편 잔치도! (${n}/${JAN_N})</text><path d="M${x+16},${y+top} H${x+w-16}" stroke="#E3D3B0" stroke-width="2"/>`;
+const by=y+top, hop=Math.abs(Math.sin(NOW*3))*-4;
+g+=dollBear(x+48,by+104+hop,{s:0.62,arms:'hold'})+songP(x+48,by+20+hop,1,spCol(n));
+const L=allDone?['관문 다 풀었네!','송편 더 모으려면']:['송편 곰을','찾으면 송편 하나!'], S=allDone?['다섯째 마당 곰 대결에도','송편 곰이 숨어 있어요']:['관문 · 마당 지도 ·','곰 대결에 숨어 있어요'];
+L.forEach((t,i)=>{ g+=`<text x="${x+160}" y="${by+40+i*30}" font-size="21" text-anchor="middle" fill="#B5352D">${t}</text>`; });
+S.forEach((t,i)=>{ g+=`<text x="${x+w/2}" y="${by+120+i*24}" font-size="18" text-anchor="middle" fill="#6A4A2A">${t}</text>`; });
+if(allDone) g+=btn3d(x+18,by+152,w-36,52,'곰 대결 하러 가기','red',()=>{ SFX.tap(); audioInit(); OPT.ta=false; OPT.ch=5; OPT.lastCh=5; store.set('lastCh',5); TSTEP='opt'; },{fam:'BHS',fs:24,dep:5});
 return g; }
 const GH_N=5, JAN_N=10; let GHASK=null;
 function ghAskUI(){ const a=ease(Math.min(1,(NOW-GHASK.t0)/0.3)), x=320, y=150, w=640, h=420, t=NOW-GHASK.t0;
