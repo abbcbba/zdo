@@ -6223,24 +6223,29 @@ if(!n) g+=`<text x="${x+w/2}" y="${y+64}" font-size="17" text-anchor="middle" fi
 for(let i=0;i<n;i++) g+=songP(x+38+(i%per)*36,y+66+Math.floor(i/per)*38,0.9,spCol(i));
 const by=y+h+10;
 if(n>=GH_N){ const k=1+0.04*Math.sin(NOW*4);
-g+=`<g transform="translate(${x+w/2},${by+28}) scale(${k}) translate(${-(x+w/2)},${-(by+28)})">`+btn3d(x,by,w,56,'곰 학당 열림!','yellow',()=>{ SFX.tap(); GHASK={t0:NOW}; },{fam:'BHS',fs:26,dep:5})+`</g>`; }
+g+=`<g transform="translate(${x+w/2},${by+28}) scale(${k}) translate(${-(x+w/2)},${-(by+28)})">`+btn3d(x,by,w,56,n>=JAN_N?'미니게임 열림!':'곰 학당 열림!','yellow',()=>{ SFX.tap(); GHASK={t0:NOW}; },{fam:'BHS',fs:26,dep:5})+`</g>`; }
 else if(n>0) g+=`<path d="${hanBoxD(x,by,w,40,8)}" fill="#FBF5E6" opacity=".9" stroke="#C9A46A" stroke-width="2"/><text x="${x+w/2}" y="${by+27}" font-size="18" text-anchor="middle" fill="#8A5A36">송편 ${GH_N}개면 곰 학당이 열려요 (${n}/${GH_N})</text>`;
+if(n>=GH_N&&n<JAN_N) g+=`<text x="${x+w/2}" y="${by+82}" font-size="17" text-anchor="middle" fill="#8A5A36">${JAN_N}개면 송편 잔치도! (${n}/${JAN_N})</text>`;
 return g; }
-const GH_N=5; let GHASK=null;
+const GH_N=5, JAN_N=10; let GHASK=null;
 function ghAskUI(){ const a=ease(Math.min(1,(NOW-GHASK.t0)/0.3)), x=320, y=150, w=640, h=420, t=NOW-GHASK.t0;
 let g=`<rect width="1280" height="720" fill="#1A0E06" opacity="${0.5*a}"/><g opacity="${a}" transform="translate(640,360) scale(${0.85+0.15*a}) translate(-640,-360)">`;
 BTN.push({x:0,y:0,w:1280,h:720,cb:()=>{ GHASK=null; }});
 g+=`<path d="${hanBoxD(x,y+8,w,h,18)}" fill="#000" opacity=".3"/><path d="${hanBoxD(x,y,w,h,18)}" fill="#FBF5E6" stroke="#3A4FA8" stroke-width="7"/><path d="${hanBoxD(x+12,y+12,w-24,h-24,12)}" fill="none" stroke="#C9A46A" stroke-width="2"/>`;
-g+=`<text class="sm" x="640" y="${y+70}" font-size="42" text-anchor="middle" fill="#3A1D12">곰 학당에 갈까?</text>`;
-g+=`<text x="640" y="${y+108}" font-size="20" text-anchor="middle" fill="#6A4A2A">송편 ${GH_N}개를 모았어요! 육십갑자 곰 학당이 열렸어요</text>`;
+const two=spRec().n>=JAN_N;
+g+=`<text class="sm" x="640" y="${y+70}" font-size="42" text-anchor="middle" fill="#3A1D12">${two?'어느 미니게임에 갈까?':'곰 학당에 갈까?'}</text>`;
+g+=`<text x="640" y="${y+108}" font-size="20" text-anchor="middle" fill="#6A4A2A">${two?`송편 ${JAN_N}개를 모았어요! 곰 학당 · 송편 잔치가 열렸어요`:`송편 ${GH_N}개를 모았어요! 육십갑자 곰 학당이 열렸어요`}</text>`;
 const gearMini=(cx,cy,r,n,rot,col)=>{ let q=''; for(let i=0;i<n;i++) q+=`<rect x="${r-6}" y="-7" width="15" height="14" rx="3" fill="${col}" stroke="#6E4524" stroke-width="2" transform="translate(${cx},${cy}) rotate(${rot+i*360/n})"/>`;
 return q+`<circle cx="${cx}" cy="${cy}" r="${r}" fill="${col}" stroke="#6E4524" stroke-width="3"/><circle cx="${cx}" cy="${cy}" r="${r-9}" fill="#F8EFDA" stroke="#6E4524" stroke-width="1.5"/>`; };
 g+=gearMini(780,y+232,52,10,-t*36,'#B0763E')+gearMini(868,y+232,62,12,t*30+15,'#9C6634');
 g+=`<text x="780" y="${y+241}" font-size="26" text-anchor="middle" fill="#B5352D">병</text><text x="868" y="${y+242}" font-size="28" text-anchor="middle" fill="#3A1D12">오</text>`;
 const hp=Math.abs(Math.sin(t*3.2))*-14;
 g+=suitBear(520,y+330+hp,{suit:'y',s:1.25,arms:'up'});
-for(let i=0;i<GH_N;i++){ const an=Math.PI*(1.15+i*0.175), r=104; g+=songP(520+Math.cos(an)*r,y+214+Math.sin(an)*r*0.62+Math.sin(t*4+i)*3,1.05,spCol(i)); }
-g+=btn3d(x+150,y+h-86,170,60,'갈래!','red',()=>{ SFX.whoosh(); GHASK=null; try{ window.open('../mini/?from=jido','_blank'); }catch(e){} },{fam:'BHS',fs:30,dep:5})
+const nS=two?JAN_N:GH_N; for(let i=0;i<nS;i++){ const an=Math.PI*(1.15+i*0.7/(nS-1)), r=104; g+=songP(520+Math.cos(an)*r,y+214+Math.sin(an)*r*0.62+Math.sin(t*4+i)*3,1.05,spCol(i)); }
+const goMini=q=>()=>{ SFX.whoosh(); GHASK=null; try{ window.open('../mini/?from=jido'+q,'_blank'); }catch(e){} };
+if(two) g+=btn3d(x+40,y+h-86,180,60,'곰 학당','red',goMini(''),{fam:'BHS',fs:28,dep:5})+btn3d(x+235,y+h-86,180,60,'송편 잔치','yellow',goMini('&g=jan'),{fam:'BHS',fs:28,dep:5})
++btn3d(x+430,y+h-86,170,60,'다음에','white',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
+else g+=btn3d(x+150,y+h-86,170,60,'갈래!','red',goMini(''),{fam:'BHS',fs:30,dep:5})
 +btn3d(x+340,y+h-86,170,60,'다음에','white',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
 return g+`</g>`; }
 function hunStamp(x,y,o,s){ return `<g transform="translate(${x},${y}) scale(${s}) rotate(-8)"><rect x="-52" y="-52" width="104" height="104" rx="14" fill="${o?'#C4161C':'#2B3A67'}"/><rect x="-44" y="-44" width="88" height="88" rx="10" fill="none" stroke="#FBF5E6" stroke-width="3"/>`
