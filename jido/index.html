@@ -4455,8 +4455,8 @@ return g; }
 function siRow(y,label,val,extra=''){ return `<text class="sm" x="560" y="${y}" font-size="26" fill="#3A1D12">${label}</text><text class="sm" x="790" y="${y}" font-size="30" fill="#3A1D12">${val}</text>`+extra; }
 function siTitle(t,sub){ return `<text class="sm" x="830" y="96" font-size="30" text-anchor="middle" fill="#3A1D12">${esc(t)}</text><text x="830" y="130" font-size="${Math.min(22,640/Math.max(1,tw(sub,1)))}" text-anchor="middle" fill="#6A4A2A">${esc(sub)}</text>`; }
 function siBest(isBest,old){ if(isBest) return nakgwan(1040,226,'신기록',1.15+Math.sin(NOW*5)*0.03,12); return old?`<text x="1040" y="236" font-size="22" text-anchor="middle" fill="#8A6A4A">${esc(old)}</text>`:''; }
-function siButtons(again){ const ok=NOW-G.rt>0.8;
-return btn3d(560,512,250,70,'한 번 더','red',ok?again:null,{icon:'again',fam:'BHS',fs:34})+btn3d(850,512,250,70,'처음으로','blue',ok?()=>{ goTitle(); }:null,{icon:'home',fam:'BHS',fs:34}); }
+function siButtons(again){ const ok=NOW-G.rt>0.8, md=['','첫째','둘째','셋째','넷째','다섯째'][mdNo()]+' 마당';
+return btn3d(540,512,196,70,'한 번 더','red',ok?again:null,{icon:'again',fam:'BHS',fs:30})+btn3d(754,512,232,70,md,'green',ok?()=>{ goMadang(); }:null,{icon:'back',fam:'BHS',fs:30})+btn3d(1004,512,196,70,'처음으로','blue',ok?()=>{ goTitle(); }:null,{icon:'home',fam:'BHS',fs:30}); }
 function resultUI(){
 if(G.ch===5) return resultUI5();
 const sub=`${chName(G)}${G.ch===3?(G.sub==='sw'?` · 지하철 · ${G.line==='mix'?'모두 섞어':swLineName(G.line)} · ${G.cnt==='all'?'전부':'10문제'}`:G.sub==='hw'?` · 고속도로 · ${G.cnt==='all'?'전부':'10문제'}`:G.sub==='hj'?` · 이순신 해전${G.ta?'':' · '+(HJ_BY[G.b]||{name:''}).name}`:' · 강'):''}${G.ch===1?` · ${CITY_NAME[G.city]}${G.city==='kr'?'':' · '+MODE_NAME[G.mode]} · ${G.cnt==='gu'?G.gu+' 전부':cntName(G)}`:''}${G.ch===2?(G.cnt==='all'?' · 전부':' · 5문제'):''}${G.ch===4?(isHY()?' · 한양 도성':isHS()?` · 역사 지도 · ${G.hsSt==='mix'?'섞어':HS_ST_NAME[G.hsSt]}`:'')+(isHS()&&G.hsSt==='mix'?' · 10문제':G.cnt==='all'||isHS()&&G.hsSt===5?' · 전부':' · 10문제'):''} · 응시자 C군`;
@@ -5939,10 +5939,13 @@ OPT.ta=!!o.ta; if(ch===5){ ch5Start(o); return; } SFX.jingle(); startMap(ch,o); 
 function goBack(){ PAUSE=false; setFrozen(); stopVoice(); CAP=null;
 if(S!=='ch5'&&G&&G.back&&((G.ch===1&&G.stage==='dong')||(isHJ()&&G.stage==='b'))){
 G.qs=G.qs.slice(0,G.back.n); G.qi=G.back.qi; G.gu=null; G.b=null; G.back=null; G.stage='pick'; C=null; S='map'; QZ={phase:'pick',t0:NOW}; forceAll(); return; }
+goMadang(); }
+function goMadang(){ PAUSE=false; setFrozen(); stopVoice(); CAP=null;
 const g5=S==='ch5', td=g5&&G&&G.today!=null; goTitle();
 if(td){ TSTEP='today'; todayScreen.t0=NOW; return; }
 if(g5) OPT.ch=5; else if(G&&G.ch===3&&G.sub==='sw'){ OPT.ch=2; OPT.ch2='sw'; OPT.swOpen=true; } else if(G&&G.ch===3&&G.sub==='hw'){ OPT.ch=2; OPT.ch2='hw'; } else if(G&&G.ch===3){ OPT.ch=3; OPT.ch3=G.sub; } else if(G&&G.ch===2){ OPT.ch=2; OPT.ch2='br'; } else if(G&&G.ch===4){ OPT.ch=4; OPT.ch4=G.sub==='hy'||G.sub==='hs'?G.sub:'pk'; } else if(G) OPT.ch=G.ch;
 TSTEP='opt'; }
+const mdNo=()=>S==='ch5'?5:G&&G.ch===3&&(G.sub==='sw'||G.sub==='hw')?2:G?G.ch:1;
 function goTitle(){ prReset(); TSTEP='home'; homeT=0; PAUSE=false; setFrozen(); stopVoice(); C=null; QZ=null; W5=null; CAP=null; S='title'; forceAll(); }
 const TD_HJ=['一','二','三'], TD_SX=[-110,-8,94], TD_SH=[150,178,206], TD_SW=[80,88,96], TD_CX=[-170,-40,110];
 function todayCrew(i,x,y){ return i===0?suitBear(x,y,{s:0.62,suit:'lee',arms:'pose',shadow:false}):kidO(i===1?'sugun':'lee',x,y,i===1?0.5:0.66,{wave:true}); }
