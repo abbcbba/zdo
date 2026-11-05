@@ -652,11 +652,14 @@ return g;
 }
 const JN = 7, JCS = 72, JBX = 640 - JN * JCS / 2, JBY = 178, J_TIME = 60, J_OPEN = 10;
 const J_COL = ['w', 'p', 'y', 'g', 'v'];
+const J_DAY = 10;
 const CHEER = ['잘한다!', '얼쑤!', '지화자!', '송편!', '최고!', '♥', '우와!', '꿀맛!', '한 입만!', '배고파…', '나도 줘!', '쫀득쫀득', '냠냠', '침 꼴깍',
 '송편 부자', '또 해 줘!', '천재다!', '엄지 척!', '반짝반짝', '곰 손 박수', '오오오!', '신난다!', '깨송편!', '콩송편!', '좋다~', '짝짝짝', '배불러', '한 판 더!'];
 function janToday() { const d = new Date(); return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`; }
 function janSongs() { try { const r = JSON.parse(localStorage.getItem('geo_songp') || 'null'); return r && r.d === janToday() ? r.n || 0 : 0; } catch (e) { return 0; } }
 const janOpen = () => janSongs() >= J_OPEN;
+function janPlays(v) { try { if (v === undefined) { const r = JSON.parse(localStorage.getItem('mini_jan_day') || 'null'); return r && r.d === janToday() ? r.n || 0 : 0; }
+localStorage.setItem('mini_jan_day', JSON.stringify({ d: janToday(), n: v })); } catch (e) { } return 0; }
 function janBest(v) { try { if (v === undefined) return +(localStorage.getItem('mini_jan_best') || 0); localStorage.setItem('mini_jan_best', String(v)); } catch (e) { } return 0; }
 const J_KIND = [['suit', 'king'], ['doll', 'blue'], ['gan', 'red'], ['suit', 'gl'], ['gan', 'blue'], ['doll', 'pink'], ['suit', 'kim'], ['gan', 'yel'],
 ['suit', 'lee'], ['doll', 'blue'], ['gan', 'white'], ['suit', 'jw'], ['doll', 'blue'], ['gan', 'black'], ['suit', 'y']];
@@ -742,7 +745,10 @@ while (!jFindMove(G));
 return G;
 }
 function janStart() {
-J = { crowdDirty: true, crowdDraws: J.crowdDraws || 0, G: jNewBoard(), left: J_TIME, tick: 0, score: 0, made: 0, combo: 0, ph: 'ready', t0: T, pick: null, drag: null, sw: null, pop: null, fl: [], banner: null,
+const played = janPlays();
+if (played >= J_DAY) { J = { crowdDirty: true, crowdDraws: J.crowdDraws || 0, ph: 'full', t0: T, fl: [] }; J_SEATS.forEach((s, i) => { s.pose = 'down'; s.until = 0; seatPose(i, 'up', 99); }); SND.jingle(); return; }
+janPlays(played + 1);
+J = { dayLeft: J_DAY - played - 1, crowdDirty: true, crowdDraws: J.crowdDraws || 0, G: jNewBoard(), left: J_TIME, tick: 0, score: 0, made: 0, combo: 0, ph: 'ready', t0: T, pick: null, drag: null, sw: null, pop: null, fl: [], banner: null,
 lastAct: T, nextIdle: T + 3, best: janBest(), newBest: false, over: null };
 J_SEATS.forEach(s => { s.pose = 'down'; s.until = 0; });
 SND.jingle();
@@ -854,7 +860,7 @@ J.banner = { t0: T, txt: '남은 송편 펑!' }; return true; }
 return false;
 }
 function janTick(dt) {
-crowdTick();
+crowdTick(); if (J.ph === 'full') return;
 const G = J.G;
 if (J.ph === 'ready' && T - J.t0 > 1.3) J.ph = 'idle';
 if (J.ph !== 'ready' && J.ph !== 'over' && J.left > 0) { J.left = Math.max(0, J.left - dt); const sec = Math.ceil(J.left); if (sec !== J.tick) { J.tick = sec; if (sec <= 5 && sec > 0) SND.click(); } if (J.left === 0 && J.ph === 'idle') janEndTurn(); }
@@ -911,11 +917,13 @@ let J_LAST = 0;
 function drawJan() {
 const dt = Math.min(0.05, Math.max(0, T - J_LAST)); J_LAST = T; NOW = T;
 janTick(dt); janLayer(true);
+if (J.ph === 'full') return janFull();
 const G = J.G;
 let g = '';
 J_SEATS.forEach((st, i) => hit(st.x - 30 * st.s, st.y - 130 * st.s, 60 * st.s, 130 * st.s, () => { seatPose(i, 'card', 2); SND.miu(); }));
 g += chorongPair();
 g += janPill(390, 70, 240, `점수 <tspan fill="${C_SEAL}">${J.score}</tspan>`) + janPill(650, 70, 240, `남은 시간 <tspan fill="${J.left <= 10 ? C_SEAL : '#2F62B0'}">${Math.ceil(J.left)}초</tspan>`);
+g += `<rect x="276" y="80" width="104" height="40" rx="20" fill="#FBF5E6" stroke="#8A5A36" stroke-width="2.5" opacity=".92"/><text x="328" y="108" font-family="Jua" font-size="20" text-anchor="middle" fill="${C_INK2}">남은 ${J.dayLeft}판</text>`;
 g += soundBtns(76, 98) + closeBtn();
 const w = JN * JCS;
 g += `<rect x="${JBX - 18}" y="${JBY - 18}" width="${w + 36}" height="${w + 36}" rx="26" fill="#9A6A3A" stroke="#5A3A20" stroke-width="5"/><rect x="${JBX - 6}" y="${JBY - 6}" width="${w + 12}" height="${w + 12}" rx="16" fill="#F6EBD2"/>`;
@@ -947,7 +955,7 @@ g += '</g>';
 J.fl.forEach(f => { const k = (T - f.t0) / 0.9; g += `<text x="${f.x}" y="${f.y - k * 50}" font-family="Jua" font-size="34" text-anchor="middle" fill="${C_SEAL}" stroke="#fff" stroke-width="6" paint-order="stroke" opacity="${(1 - k * k).toFixed(2)}">${f.txt}</text>`; });
 if (J.banner && T - J.banner.t0 < 1) { const k = (T - J.banner.t0), s = 1 + Math.max(0, 0.3 - k) * 1.5;
 g += `<text x="640" y="${JBY + 60}" font-family="Jua" font-size="${56 * s}" text-anchor="middle" fill="#E9B21C" stroke="#5A2A10" stroke-width="7" paint-order="stroke" opacity="${k > 0.7 ? (1 - k) / 0.3 : 1}">${J.banner.txt}</text>`; }
-if (J.ph === 'ready') g += janBanner('송편 잔치 시작!', '같은 색 송편 세 개를 줄 세워요');
+if (J.ph === 'ready') g += janBanner('송편 잔치 시작!', '같은 색 송편 세 개를 줄 세워요') + tx(640, 520, J.dayLeft ? `오늘 남은 잔치 ${J.dayLeft}판` : '오늘 마지막 잔치!', { fs: 26, c: C_SEAL });
 if (J.ph === 'mix') g += janBanner('송편을 다시 섞어요', '바꿀 곳이 없어요');
 if (J.ph === 'over') g += janOver();
 return g;
@@ -983,6 +991,18 @@ return `<rect x="440" y="370" width="400" height="120" rx="20" fill="#FBF5E6" st
 }
 const J_BYE = 8;
 function janBye() { if (J.bye) return; J.bye = true; byeMini(); }
+function janFull() {
+const k = Math.min(1, (T - J.t0) / 0.3), x = 410, y = 220, w = 460, h = 300, left = Math.max(0, Math.ceil(J_BYE - (T - J.t0)));
+hit(0, 0, W, H, () => { });
+let g = chorongPair() + soundBtns(76, 98) + `<g opacity="${k}"><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#3A1D12" opacity=".35"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`;
+g += tx(640, y + 66, '오늘 잔치는 끝!', { f: 'SM', fs: 44, c: C_SEAL });
+g += J_COL.map((c, i) => songP(560 + i * 40, y + 110 + Math.sin(T * 4 + i) * 3, 0.9, c)).join('');
+g += tx(640, y + 168, `오늘 ${J_DAY}판을 다 했어요 · 내일 또 만나요`, { fs: 26 });
+g += btn(x + w / 2 - 110, y + h - 92, 220, 64, '끝', () => janBye(), { col: '#FBE7A6', bd: '#B07E10', fs: 30 }) + `<text x="640" y="${y + h + 40}" font-family="Jua" font-size="22" text-anchor="middle" fill="#FFFDF6" stroke="#3A1D12" stroke-width="5" paint-order="stroke">${left}초 뒤에 ${BYE_TO()} 돌아가요</text></g>`;
+g += closeBtn();
+if (T - J.t0 > J_BYE) janBye();
+return g;
+}
 function janOver() {
 const k = Math.min(1, (T - J.over) / 0.3), x = 410, y = 230, w = 460, h = 330;
 hit(0, 0, W, H, () => { });
