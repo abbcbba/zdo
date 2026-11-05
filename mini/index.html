@@ -715,7 +715,7 @@ if (!el) { el = document.createElement('div'); el.id = 'jbg'; el.style.cssText =
 if (J.crowdDirty || !el.innerHTML) { el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" style="display:block">${janCrowdSVG()}</svg>`; J.crowdDirty = false; J.crowdDraws++; }
 }
 let J = { crowdDirty: true, crowdDraws: 0 };
-const J_ITEMS = ['jar', 'mal', 'siru', 'sun'];
+const J_ITEMS = ['jar', 'mal', 'siru', 'sun', 'cho'];
 const jItem = p => !!p && J_ITEMS.includes(p.k);
 const jPiece = k => ({ k: k || J_COL[rnd(5)], fy: 0, id: Math.random() });
 function jRuns(G) {
@@ -758,8 +758,10 @@ function janJarCell(set) {
 const L = [...set]; if (J.lastSw) for (const [r, c] of J.lastSw) if (set.has(r * JN + c)) return r * JN + c;
 return L.sort((a, b) => a - b)[Math.floor(L.length / 2)];
 }
-function janJarBoom(jr, jc, other) {
+function janTopColor() { const n = {}; J.G.flat().forEach(q => { if (q && !jItem(q)) n[q.k] = (n[q.k] || 0) + 1; }); return Object.keys(n).sort((a, b) => n[b] - n[a])[0] || 'jar'; }
+function janJarBoom(jr, jc, other, oi) {
 const G = J.G, set = new Set([jr * JN + jc]);
+if (other !== 'jar' && J_ITEMS.includes(other)) { other = janTopColor(); if (oi != null) set.add(oi); }
 for (let r = 0; r < JN; r++) for (let c = 0; c < JN; c++) if (other === 'jar' || G[r][c].k === other) set.add(r * JN + c);
 J.jarAt = null; janPop(set, true);
 J.banner = { t0: T, txt: '꿀단지 펑!' }; SND.jingle();
@@ -779,26 +781,44 @@ for (const i of set) { const r = Math.floor(i / JN), c = i % JN, k = at(r, c); i
 if (len(r, c, 0, -1, k) + len(r, c, 0, 1, k) >= 2 && len(r, c, -1, 0, k) + len(r, c, 1, 0, k) >= 2) return i; }
 return -1;
 }
+const J_BIG = ['mal', 'siru', 'cho'];
+function janMerge(a, b) {
+const G = J.G, [ar, ac] = a, [r, c] = b, pa = G[ar][ac], pb = G[r][c];
+if (!J_BIG.includes(pa.k) || !J_BIG.includes(pb.k)) return false;
+const set = new Set([ar * JN + ac, r * JN + c]), add = (rr, cc) => { if (rr >= 0 && cc >= 0 && rr < JN && cc < JN && G[rr][cc] && G[rr][cc].k !== 'jar') set.add(rr * JN + cc); };
+const ks = [pa.k, pb.k].sort().join('+'); let txt;
+if (ks.includes('cho')) { for (let d = -1; d <= 1; d++) for (let k = 0; k < JN; k++) { add(r + d, k); add(k, c + d); } txt = '큰 십자 쾅!'; }
+else if (ks === 'mal+mal') { for (let k = 0; k < JN; k++) { add(r, k); add(k, c); } txt = '십자 쾅!'; }
+else if (ks === 'mal+siru') { const dir = (pa.k === 'mal' ? pa : pb).dir; for (let d = -1; d <= 1; d++) for (let k = 0; k < JN; k++) dir === 'h' ? add(r + d, k) : add(k, c + d); txt = '세 줄 쾅!'; }
+else { for (let dr = -2; dr <= 2; dr++) for (let dc = -2; dc <= 2; dc++) add(r + dr, c + dc); txt = '큰 시루 펑!'; }
+janPop(set, true); J.merges = (J.merges || 0) + 1;
+J.banner = { t0: T, txt }; SND.jingle();
+J_SEATS.forEach((st, i) => { if (st.pose === 'down') seatPose(i, 'up', 1.6); }); cheerCards(4);
+return true;
+}
 function janMalExpand(set) {
-const G = J.G, done = new Set(); let n = 0, siru = 0, sun = 0, more = true;
+const G = J.G, done = new Set(); let n = 0, siru = 0, sun = 0, cho = 0, more = true;
 while (more) { more = false;
-for (const i of [...set]) { const r = Math.floor(i / JN), c = i % JN, p = G[r][c]; if (!p || done.has(i) || !['mal', 'siru', 'sun'].includes(p.k)) continue; done.add(i); more = true;
+for (const i of [...set]) { const r = Math.floor(i / JN), c = i % JN, p = G[r][c]; if (!p || done.has(i) || !['mal', 'siru', 'sun', 'cho'].includes(p.k)) continue; done.add(i); more = true;
 if (p.k === 'sun') { sun++; continue; }
+if (p.k === 'cho') { cho++; for (let k = 0; k < JN; k++) [r * JN + k, k * JN + c].forEach(j => { const q = G[Math.floor(j / JN)][j % JN]; if (q && q.k !== 'jar') set.add(j); }); continue; }
 if (p.k === 'siru') { siru++; for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) { const rr = r + dr, cc = c + dc; if (rr >= 0 && cc >= 0 && rr < JN && cc < JN && G[rr][cc] && G[rr][cc].k !== 'jar') set.add(rr * JN + cc); } continue; }
 n++; for (let k = 0; k < JN; k++) { const j = p.dir === 'h' ? r * JN + k : k * JN + c, q = G[Math.floor(j / JN)][j % JN]; if (q && q.k !== 'jar') set.add(j); } } }
-J.xSiru = siru; J.xSun = sun;
+J.xSiru = siru; J.xSun = sun; J.xCho = cho;
 return n;
 }
 function janPop(set, jar) {
-const mals = janMalExpand(set), sirus = J.xSiru, suns = J.xSun, big = mals || sirus;
+const mals = janMalExpand(set), sirus = J.xSiru, suns = J.xSun, chos = J.xCho, big = mals || sirus || chos;
 J.malAt = null; J.siruAt = null; if (J.left <= 0) jar = true;
 const bend = !jar && !big && set.size >= 5 ? jBend(set) : -1;
 if (bend >= 0) { J.jarAt = null; J.siruAt = bend; }
 else if (!jar && set.size >= 5 && !big) J.jarAt = janJarCell(set); else if (!jar) { J.jarAt = null; const r4 = !big && set.size === 4 && jRun4(set); if (r4) J.malAt = { at: janJarCell(r4.cells), dir: r4.dir }; }
 if (mals) { J.banner = { t0: T, txt: '떡메 쾅!' }; SND.whoosh(); }
 if (sirus) { J.banner = { t0: T, txt: '떡시루 펑!' }; SND.whoosh(); }
+if (chos) { J.banner = { t0: T, txt: '청사초롱 번쩍!' }; SND.whoosh(); }
 if (suns && J.left > 0) { J.left = Math.min(J_TIME, J.left + 5 * suns); J.banner = { t0: T, txt: `시간 +${5 * suns}초!` }; SND.jingle(); }
-J.combo++; const gain = set.size * 10 * J.combo; J.score += gain; J.made += set.size;
+J.combo++; if (J.combo === 3 && J.left > 0) J.choDue = (J.choDue || 0) + 1;
+const gain = set.size * 10 * J.combo; J.score += gain; J.made += set.size;
 let sx = 0, sy = 0; set.forEach(i => { sx += i % JN; sy += Math.floor(i / JN); });
 J.fl.push({ x: JBX + (sx / set.size + 0.5) * JCS, y: JBY + (sy / set.size + 0.5) * JCS, t0: T, txt: '+' + gain });
 J.pop = { set, t0: T }; J.ph = 'pop'; SND.bbyong(J.combo - 1);
@@ -828,7 +848,7 @@ function janLeftover() {
 const G = J.G; if ((J.bonusN || 0) >= 40) return false;
 for (let r = 0; r < JN; r++) for (let c = 0; c < JN; c++) { const p = G[r][c]; if (!jItem(p)) continue;
 J.bonusN = (J.bonusN || 0) + 1;
-if (p.k === 'jar') { const n = {}; G.flat().forEach(q => { if (!jItem(q)) n[q.k] = (n[q.k] || 0) + 1; }); const top = Object.keys(n).sort((a, b) => n[b] - n[a])[0] || 'jar'; janJarBoom(r, c, top); }
+if (p.k === 'jar') janJarBoom(r, c, janTopColor());
 else janPop(new Set([r * JN + c]), true);
 J.banner = { t0: T, txt: '남은 송편 펑!' }; return true; }
 return false;
@@ -842,7 +862,8 @@ if ((J.ph === 'swap' || J.ph === 'back') && T - J.sw.t0 > 0.17) {
 if (J.ph === 'back') { J.sw = null; J.ph = 'idle'; }
 else { const set = jRuns(G);
 const { a: [ar, ac], b: [br, bc] } = J.sw, ja = G[ar][ac].k === 'jar', jb = G[br][bc].k === 'jar';
-if (ja || jb) { J.sw = null; J.combo = 0; J.lastSw = null; ja ? janJarBoom(ar, ac, G[br][bc].k) : janJarBoom(br, bc, G[ar][ac].k); }
+if (ja || jb) { J.sw = null; J.combo = 0; J.lastSw = null; ja ? janJarBoom(ar, ac, G[br][bc].k, br * JN + bc) : janJarBoom(br, bc, G[ar][ac].k, ar * JN + ac); }
+else if (jItem(G[ar][ac]) && jItem(G[br][bc]) && (J.combo = 0, janMerge([ar, ac], [br, bc]))) { J.sw = null; J.lastSw = null; }
 else if (jItem(G[ar][ac]) || jItem(G[br][bc])) { J.sw = null; J.combo = 0; J.lastSw = null; const st = jRuns(G); [[ar, ac], [br, bc]].forEach(([r, c]) => { if (jItem(G[r][c])) st.add(r * JN + c); }); janPop(st, true); }
 else if (set.size) { J.lastSw = [J.sw.a, J.sw.b]; J.sw = null; J.combo = 0; janPop(set); }
 else { const { a: [r, c], b: [r2, c2] } = J.sw; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]]; J.sw = { a: J.sw.b, b: J.sw.a, t0: T }; J.ph = 'back'; SND.wrong(); } }
@@ -860,6 +881,8 @@ if (!moving) { const set = jRuns(G); if (set.size) janPop(set); else janEndTurn(
 if (J.ph === 'mix' && T - J.t0 > 0.9) { J.G = jNewBoard(); J.G.forEach((row, r) => row.forEach(p => p.fy = r - JN)); J.ph = 'fall'; SND.whoosh(); }
 if (J.ph === 'idle' && J.left > 0 && (J.sunN || 0) < 2 && J.left <= [40, 20][J.sunN || 0]) { const L = []; G.forEach((row, r) => row.forEach((q, c) => { if (!jItem(q)) L.push([r, c]); }));
 if (L.length) { const [r, c] = L[rnd(L.length)], q = jPiece('sun'); q.fy = r; q.born = T; G[r][c] = q; SND.bbyong(4); } J.sunN = (J.sunN || 0) + 1; }
+if (J.ph === 'idle' && J.left > 0 && J.choDue > 0) { const L = []; G.forEach((row, r) => row.forEach((q, c) => { if (!jItem(q)) L.push([r, c]); }));
+if (L.length) { const [r, c] = L[rnd(L.length)], q = jPiece('cho'); q.fy = r; q.born = T; G[r][c] = q; J.chos = (J.chos || 0) + 1; J.banner = { t0: T, txt: '청사초롱 쏙!' }; SND.bbyong(6); } J.choDue--; }
 if (J.ph === 'idle' && J.left > 0 && T > J.nextIdle) { cheerCards(1); J.nextIdle = T + 4 + Math.random() * 3; }
 J.fl = J.fl.filter(f => T - f.t0 < 0.9);
 }
@@ -915,6 +938,7 @@ if (J.pick && J.pick[0] === r && J.pick[1] === c && J.ph === 'idle') g += `<circ
 const wig = hint && hint.some(([a, b]) => a === r && b === c) ? Math.sin(T * 12) * 4 : 0;
 g += `<g opacity="${op.toFixed(2)}">` + (p.k === 'jar' ? honeyJar(cx + wig, cy + 2, JCS / 40 * 1.15 * (p.born && T - p.born < 0.35 ? 0.4 + (T - p.born) / 0.35 * 0.6 : 1 + Math.sin(T * 5) * 0.04))
 : p.k === 'siru' ? siru(cx + wig, cy, JCS / 40 * (p.born && T - p.born < 0.35 ? 0.4 + (T - p.born) / 0.35 * 0.6 : 1 + Math.sin(T * 5) * 0.04), T)
+: p.k === 'cho' ? choItem(cx + wig, cy, JCS / 40 * (p.born && T - p.born < 0.35 ? 0.4 + (T - p.born) / 0.35 * 0.6 : 1 + Math.sin(T * 5) * 0.04))
 : p.k === 'sun' ? sunItem(cx + wig, cy, JCS / 40 * (p.born && T - p.born < 0.35 ? 0.4 + (T - p.born) / 0.35 * 0.6 : 1 + Math.sin(T * 5) * 0.04))
 : p.k === 'mal' ? ddeokme(cx + wig, cy, JCS / 40 * (p.born && T - p.born < 0.35 ? 0.4 + (T - p.born) / 0.35 * 0.6 : 1 + Math.sin(T * 5) * 0.04), p.dir) : songP(cx + wig, cy + 3, sc, p.k)) + '</g>';
 if (popping) g += sparkle(cx, cy, (T - J.pop.t0) / 0.3);
@@ -940,6 +964,10 @@ return `<g transform="translate(${x},${y}) scale(${s})"><circle r="20" fill="#FF
 + `<path d="M-14,-2 Q-24,-4 -24,-12 M14,-2 Q24,-4 24,-12" stroke="#4A2A16" stroke-width="5" fill="none" stroke-linecap="round"/><path d="M-14,-2 Q-24,-4 -24,-12 M14,-2 Q24,-4 24,-12" stroke="#8A5430" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
 + `<path d="M-20,-8 Q0,-11 20,-8 L12,15 Q0,18 -12,15Z" fill="#7A4626" stroke="#3A1E0E" stroke-width="2.4" stroke-linejoin="round"/><ellipse cx="0" cy="-8" rx="20" ry="3.4" fill="#5A321A" stroke="#3A1E0E" stroke-width="2"/>`
 + `<path d="M-16,2 q2,3 4,0 q2,3 4,0 q2,3 4,0 q2,3 4,0 q2,3 4,0 q2,3 4,0 q2,3 4,0 q2,3 4,0" stroke="#C89A6A" stroke-width="1.5" fill="none"/><ellipse cx="-11" cy="0" rx="2.2" ry="5" fill="#fff" opacity=".25"/></g>`;
+}
+function choItem(x, y, s) {
+return `<g transform="translate(${x},${y}) scale(${s})"><circle r="20" fill="#FFE07A" opacity=".55"/><path d="M-19,0 H19 M0,-19 V19" stroke="#FFF6C8" stroke-width="5" stroke-linecap="round" opacity=".8"/>`
++ chorong(0, -20, 0.31, { len: 0, lit: 0.8, swing: Math.sin(T * 3) * 6 }) + '</g>';
 }
 function sunItem(x, y, s) {
 return `<g transform="translate(${x},${y}) scale(${s})"><circle r="20" fill="#FFE07A" opacity=".55"/>${sundial(0, -5, 0.3)}</g>`;
