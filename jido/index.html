@@ -6258,7 +6258,7 @@ g+=suitBear(520,y+330+hp,{suit:'y',s:1.25,arms:'up'});
 const nS=two?JAN_N:GH_N; for(let i=0;i<nS;i++){ const an=Math.PI*(1.15+i*0.7/(nS-1)), r=104; g+=songP(520+Math.cos(an)*r,y+214+Math.sin(an)*r*0.62+Math.sin(t*4+i)*3,1.05,spCol(i)); }
 const goMini=q=>()=>{ SFX.whoosh(); GHASK=null; try{ window.open('../mini/?from=jido'+q,'_blank'); }catch(e){} };
 if(two) g+=btn3d(x+18,y+h-86,116,60,'곰 학당','red',goMini(''),{fam:'BHS',fs:22,dep:5})+btn3d(x+140,y+h-86,116,60,'송편 잔치','yellow',goMini('&g=jan'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+262,y+h-86,116,60,'곰 스도쿠','blue',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+262,y+h-86,116,60,'곰 서원','blue',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
 +btn3d(x+384,y+h-86,124,60,'곰 국악단','red',goMini('&g=gak'),{fam:'BHS',fs:22,dep:5})
 +btn3d(x+514,y+h-86,108,60,'다음에','white',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:22,dep:5});
 else g+=btn3d(x+70,y+h-86,170,60,'곰 학당','red',goMini(''),{fam:'BHS',fs:28,dep:5})
