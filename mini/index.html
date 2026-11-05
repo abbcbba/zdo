@@ -2041,7 +2041,7 @@ g += `<g opacity="${k}">` + tx(361, 200, '알아 두면 좋아요', { f: 'SM', f
 + `<rect x="120" y="228" width="482" height="250" rx="16" fill="${P0.soft}" stroke="${col}" stroke-width="2.5"/>`;
 dalWrap(DAL_NOTE[DL.pg], 15).forEach((l, i) => g += tx(361, 290 + i * 44, l, { f: 'SM', fs: 27, c: C_INK }));
 g += tx(361, 528, '채운 칸을 누르면 크게 볼 수 있어요', { fs: 20, c: C_INK2 }) + `</g>`;
-if (DL.pg < DAL_PAGES.length - 1) g += btn(256, 556, 210, 58, '다음 쪽 ▶', () => dalNext(1), { fs: 26, col: P0.soft, bd: col, f: 'SM' });
+if (DL.pg < DAL_PAGES.length - 1) g += btn(256, 556, 210, 58, '다음 쪽', () => dalNext(1), { fs: 26, col: P0.soft, bd: col, f: 'SM' });
 else g += btn(236, 556, 250, 58, '다 채운 표 보기', () => { DL.ph = 'done'; DL.t0 = T; }, { fs: 24, col: P0.soft, bd: col, f: 'SM' });
 }
 { const hop = DL.fly || (DL.noteT && T - DL.noteT < 1.2);
@@ -2595,9 +2595,7 @@ if (sub) { const sw = sub.length * 17 + 40; g += `<rect x="${W / 2 - sw / 2}" y=
 return g;
 }
 function backBtn() {
-const x = 46, y = 70, h = 52, cx = x + 32, cy = y + h / 2;
-const icon = `<circle cx="${cx}" cy="${cy}" r="17" fill="#F3E6CC" stroke="#8A5A36" stroke-width="2"/><path d="M${cx + 5},${cy - 9} L${cx - 8},${cy} L${cx + 5},${cy + 9}Z" fill="${C_INK}" stroke="${C_INK}" stroke-width="3" stroke-linejoin="round"/>`;
-return pill(x, y, 200, '간지 바퀴', () => go('wheel', { y: S === 'calc' ? P.c * 100 + P.t * 10 + P.o : undefined }), { fs: 25, h, icon });
+return pill(46, 70, 180, '간지 바퀴', () => go('wheel', { y: S === 'calc' ? P.c * 100 + P.t * 10 + P.o : undefined }), { fs: 25 });
 }
 function sparkle(x, y, t) {
 if (t < 0 || t > 1) return '';
@@ -2669,12 +2667,6 @@ let g = '';
 teethAt.forEach(a => { g += `<g transform="translate(${c.x},${c.y}) rotate(${a})"><rect x="${c.r - 10}" y="-13" width="26" height="26" rx="6" fill="${wood}" stroke="${rim}" stroke-width="3"/></g>`; });
 return g + `<circle cx="${c.x}" cy="${c.y}" r="${c.r}" fill="${wood}" stroke="${rim}" stroke-width="4"/><circle cx="${c.x}" cy="${c.y}" r="${c.r - 12}" fill="#F8EFDA" stroke="${rim}" stroke-width="2"/>`;
 }
-function roundBtn(x, y, r, dir, cb, o = {}) {
-hit(x - r, y - r, r * 2, r * 2, cb);
-const k = dir < 0 ? -1 : 1, col = o.col || '#FFFDF6';
-return `<circle cx="${x}" cy="${y + 4}" r="${r}" fill="#8A5A36" opacity=".45"/><circle cx="${x}" cy="${y}" r="${r}" fill="${col}" stroke="#8A5A36" stroke-width="3"/>`
-+ `<path d="M${x - 9 * k},${y - 15} L${x + 13 * k},${y} L${x - 9 * k},${y + 15}Z" fill="${C_INK}" stroke="${C_INK}" stroke-width="4" stroke-linejoin="round"/>`;
-}
 function chevron(x, y, dir, cb, col, hb = [80, 160]) {
 hit(x - hb[0] / 2, y - hb[1] / 2, hb[0], hb[1], cb);
 return `<path d="M${x - 9 * dir},${y - 26} L${x + 11 * dir},${y} L${x - 9 * dir},${y + 26}" stroke="${col || '#8A5A36'}" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`;
@@ -2719,7 +2711,7 @@ if (P.landT != null && T - P.landT < 0.7) g += sparkle(CX, WL.y - 40, (T - P.lan
 const busy = () => (P.intro && moving) || !!P.pop;
 const step = d => { if (busy() || P.y + d < Y_MIN || P.y + d > Y_MAX) return; spinBy(d, 0.45, false, 'step'); };
 if (P.stepLand != null && !moving && !P.pop && T - P.stepLand > 0.8) openPop('pick');
-g += roundBtn(140, WL.y, 46, -1, () => step(-1)) + roundBtn(1140, WR.y, 46, 1, () => step(1));
+g += chevron(140, WL.y, -1, () => step(-1), '#8A5A36', [110, 180]) + chevron(1140, WR.y, 1, () => step(1), '#8A5A36', [110, 180]);
 hit(WL.x - WL.r, WL.y - WL.r, WL.r * 2 - 30, WL.r * 2, () => step(-1)); hit(WR.x - WR.r + 30, WR.y - WR.r, WR.r * 2, WR.r * 2, () => step(1));
 const now = () => { if (!busy()) spinToYear(THIS_YEAR, { dur: 1.6 }); };
 const pick = () => { if (busy()) return; let y; do y = rnd(3) === 0 ? EVENTS[rnd(EVENTS.length)][1] : Y_MIN + rnd(Y_MAX - Y_MIN + 1); while (y === P.y); SND.roll(); spinToYear(y, { mystery: true }); };
