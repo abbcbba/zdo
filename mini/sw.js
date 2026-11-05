@@ -1,5 +1,5 @@
-const C='mini-r3-9645f36db798', A='mini-assets';
-const FILES=['./','index.html','manifest.webmanifest','icon-d5efb78a-180.png','icon-d5efb78a-192.png','icon-d5efb78a-512.png'];
+const C='mini-r3-1bbf5855aeda', A='mini-assets';
+const FILES=['./','index.html','manifest.webmanifest','icon-ec100e5e-180.png','icon-ec100e5e-192.png','icon-ec100e5e-512.png'];
 const ASSETS=[];
 let filling=null;
 function fill(){ if(filling) return filling; filling=caches.open(A).then(async c=>{
