@@ -6228,7 +6228,7 @@ if(!n) g+=`<text x="${x+w/2}" y="${y+64}" font-size="17" text-anchor="middle" fi
 for(let i=0;i<n;i++) g+=songP(x+38+(i%per)*36,y+66+Math.floor(i/per)*38,0.9,spCol(i));
 const by=y+h+10;
 if(n>=GH_N){ const k=1+0.04*Math.sin(NOW*4);
-g+=`<g transform="translate(${x+w/2},${by+28}) scale(${k}) translate(${-(x+w/2)},${-(by+28)})">`+btn3d(x,by,w,56,'미니게임 열림!','yellow',()=>{ SFX.tap(); GHASK={t0:NOW}; },{fam:'BHS',fs:26,dep:5})+`</g>`; }
+g+=`<g transform="translate(${x+w/2},${by+28}) scale(${k}) translate(${-(x+w/2)},${-(by+28)})">`+btn3d(x,by,w,56,'곰 놀이 마을 열림!','yellow',()=>{ SFX.tap(); GHASK={t0:NOW}; },{fam:'BHS',fs:24,dep:5})+`</g>`; }
 else if(n>0) g+=`<path d="${hanBoxD(x,by,w,40,8)}" fill="#FBF5E6" opacity=".9" stroke="#C9A46A" stroke-width="2"/><text x="${x+w/2}" y="${by+27}" font-size="18" text-anchor="middle" fill="#8A5A36">송편 ${GH_N}개면 곰 학당이 열려요 (${n}/${GH_N})</text>`;
 spPanel.gy=n<JAN_N?by+(n>=GH_N?68:n>0?50:0):null;
 return g; }
@@ -6258,13 +6258,13 @@ const hp=Math.abs(Math.sin(t*3.2))*-14;
 g+=suitBear(520,y+330+hp,{suit:'y',s:1.25,arms:'up'});
 const nS=two?JAN_N:GH_N; for(let i=0;i<nS;i++){ const an=Math.PI*(1.15+i*0.7/(nS-1)), r=104; g+=songP(520+Math.cos(an)*r,y+214+Math.sin(an)*r*0.62+Math.sin(t*4+i)*3,1.05,spCol(i)); }
 const goMini=q=>()=>{ SFX.whoosh(); GHASK=null; try{ window.open('../mini/?from=jido'+q,'_blank'); }catch(e){} };
-if(two) g+=btn3d(x+18,y+h-86,116,60,'곰 학당','sp_w',goMini(''),{fam:'BHS',fs:22,dep:5})+btn3d(x+140,y+h-86,116,60,'송편 잔치','sp_p',goMini('&g=jan'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+262,y+h-86,116,60,'곰 서원','sp_y',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+384,y+h-86,124,60,'곰 국악단','sp_g',goMini('&g=gak'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+514,y+h-86,108,60,'다음에','sp_v',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:22,dep:5});
-else g+=btn3d(x+70,y+h-86,170,60,'곰 학당','sp_w',goMini(''),{fam:'BHS',fs:28,dep:5})
-+btn3d(x+250,y+h-86,170,60,'곰 국악단','sp_p',goMini('&g=gak'),{fam:'BHS',fs:28,dep:5})
-+btn3d(x+430,y+h-86,140,60,'다음에','sp_y',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
+if(two) g+=btn3d(x+18,y+h-86,114,60,'곰 학당','sp_p',goMini(''),{fam:'BHS',fs:22,dep:5})+btn3d(x+138,y+h-86,114,60,'송편 잔치','sp_y',goMini('&g=jan'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+258,y+h-86,114,60,'곰 서원','sp_g',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+378,y+h-86,122,60,'곰 국악단','sp_v',goMini('&g=gak'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+516,y+h-86,106,60,'다음에','sp_w',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:22,dep:5});
+else g+=btn3d(x+60,y+h-86,170,60,'곰 학당','sp_p',goMini(''),{fam:'BHS',fs:28,dep:5})
++btn3d(x+240,y+h-86,170,60,'곰 국악단','sp_y',goMini('&g=gak'),{fam:'BHS',fs:28,dep:5})
++btn3d(x+436,y+h-86,140,60,'다음에','sp_w',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
 return g+`</g>`; }
 function hunStamp(x,y,o,s){ return `<g transform="translate(${x},${y}) scale(${s}) rotate(-8)"><rect x="-52" y="-52" width="104" height="104" rx="14" fill="${o?'#C4161C':'#2B3A67'}"/><rect x="-44" y="-44" width="88" height="88" rx="10" fill="none" stroke="#FBF5E6" stroke-width="3"/>`
 +(o?`<circle cx="0" cy="0" r="27" fill="none" stroke="#FBF5E6" stroke-width="11"/>`:`<path d="M-24,-24 L24,24 M24,-24 L-24,24" stroke="#FBF5E6" stroke-width="11" stroke-linecap="round"/>`)+`</g>`; }
