@@ -1673,7 +1673,8 @@ function layer(el,fps,fn){ if(el._force||!el._next||NOW>=el._next){ el._next=NOW
 function forceAll(){ for(const k in L) L[k]._force=true; }
 function button(x,y,w,h,cb,o={}){ BTN.push({x,y,w,h,cb,press:!!o.press,hold:o.hold||0}); return ''; }
 let PRESS=null; const RT=()=>performance.now()/1000;
-const BTN_COL={red:['#C8402F','#7A2016'],blue:['#2F5AA8','#1B356B'],green:['#2F8F7A','#1D5A4D'],yellow:['#F6D36A','#A8741C'],white:['#FBF5E6','#8A5A36'],navy:['#3A2416','#1E120A'],orange:['#D9773E','#8A4318'],purple:['#6B3A5A','#3A1D30']};
+const BTN_COL={red:['#C8402F','#7A2016'],blue:['#2F5AA8','#1B356B'],green:['#2F8F7A','#1D5A4D'],yellow:['#F6D36A','#A8741C'],white:['#FBF5E6','#8A5A36'],navy:['#3A2416','#1E120A'],orange:['#D9773E','#8A4318'],purple:['#6B3A5A','#3A1D30'],
+sp_w:['#F7F2E4','#B9AA8A'],sp_p:['#F5B3C3','#C67A8E'],sp_y:['#F4D47C','#C29A38'],sp_g:['#9FBA7A','#5E7D44'],sp_v:['#BDA2D0','#7D5F94']};
 function hanBoxD(x,y,w,h,c=10){ c=Math.max(0,Math.min(c,w/4,h/4)); return `M${x+c},${y} H${x+w-c} L${x+w},${y+c} V${y+h-c} L${x+w-c},${y+h} H${x+c} L${x},${y+h-c} V${y+c}Z`; }
 function enText(x,y,txt,fs,fill='#FFE07A',o={}){
 const a=o.anchor||'middle', sw=o.sw??Math.max(3,fs*0.13), sh=o.sh??Math.max(3,fs*0.07), st=o.stroke||'#16264F';
@@ -1683,15 +1684,15 @@ return `<g class="${o.k==='sm'?'sm':o.k?'bhs':'fr'}"><text x="${x}" y="${y+sh}" 
 function btn3d(x,y,w,h,label,col,cb,o={}){
 const [f,d]=BTN_COL[col], dep=o.dep||8, c=h>=80?16:h>=56?11:8;
 const pr=PRESS&&PRESS.x===x&&PRESS.y===y&&RT()-PRESS.t<0.18?dep-2:0;
-const fam=o.fam||'Jua', hh=o.sub?h*0.72:h;
+const fam=o.fam||'Jua', hh=o.sub?h*0.72:h, lite=col==='white'||col==='yellow'||col.startsWith('sp_');
 const fs=Math.min(o.fs||hh*0.6,(w-34-(o.icon?h*0.6:0))/Math.max(1,tw(label,1,fam)));
 let g=`<path d="${hanBoxD(x,y+dep,w,h,c)}" fill="${d}"/>`;
 g+=`<g transform="translate(0,${pr})"><path d="${hanBoxD(x,y,w,h,c)}" fill="${f}" stroke="${o.stroke||d}" stroke-width="${o.sw||3}"/>`;
-g+=`<path d="${hanBoxD(x+6,y+6,w-12,h-12,c-3)}" fill="none" stroke="${col==='white'||col==='yellow'?'#C9A86A':'#F5D77A'}" stroke-width="1.5" opacity=".7"/>`;
-const tc=o.tc||(col==='white'||col==='yellow'?'#3A1D12':'#FFF6E0'), lw=tw(label,fs,fam), iw=o.icon?h*0.5:0, gap=o.icon?14:0;
+g+=`<path d="${hanBoxD(x+6,y+6,w-12,h-12,c-3)}" fill="none" stroke="${lite?'#C9A86A':'#F5D77A'}" stroke-width="1.5" opacity=".7"/>`;
+const tc=o.tc||(lite?'#3A1D12':'#FFF6E0'), lw=tw(label,fs,fam), iw=o.icon?h*0.5:0, gap=o.icon?14:0;
 const x0=x+w/2-(lw+iw+gap)/2, my=o.sub?y+h*0.42:y+h/2, ix=o.iconRight?x0+lw+gap+iw/2:x0+iw/2, lx=o.iconRight?x0+lw/2:x0+iw+gap+lw/2;
 if(o.icon) g+=icon(o.icon,ix,y+h/2,iw,tc);
-g+=fam==='LIL'||fam==='BHS'?enText(lx,my+fs*0.36,label,fs,tc,{k:fam==='BHS',stroke:col==='white'||col==='yellow'?'#fff':'#3A1D12',sw:fs*0.14,sh:fs*0.06})
+g+=fam==='LIL'||fam==='BHS'?enText(lx,my+fs*0.36,label,fs,tc,{k:fam==='BHS',stroke:lite?'#fff':'#3A1D12',sw:fs*0.14,sh:fs*0.06})
 :`<text x="${lx}" y="${my+fs*0.36}" font-size="${fs}" text-anchor="middle" fill="${tc}">${esc(label)}</text>`;
 if(o.sub) g+=`<text x="${lx}" y="${y+h*0.84}" font-size="${Math.min(h*0.2,26)}" text-anchor="middle" fill="${tc}" opacity=".9">${esc(o.sub)}</text>`;
 g+=`</g>`;
@@ -6257,13 +6258,13 @@ const hp=Math.abs(Math.sin(t*3.2))*-14;
 g+=suitBear(520,y+330+hp,{suit:'y',s:1.25,arms:'up'});
 const nS=two?JAN_N:GH_N; for(let i=0;i<nS;i++){ const an=Math.PI*(1.15+i*0.7/(nS-1)), r=104; g+=songP(520+Math.cos(an)*r,y+214+Math.sin(an)*r*0.62+Math.sin(t*4+i)*3,1.05,spCol(i)); }
 const goMini=q=>()=>{ SFX.whoosh(); GHASK=null; try{ window.open('../mini/?from=jido'+q,'_blank'); }catch(e){} };
-if(two) g+=btn3d(x+18,y+h-86,116,60,'곰 학당','red',goMini(''),{fam:'BHS',fs:22,dep:5})+btn3d(x+140,y+h-86,116,60,'송편 잔치','yellow',goMini('&g=jan'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+262,y+h-86,116,60,'곰 서원','blue',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+384,y+h-86,124,60,'곰 국악단','red',goMini('&g=gak'),{fam:'BHS',fs:22,dep:5})
-+btn3d(x+514,y+h-86,108,60,'다음에','white',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:22,dep:5});
-else g+=btn3d(x+70,y+h-86,170,60,'곰 학당','red',goMini(''),{fam:'BHS',fs:28,dep:5})
-+btn3d(x+250,y+h-86,170,60,'곰 국악단','yellow',goMini('&g=gak'),{fam:'BHS',fs:28,dep:5})
-+btn3d(x+430,y+h-86,140,60,'다음에','white',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
+if(two) g+=btn3d(x+18,y+h-86,116,60,'곰 학당','sp_w',goMini(''),{fam:'BHS',fs:22,dep:5})+btn3d(x+140,y+h-86,116,60,'송편 잔치','sp_p',goMini('&g=jan'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+262,y+h-86,116,60,'곰 서원','sp_y',goMini('&g=sdk'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+384,y+h-86,124,60,'곰 국악단','sp_g',goMini('&g=gak'),{fam:'BHS',fs:22,dep:5})
++btn3d(x+514,y+h-86,108,60,'다음에','sp_v',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:22,dep:5});
+else g+=btn3d(x+70,y+h-86,170,60,'곰 학당','sp_w',goMini(''),{fam:'BHS',fs:28,dep:5})
++btn3d(x+250,y+h-86,170,60,'곰 국악단','sp_p',goMini('&g=gak'),{fam:'BHS',fs:28,dep:5})
++btn3d(x+430,y+h-86,140,60,'다음에','sp_y',()=>{ SFX.tap(); GHASK=null; },{fam:'BHS',fs:28,dep:5});
 return g+`</g>`; }
 function hunStamp(x,y,o,s){ return `<g transform="translate(${x},${y}) scale(${s}) rotate(-8)"><rect x="-52" y="-52" width="104" height="104" rx="14" fill="${o?'#C4161C':'#2B3A67'}"/><rect x="-44" y="-44" width="88" height="88" rx="10" fill="none" stroke="#FBF5E6" stroke-width="3"/>`
 +(o?`<circle cx="0" cy="0" r="27" fill="none" stroke="#FBF5E6" stroke-width="11"/>`:`<path d="M-24,-24 L24,24 M24,-24 L-24,24" stroke="#FBF5E6" stroke-width="11" stroke-linecap="round"/>`)+`</g>`; }
