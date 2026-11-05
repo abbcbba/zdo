@@ -1,4 +1,4 @@
-const C='mini-r3-887d4a44914d', A='mini-assets';
+const C='mini-r3-8abb606283d6', A='mini-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-ec100e5e-180.png','icon-ec100e5e-192.png','icon-ec100e5e-512.png'];
 const ASSETS=[];
 let filling=null;
