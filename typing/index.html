@@ -83,16 +83,16 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .pi .c { position: absolute; right: 16px; top: 16px; font-size: 14px; color: #9BC0FF; }
 
 
-#back { left: 26px; top: 22px; font-size: 19px; color: #8F9AB5; padding: 4px 8px; }
-#ptitle { left: 170px; top: 16px; font-size: 30px; font-weight: 700; white-space: nowrap; }
+#back { left: 26px; top: 38px; font-size: 19px; color: #8F9AB5; padding: 4px 8px; }
+#ptitle { left: 170px; top: 32px; font-size: 30px; font-weight: 700; white-space: nowrap; }
 #ptitle span { font-size: 20px; font-weight: 400; color: #8F9AB5; }
-#stats { right: 150px; top: 14px; display: flex; gap: 28px; text-align: center; }
+#stats { right: 150px; top: 28px; display: flex; gap: 28px; text-align: center; }
 #stats .h { font-size: 14px; color: #8F9AB5; }
 #stats .v { font-size: 28px; font-weight: 700; min-width: 64px; }
-#nextpl { right: 34px; top: 12px; width: 92px; text-align: center; }
+#nextpl { right: 34px; top: 24px; width: 92px; text-align: center; }
 #nextpl img { height: 60px; max-width: 92px; }
 #nextpl div { font-size: 13px; color: #8F9AB5; margin-top: 2px; }
-#bar { left: 120px; top: 120px; width: 940px; height: 6px; border-radius: 3px; background: #1D2A4A; }
+#bar { left: 120px; top: 128px; width: 940px; height: 6px; border-radius: 3px; background: #1D2A4A; }
 #bar i { display: block; height: 100%; width: 0; border-radius: 3px; background: #4F8DFF; transition: width .2s; }
 #area { left: 0; top: 136px; width: 1180px; height: 300px; }
 .tile { position: absolute; display: flex; align-items: center; justify-content: center; border-radius: 16px; background: #16213D; border: 3px solid #26365C; font-weight: 700; color: #F3F5FA; transition: all .12s; }
@@ -161,6 +161,10 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .cr b { flex: 0 0 150px; color: #9BC0FF; font-weight: 700; } .cr span { flex: 1; color: #DDE3F0; }
 .cr:not(:has(b)) span { margin-left: 168px; margin-top: -10px; }
 #credC { position: absolute; left: 0; right: 0; bottom: 26px; text-align: center; font-size: 14px; color: #8F9AB5; }
+
+
+.nextring { animation: ring 1.6s ease-in-out infinite; }
+@keyframes ring { 0%, 100% { opacity: .9; } 50% { opacity: .2; } }
 </style></head>
 <body><div id="safe" style="position:fixed;left:0;top:0;width:0;height:0;visibility:hidden;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)"></div><div id="stage">
 <div id="sky"></div>
@@ -279,7 +283,7 @@ const POEMS = [
 ] },
 { id: 'jindallae', title: '진달래꽃', by: '김소월', pages: [['나 보기가 역겨워', '가실 때에는', '말없이 고이 보내 드리우리다.', '영변에 약산', '진달래꽃', '아름 따다 가실 길에 뿌리우리다.', '가시는 걸음걸음', '놓인 그 꽃을', '사뿐히 즈려밟고 가시옵소서.', '나 보기가 역겨워', '가실 때에는', '죽어도 아니 눈물 흘리우리다.']] },
 ];
-const PLANETS = [['sun', '해'], ['planet_mercury', '수성'], ['planet_venus', '금성'], ['planet_earth', '지구'], ['planet_mars', '화성'], ['planet_jupiter', '목성'], ['planet_saturn', '토성'], ['planet_uranus', '천왕성'], ['planet_neptune', '해왕성']];
+const PLANETS = [['sun', '태양'], ['planet_mercury', '수성'], ['planet_venus', '금성'], ['planet_earth', '지구'], ['planet_mars', '화성'], ['planet_jupiter', '목성'], ['planet_saturn', '토성'], ['planet_uranus', '천왕성'], ['planet_neptune', '해왕성']];
 if (false) module.exports = { JARI, JARI_N, WORDS_SPACE, WORDS_LIFE, WORD_N, SENTENCES, SENT_N, POEMS, PLANETS };
 const $ = id => document.getElementById(id);
 const W = 1180, H = 820;
@@ -288,6 +292,7 @@ const FING = { p: '#B48CFF', r: '#4FC3F7', m: '#6EE7A8', i: '#FFC53D', t: '#8F9A
 const FNAME = { p: '새끼', r: '약지', m: '중지', i: '검지', t: '엄지' };
 const rnd = n => Math.floor(Math.random() * n);
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const ro = w => { const c = w.charCodeAt(w.length - 1) - 0xAC00, j = c % 28; return j === 0 || j === 8 ? '로' : '으로'; };
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const SKEY = 'byeolTaja1';
 let S = { trip: 0, stars: 0, best: {}, page: {}, today: '', todayN: 0, snd: 1 };
@@ -346,7 +351,9 @@ if (k) pl += `<div class="plname${done ? ' done' : ''}" style="left:${x}px;top:$
 });
 $('map').innerHTML = `<svg class="ab" width="${W}" height="580">${orb}<g id="belt">${belt}</g><path id="trail" fill="none" stroke="${C.blue}" stroke-width="2.5" stroke-dasharray="2 8" stroke-linecap="round" opacity=".8"/></svg>${pl}<img id="rocket" src="${ART.boy_riding_sword_rocket}">`;
 placeRocket(at, false);
-$('trip').innerHTML = `<span class="mist">여행 기록</span> &nbsp;지금 <b>${PLANETS[at][1]}</b> · 다음 ${PLANETS[(at + 1) % 9][1]}<br><span class="mist">다 돈 바퀴</span> &nbsp;★ ${S.stars} &nbsp;·&nbsp; <span class="mist">오늘</span> ${S.todayN}판`;
+const nx = (at + 1) % 9, [x1, y1] = plPos(at), [x2, y2] = plPos(nx), rr = PW[nx] / 2 + 12;
+$('map').insertAdjacentHTML('beforeend', `<svg class="ab" width="${W}" height="580" style="pointer-events:none"><path d="M${x1} ${y1} Q ${(x1 + x2) / 2} ${Math.min(y1, y2) - 70} ${x2} ${y2}" fill="none" stroke="#9BC0FF" stroke-width="2" stroke-dasharray="1 9" stroke-linecap="round" opacity=".7"/><circle class="nextring" cx="${x2}" cy="${y2}" r="${rr}" fill="none" stroke="#9BC0FF" stroke-width="2.5"/></svg>`);
+$('trip').innerHTML = `<span class="mist">여행 기록</span> &nbsp;지금 <b>${PLANETS[at][1]}</b> · 한 판 마치면 <b style="color:#9BC0FF">${PLANETS[(at + 1) % 9][1]}</b>${ro(PLANETS[(at + 1) % 9][1])}<br><span class="mist">다 돈 바퀴</span> &nbsp;★ ${S.stars} &nbsp;·&nbsp; <span class="mist">오늘</span> ${S.todayN}판`;
 }
 function plPop(el, k) {
 ac(); el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
