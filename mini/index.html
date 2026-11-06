@@ -791,11 +791,28 @@ return G;
 function janStart() {
 const played = janPlays();
 if (played >= J_DAY) { J = { crowdDirty: true, crowdDraws: J.crowdDraws || 0, ph: 'full', t0: T, fl: [] }; J_SEATS.forEach((s, i) => { s.pose = 'down'; s.until = 0; seatPose(i, 'up', 99); }); SND.jingle(); return; }
-janPlays(played + 1);
-J = { dayLeft: J_DAY - played - 1, crowdDirty: true, crowdDraws: J.crowdDraws || 0, G: jNewBoard(), left: J_TIME, tick: 0, score: 0, made: 0, combo: 0, ph: 'ready', t0: T, pick: null, drag: null, sw: null, pop: null, fl: [], banner: null,
+J = { dayLeft: J_DAY - played - 1, crowdDirty: true, crowdDraws: J.crowdDraws || 0, G: jNewBoard(), left: J_TIME, tick: 0, score: 0, made: 0, combo: 0, ph: 'ask', t0: T, pick: null, drag: null, sw: null, pop: null, fl: [], banner: null,
 lastAct: T, nextIdle: T + 3, best: janBest(), newBest: false, over: null, ord: null, ordNext: T + 2.3, ordSide: rnd(2), ords: 0, fever: 0 };
 J_SEATS.forEach(s => { s.pose = 'down'; s.until = 0; });
+}
+function janGo() {
+if (J.ph !== 'ask') return;
+const played = janPlays(); janPlays(played + 1);
+Object.assign(J, { dayLeft: J_DAY - played - 1, ph: 'ready', t0: T, lastAct: T, nextIdle: T + 3, ordNext: T + 2.3 });
 SND.jingle();
+}
+function janAsk() {
+const x = 420, y = 230, w = 440, h = 290;
+hit(0, 0, W, H, () => { });
+let g = `<rect x="${JBX - 18}" y="${JBY - 18}" width="${JN * JCS + 36}" height="${JN * JCS + 36}" rx="26" fill="#1E120A" opacity=".3"/>`
++ `<rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#3A1D12" opacity=".35"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`;
+g += tx(640, y + 64, '송편 잔치를 열까요?', { f: 'SM', fs: 38, c: C_SEAL });
+g += J_COL.map((c, i) => songP(560 + i * 40, y + 108 + Math.sin(T * 4 + i) * 3, 0.9, c)).join('');
+g += tx(640, y + 164, J.dayLeft >= 0 ? `오늘 남은 잔치 ${J.dayLeft + 1}판 · 시작하면 한 판 써요` : '', { fs: 22, c: C_INK2 });
+g += btn(x + w / 2 - 200, y + h - 92, 180, 64, '안 할래요', () => janBye(), { col: '#FFFDF4', bd: '#8A5A36', fs: 26 })
++ btn(x + w / 2 + 20, y + h - 92, 180, 64, '시작!', () => janGo(), { col: '#FBE7A6', bd: '#B07E10', fs: 30 });
+closeBtn();
+return g;
 }
 function janSwap(a, b) {
 if (J.ph !== 'idle' || J.left <= 0) return false;
@@ -868,7 +885,7 @@ if (sirus) { J.banner = { t0: T, txt: '떡시루 펑!' }; SND.whoosh(); }
 if (chos) { J.banner = { t0: T, txt: '청사초롱 번쩍!' }; SND.whoosh(); }
 if (suns && J.left > 0) { J.left = Math.min(J_TIME, J.left + 5 * suns); J.banner = { t0: T, txt: `시간 +${5 * suns}초!` }; SND.jingle(); }
 J.combo++; if (J.combo === 3 && J.left > 0) J.choDue = (J.choDue || 0) + 1;
-const gain = set.size * 10 * J.combo * (J.fever ? 2 : 1); J.score += gain;
+const gain = set.size * 10 * J.combo * (J.fever ? 2 : 1); J.score += gain; J.made += set.size;
 let sx = 0, sy = 0; set.forEach(i => { sx += i % JN; sy += Math.floor(i / JN); });
 J.fl.push({ x: JBX + (sx / set.size + 0.5) * JCS, y: JBY + (sy / set.size + 0.5) * JCS, t0: T, txt: '+' + gain });
 J.pop = { set, t0: T }; J.ph = 'pop'; SND.bbyong(J.combo - 1);
@@ -1008,7 +1025,7 @@ J.banner = { t0: T, txt: '남은 송편 펑!' }; return true; }
 return false;
 }
 function janTick(dt) {
-crowdTick(); if (J.ph === 'full') return;
+crowdTick(); if (J.ph === 'full' || J.ph === 'ask') return;
 const G = J.G; janOrdTick();
 if (J.ph === 'ready' && T - J.t0 > 1.3) J.ph = 'idle';
 if (J.ph !== 'ready' && J.ph !== 'over' && J.left > 0) { J.left = Math.max(0, J.left - dt); const sec = Math.ceil(J.left); if (sec !== J.tick) { J.tick = sec; if (sec <= 5 && sec > 0) SND.click(); } if (J.left === 0 && J.ph === 'idle') janEndTurn(); }
@@ -1042,7 +1059,7 @@ J.fl = J.fl.filter(f => T - f.t0 < 0.9);
 }
 function janCell(x, y) { const c = Math.floor((x - JBX) / JCS), r = Math.floor((y - JBY) / JCS); return r >= 0 && c >= 0 && r < JN && c < JN ? [r, c] : null; }
 function janDown(x, y) {
-const at = janCell(x, y); if (!at || J.ph === 'over') return;
+const at = janCell(x, y); if (!at || J.ph === 'over' || J.ph === 'ask') return;
 if (J.pick && Math.abs(J.pick[0] - at[0]) + Math.abs(J.pick[1] - at[1]) === 1 && J.ph === 'idle') { janSwap(J.pick, at); return; }
 const q = J.G[at[0]][at[1]];
 if (q && q.k === 'sun' && J.ph === 'idle' && J.left > 0) { J.pick = null; J.drag = null; J.lastAct = T; J.combo = 0; janPop(new Set([at[0] * JN + at[1]]), true); return; }
@@ -1074,7 +1091,7 @@ J_SEATS.forEach((st, i) => hit(st.x - 30 * st.s, st.y - 130 * st.s, 60 * st.s, 1
 g += chorongPair();
 g += janFever();
 g += janPill(390, 70, 240, `점수 <tspan fill="${C_SEAL}">${J.score}</tspan>`) + janPill(650, 70, 240, `남은 시간 <tspan fill="${J.left <= 10 ? C_SEAL : '#2F62B0'}">${Math.ceil(J.left)}초</tspan>`);
-g += `<rect x="276" y="80" width="104" height="40" rx="20" fill="#FBF5E6" stroke="#8A5A36" stroke-width="2.5" opacity=".92"/><text x="328" y="108" font-family="Jua" font-size="20" text-anchor="middle" fill="${C_INK2}">남은 ${J.dayLeft}판</text>`;
+g += `<rect x="276" y="80" width="104" height="40" rx="20" fill="#FBF5E6" stroke="#8A5A36" stroke-width="2.5" opacity=".92"/><text x="328" y="108" font-family="Jua" font-size="20" text-anchor="middle" fill="${C_INK2}">남은 ${J.ph === 'ask' ? J.dayLeft + 1 : J.dayLeft}판</text>`;
 if (J.fever && J.ph !== 'over') g += `<circle cx="618" cy="72" r="26" fill="${C_SEAL}" stroke="#FFD23F" stroke-width="4"/><text x="618" y="82" font-family="Jua" font-size="26" text-anchor="middle" fill="#fff">×2</text>`;
 g += soundBtns(76, 98) + closeBtn();
 const w = JN * JCS;
@@ -1110,6 +1127,7 @@ g += `<text x="640" y="${JBY + 60}" font-family="Jua" font-size="${56 * s}" text
 if (J.ph === 'ready') g += janBanner('송편 잔치 시작!', '같은 색 송편 세 개를 줄 세워요') + tx(640, 520, J.dayLeft ? `오늘 남은 잔치 ${J.dayLeft}판` : '오늘 마지막 잔치!', { fs: 26, c: C_SEAL });
 if (J.ph === 'mix') g += janBanner('송편을 다시 섞어요', '바꿀 곳이 없어요');
 if (J.ph === 'over') g += janOver();
+if (J.ph === 'ask') g += janAsk();
 return g;
 }
 function ddeokme(x, y, s, dir) {
@@ -2295,7 +2313,14 @@ function svWarn(txt, p) { STD.warn = { txt, p, t0: T }; SND.wrong(); }
 function svPick(p) {
 if (STD.ph !== 'play' || STD.done || STD.step !== 'lad') return false;
 if (STD.cur % p) { svWarn(`${svEun(STD.cur)} ${svRo(p)} 안 나눠져요`, p); return false; }
-STD.pick = p; STD.typing = ''; STD.warn = null; SND.pop(); return true;
+STD.pick = p; STD.typing = ''; STD.warn = null;
+if (SV_AUTO.includes(p)) { svDown(STD.cur / p); return true; }
+SND.pop(); return true;
+}
+const SV_AUTO = [2, 3];
+function svDown(q) {
+STD.rows.push([STD.pick, STD.cur]); STD.cur = q; STD.pick = null; STD.typing = ''; STD.warn = null; SND.chop();
+if (svPrime(q)) { STD.step = 'pow'; STD.pi = 0; }
 }
 function svKey(k) {
 if (STD.ph !== 'play' || STD.done) return false;
@@ -2307,9 +2332,7 @@ if (!STD.typing) return false;
 if (lad) {
 const q = STD.cur / STD.pick;
 if (+STD.typing !== q) { svWarn(`${STD.cur} ÷ ${STD.pick} 다시 셈해 봐요`); STD.typing = ''; return false; }
-STD.rows.push([STD.pick, STD.cur]); STD.cur = q; STD.pick = null; STD.typing = ''; STD.warn = null; SND.chop();
-if (svPrime(q)) { STD.step = 'pow'; STD.pi = 0; }
-return true;
+svDown(q); return true;
 }
 const ps = [...new Set(stdFactors(STD.n))], p = ps[STD.pi], e = stdFactors(STD.n).filter(x => x === p).length;
 if (+STD.typing !== e) { svWarn(`${p}${svBat(p) ? '이' : '가'} 몇 번? 사다리를 세어요`); STD.typing = ''; return false; }
@@ -4283,7 +4306,7 @@ if (holdStart(x, y)) return;
 tapAt(x, y);
 });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(n => window.addEventListener(n, holdEnd));
-window.__mini = { GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
+window.__mini = { GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, janGo, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
 Object.defineProperties(window.__mini, Object.getOwnPropertyDescriptors(HW_TEST));
 const START_JAN = typeof location !== 'undefined' && /[?&]g=jan/.test(location.search || '');
 const START_GAK = typeof location !== 'undefined' && /[?&]g=gak/.test(location.search || '');
