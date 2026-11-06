@@ -1500,7 +1500,7 @@ if (HW.ok) bx = X + (Wd - bw) / 2;
 const isWrong = HW.wrong.includes(ci), isOk = HW.ok && ci === 0, dx = isWrong && HW.sel === ci && T - HW.shake < 0.35 ? Math.sin((T - HW.shake) * 60) * 6 : 0;
 hit(bx, by, bw, bh, () => hwAnswer(ci));
 g += `<g transform="translate(${dx},0)">` + hwBox(bx, by, bw, bh, { fill: isOk ? '#DDF0D6' : isWrong ? '#F6D2CC' : '#FFFDF6', bd: isOk ? '#2F7A3A' : isWrong ? '#C8312D' : '#8A5A36', r: 14 })
-+ hwFrac(bx + bw / 2, by + bh / 2 + (/\//.test(S0.ch[ci]) ? -14 : 0), S0.ch[ci], { fs: long ? 26 : 32, c: isWrong ? '#B0605A' : C_INK }) + `</g>`;
++ hwFrac(bx + bw / 2, by + bh / 2, S0.ch[ci], { fs: long ? 26 : 32, c: isWrong ? '#B0605A' : C_INK }) + `</g>`;
 });
 if (HW.ok) {
 const wy = qy + (long ? 58 : 88) + 52;

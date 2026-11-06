@@ -1,4 +1,4 @@
-const C='typing-r3-fc050acf7902', A='typing-assets';
+const C='typing-r3-05587904cc4c', A='typing-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-3c2265cc-180.png','icon-3c2265cc-192.png','icon-3c2265cc-512.png'];
 const ASSETS=[];
 let filling=null;
