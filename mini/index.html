@@ -3754,14 +3754,16 @@ function jamTouch(x, y) {
 for (const h of HITS) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) return false;
 const k = jamAt(x, y); if (!k) return false; jamHit(k); render(); return true;
 }
+function jamRisers() {
+return [[420, 1180], [562, 1000]].map(([y, w]) => `<rect x="${640 - w / 2}" y="${y - 6}" width="${w}" height="26" rx="6" fill="#B98A52" stroke="#5A3A22" stroke-width="3"/><rect x="${640 - w / 2 + 14}" y="${y - 12}" width="${w - 28}" height="10" rx="4" fill="#C8323A" opacity=".85"/>`).join('');
+}
 function jamDraw() {
 SND.rhyTick();
-let g = rhyYard() + rhyCrowd() + rhyYardFront();
+let g = gkStage() + jamRisers();
 const beat = GK.beat !== 'none' ? (SND.now ?? T) * (SND.GAK_JANG[GK.beat].bpm / 60) : null;
 JAM.forEach(([k, x, y, s], i) => {
 const bob = beat != null ? -Math.abs(Math.sin(beat * Math.PI + i * 0.4)) * 6 : -Math.abs(Math.sin(T * 2 + i)) * 3;
-g += `<ellipse cx="${x + 20 * s}" cy="${y + 4}" rx="${100 * s}" ry="${16 * s}" fill="#5A3A22" opacity=".18"/>`
-+ `<g transform="translate(${x},${(y + bob + hop(GK.at[k])).toFixed(1)}) scale(${s})">${gugakBear(GUGAK_BY[k])}</g>`;
+g += `<g transform="translate(${x},${(y + bob + hop(GK.at[k])).toFixed(1)}) scale(${s})">${gugakBear(GUGAK_BY[k])}</g>`;
 });
 g += GK.fx.map(f => { const t = T - f.t0; if (t > 0.9) return ''; return `<g opacity="${(1 - t / 0.9).toFixed(2)}">${pgNote(f.x + t * 26, f.y - t * 60).replace(/#2F8F8A/g, f.c)}</g>`; }).join('');
 if (T - GK.all < 0.6) g += `<rect width="${W}" height="${H}" fill="#FFF6D6" opacity="${(0.35 * (1 - (T - GK.all) / 0.6)).toFixed(2)}"/>`;
