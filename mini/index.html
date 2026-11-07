@@ -3387,13 +3387,9 @@ if (!SEL) hit(x - 70 * sc / 0.6, y - 120 * sc / 0.6, 140 * sc / 0.6, 125 * sc / 
 g += `<g transform="translate(${x},${y + bob(i) + jmp(k)}) scale(${sc})">${gugakBear(GUGAK_BY[k])}</g>`;
 });
 { const db = GK.mb && GK.mb.k === 'drum' ? T - GK.mb.t0 : 9, s = db < 0.3 ? 1 + 0.08 * Math.sin(db / 0.3 * Math.PI) : 1;
-const [dx, dy, ds] = RM_DRUM; if (!SEL) hit(dx - 70 * ds, dy - 62 * ds, 140 * ds, 140 * ds, () => { GK.mb = { k: 'drum', t0: T }; SND.jang('쿵'); });
+const [dx, dy, ds] = RM_DRUM; if (!SEL) hit(dx - 70 * ds, dy - 62 * ds, 140 * ds, 140 * ds, () => { if (GK.mb && GK.mb.k === 'drum' && T - GK.mb.t0 < 0.5) return; GK.mb = { k: 'drum', t0: T }; SND.jang('쿵'); SND.jingGong(0.2); const M0 = GK.mb;
+setTimeout(() => { if (GK.mb !== M0 || S !== 'gak' || GK.ph !== 'rmenu' || GK.sel) return; jamStart(); }, 450); });
 g += `<g transform="translate(${dx},${dy}) scale(${(s * ds).toFixed(3)})">${rmDrum(0, 0)}</g>`; }
-if (!SEL) {
-const pk = GK.pick && GK.pick.key === 'jam';
-hit(640 - 92, 268, 184, 84, () => { if (GK.pick) return; SND.rhyHit('덩'); SND.jingGong(0.2); const P0 = GK.pick = { key: 'jam', t0: T };
-setTimeout(() => { if (GK.pick !== P0 || S !== 'gak' || GK.ph !== 'rmenu') return; jamStart(); }, 350); });
-g += `<g transform="translate(640,${306 + (pk ? hop(GK.pick.t0) : 0)}) scale(.78)">` + rmSignArt('다 같이 합주', '마음대로', '#C8323A', null) + `</g>`; }
 RM_DECO.forEach(([k, x, sd], i) => { if (!SEL) hit(x - 90, 500, 180, 190, () => { GK.mb = { k, t0: T }; SND.jang(sd); });
 g += `<g transform="translate(${x},${640 + bob(i + 7, 6) + jmp(k)}) scale(.95)">${gugakBear(GUGAK_BY[k])}</g>`; });
 RM_INST.forEach(([k, name, x, col], i) => {
@@ -3406,7 +3402,7 @@ const w = name.length * 30 + 40; g += `<rect x="${x - w / 2}" y="662" width="${w
 g += title('곰실곰실 장단놀이', '', undefined, 38);
 if (!SEL) g += rhyResetBtn();
 if (!SEL) { const t = T - (GK.t0 ?? T), op = t < 3 ? 1 : Math.max(0, 1 - (t - 3));
-if (op > 0) g += `<g opacity="${op.toFixed(2)}">` + tx(640, 384, '악기 곰을 톡!', { fs: 24, c: '#FFFDF6' }).replace('<text ', '<text stroke="#5A3A22" stroke-width="6" stroke-linejoin="round" paint-order="stroke" ') + `</g>`; }
+if (op > 0) g += `<g opacity="${op.toFixed(2)}">` + tx(640, 352, '악기 곰을 톡! · 큰 북 = 다 같이 합주', { fs: 24, c: '#FFFDF6' }).replace('<text ', '<text stroke="#5A3A22" stroke-width="6" stroke-linejoin="round" paint-order="stroke" ') + `</g>`; }
 else {
 const [k, name, ox, col] = RM_INST.find(r => r[0] === SEL.inst), t = Math.min(1, (T - SEL.t0) / 0.35), e = 1 - Math.pow(1 - t, 3);
 const x = ox + (RM_C[0] - ox) * e, y = 634 + (RM_C[1] - 634) * e - Math.sin(t * Math.PI) * 60, sc = 1.15 + (RM_C[2] - 1.15) * e;
