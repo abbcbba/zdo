@@ -558,7 +558,8 @@ if (t > now - 0.05) { if (k !== _) jg2(R.bus, t, k, 0.09); if (m !== _) gaya(R.b
 R.i++; }
 if (!R.end && R.i >= R.total) { R.end = true; const t = R.t0 + R.total * R.step; jg2(R.bus, t, '덩', 0.3); gaya(R.bus, t, hz('C5'), 0.1); gaya(R.bus, t, hz('C4'), 0.08); }
 }
-function rhyHit(k) { if (!ok()) return; jg2(R ? R.bus : FX, AC.currentTime + 0.005, k, 0.34); stats.hits = (stats.hits || 0) + 1; }
+const sogoHit = (out, t, v) => { tone(out, t, 340, 210, 0.14, v * 0.6, 'triangle', 0.002); tone(out, t, 170, 120, 0.2, v * 0.45); noise(out, t, 0.03, 2400, v * 0.35, 1.2); };
+function rhyHit(k) { if (!ok()) return; if (k === '소고') sogoHit(R ? R.bus : FX, AC.currentTime + 0.005, 0.4); else jg2(R ? R.bus : FX, AC.currentTime + 0.005, k, 0.34); stats.hits = (stats.hits || 0) + 1; }
 function rhyNote(ins, n) { if (!ok()) return; (ins === 'daeg' ? daeg : gaya)(R ? R.bus : FX, AC.currentTime + 0.005, hz(n), ins === 'daeg' ? 0.05 : 0.11); }
 function gakStop() { rhyStop(); if (gakBus && AC) { try { gakBus.gain.setTargetAtTime(0, AC.currentTime, 0.03); } catch (e) { } gakBus = null; if (duckUntil > AC.currentTime) duck(0); } }
 const jgGak = (out, t, k, v) => jg2(out, t, k, v);
@@ -3111,42 +3112,48 @@ jaj: { name: '자진모리', tag: '빠름', col: '#C8323A', step: 60 / 104 / 3, 
 const RHY_KEYS = ['sema', 'gut', 'jaj'];
 const RHY_FREE = [['gut', '굿거리'], ['jjm', '중중모리'], ['jaj', '자진모리'], ['sema', '세마치'], ['none', '음악 끔']];
 const RX = [400, 880], RY = 540, RTOP = 150, RFALL = 1.3, RN = 38, RP = 0.08, RG = 0.16;
-const R_COL = ['#2F62B0', '#C8323A', '#E9B21C'];
+const R_COL = ['#2F62B0', '#C8323A', '#E9B21C', '#7A3FA0'];
+const RYS = 430, laneX = l => l >= 2 ? 640 : RX[l], laneY = l => l === 3 ? RYS : RY;
+const rhyInst = () => gkMem('ri') === 'sogo' ? 'sogo' : 'jang';
+const rhyBestKey = (key, inst) => inst === 'sogo' ? key + '_s' : key;
 const R_SIDE = [['geo', 130], ['dae', 265], ['hae', 1015], ['gaya', 1150]];
 const RHY_INS = { geo: ['gaya', ['C3', 'D3', 'E3', 'G3', 'A3', 'C4']], dae: ['daeg', ['G4', 'A4', 'C5', 'D5', 'E5', 'D5']], hae: ['daeg', ['C5', 'D5', 'E5', 'G5', 'A5', 'G5']], gaya: ['gaya', ['C5', 'D5', 'E5', 'G5', 'A5', 'C6']] };
 let RHY_BEST = null;
 const rhyBest = () => RHY_BEST || (RHY_BEST = gkMem('rhy') || {});
 const rhyOn = () => S === 'gak' && (GK.ph === 'rplay' || GK.ph === 'rfree');
 function rhyClock() { const a = SND.now; return GK.clk === 'a' && a != null ? a : T; }
-function rhyMenu() { SND.rhyStop(); GK = { ph: 'rmenu', t0: T, ins: {} }; }
-function rhyNotes(key) {
-const R = RHY[key], n = SND.GAK_JANG[key].n, out = [];
+function rhyMenu(keep) { SND.rhyStop(); GK = { ph: 'rmenu', t0: T, ins: {}, sel: keep ? { inst: rhyInst(), t0: T - 9 } : null }; }
+function rhyNotes(key, inst = 'jang') {
+const R = RHY[key], n = SND.GAK_JANG[key].n, out = [], so = inst === 'sogo';
 for (let b = 0; b < R.bars; b++) for (const [ps, lv] of [[R.p1, 1], [R.p2, 2]]) {
-if (lv === 2 && b < Math.floor(R.bars / 3)) continue;
-for (const [s, k] of ps) out.push({ t: (b * n + s) * R.step, k, lane: k === '쿵' ? 0 : k === '덕' ? 1 : 2, g: null });
+if (lv === 2 && (so || b < Math.floor(R.bars / 3))) continue;
+for (const [s, k] of ps) out.push({ t: (b * n + s) * R.step, k, lane: so ? 3 : k === '쿵' ? 0 : k === '덕' ? 1 : 2, g: null });
 }
-return out.sort((a, b) => a.t - b.t);
+out.sort((a, b) => a.t - b.t);
+if (so) { let last = -9; return out.filter(n => n.t - last >= 0.3 ? (last = n.t, true) : false); }
+return out;
 }
 function rhyPlay(key) {
 const R = RHY[key], lead = 4; let t0 = SND.rhyStart(key, R.step, R.bars, lead), clk = 'a';
 if (t0 == null) { clk = 't'; t0 = T + 0.15 + lead * 3 * R.step; }
-GK = { ph: 'rplay', key, R, notes: rhyNotes(key), t0, clk, lead, step: R.step, end: R.bars * SND.GAK_JANG[key].n * R.step, fx: [], hitAt: [-9, -9], combo: 0, top: 0 };
+const inst = rhyInst(); GK = { ph: 'rplay', key, inst, R, notes: rhyNotes(key, inst), t0, clk, lead, step: R.step, end: R.bars * SND.GAK_JANG[key].n * R.step, fx: [], hitAt: [-9, -9], combo: 0, top: 0 };
 }
 function rhyFree(key) {
 const J = SND.GAK_JANG[key], step = J ? 60 / J.bpm / 3 : 0.25; let t0 = SND.rhyStart(key, step, Infinity, 0), clk = 'a';
 if (t0 == null) { clk = 't'; t0 = T; }
-GK = { ph: 'rfree', key, t0, clk, step, music: !!J, fx: [], hitAt: [-9, -9], ins: {}, sb: {} };
+GK = { ph: 'rfree', key, inst: rhyInst(), t0, clk, step, music: !!J, fx: [], hitAt: [-9, -9], ins: {}, sb: {} };
 }
-function rhyPop(lane, s, col) { GK.fx.push({ x: lane === 2 ? 640 : RX[lane], s, col, t0: T }); if (GK.fx.length > 6) GK.fx.shift(); }
+function rhyPop(lane, s, col) { GK.fx.push({ x: laneX(lane), y: laneY(lane), s, col, t0: T }); if (GK.fx.length > 6) GK.fx.shift(); }
 function gkRhyTouch(x, y) {
 if (!rhyOn()) return false;
 for (const h of HITS) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) return false;
 if (y < RTOP) return false;
-rhyHit(x < 640 ? 0 : 1); render(); return true;
+rhyHit(GK.inst === 'sogo' ? 3 : x < 640 ? 0 : 1); render(); return true;
 }
 function rhyHit(side) {
-SND.rhyHit(side ? '덕' : '쿵'); const other = GK.hitAt[1 - side]; GK.hitAt[side] = T; GK.bop = T;
-if (GK.ph !== 'rplay') { if (T - other < 0.12) rhyPop(2, '덩!', R_COL[2]); return; }
+if (side === 3) { SND.rhyHit('소고'); GK.hitAt[2] = T; GK.bop = T; if (GK.ph !== 'rplay') return; }
+else { SND.rhyHit(side ? '덕' : '쿵'); const other = GK.hitAt[1 - side]; GK.hitAt[side] = T; GK.bop = T;
+if (GK.ph !== 'rplay') { if (T - other < 0.12) rhyPop(2, '덩!', R_COL[2]); return; } }
 const tn = rhyClock() - GK.t0; let best = null, bd = 9;
 for (const n of GK.notes) {
 if (n.t - tn > RG) break; const d = Math.abs(n.t - tn); if (d > RG || (n.lane !== 2 && n.lane !== side)) continue;
@@ -3159,16 +3166,19 @@ rhyPop(best.lane, best.g === 'p' ? '얼쑤!' : '좋다!', best.g === 'p' ? R_COL
 }
 function rhyFinish() {
 const N = GK.notes.length, p = GK.notes.filter(n => n.g === 'p').length, g = GK.notes.filter(n => n.g === 'g').length, pct = (p * 2 + g) / (N * 2);
-const star = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1, B = rhyBest(), nw = star > (B[GK.key] || 0);
-if (nw) { B[GK.key] = star; gkMem('rhy', B); }
+const star = pct >= 0.8 ? 3 : pct >= 0.5 ? 2 : 1, B = rhyBest(), bk = rhyBestKey(GK.key, GK.inst), nw = star > (B[bk] || 0);
+if (nw) { B[bk] = star; gkMem('rhy', B); }
 GK.ph = 'rend'; GK.res = { star, nw, p, g, N, pct }; GK.te = T; if (star === 3) SND.fanfare(); else SND.jingle();
 }
 function rhyIns(k) { const [ins, ns] = RHY_INS[k], i = GK.ins[k] = ((GK.ins[k] ?? -1) + 1) % ns.length; SND.rhyNote(ins, ns[i]); GK.sb[k] = T; }
 const rStar = (x, y, r, on) => `<path d="${[...Array(10)].map((_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * 0.45 : r; return (i ? 'L' : 'M') + (x + Math.cos(a) * rr).toFixed(1) + ',' + (y + Math.sin(a) * rr).toFixed(1); }).join('')}Z" fill="${on ? '#F5C518' : '#E6DCC8'}" stroke="${on ? '#B7791F' : '#B9AE98'}" stroke-width="${Math.max(2, r / 10)}" stroke-linejoin="round"/>`;
 function rhyBeat() { const b = 3 * (GK.step || 0.25), tn = rhyClock() - GK.t0; return GK.ph === 'rfree' && !GK.music ? T * 0.8 : tn / b; }
 function rhyScene(dance) {
-let g = gkStage();
-RX.forEach((x, i) => {
+let g = gkStage(); const so = GK.inst === 'sogo';
+if (so) { const ht = T - (GK.hitAt[2] ?? -9), fl = ht < 0.15 ? 1 - ht / 0.15 : 0;
+g += `<rect x="582" y="${RTOP - 10}" width="116" height="${RYS - RTOP + 70}" rx="58" fill="#FFFDF6" opacity=".5" stroke="#C9A97A" stroke-width="2"/>`
++ `<circle cx="640" cy="${RYS}" r="${56 + fl * 8}" fill="${R_COL[3]}" opacity="${0.22 + fl * 0.5}"/><circle cx="640" cy="${RYS}" r="56" fill="none" stroke="${R_COL[3]}" stroke-width="7"/>` + tx(640, RYS + 12, '소고', { f: 'SM', fs: 30, c: R_COL[3], op: 0.55 + fl * 0.45 }); }
+else RX.forEach((x, i) => {
 const ht = T - GK.hitAt[i], fl = ht < 0.15 ? 1 - ht / 0.15 : 0;
 g += `<rect x="${x - 58}" y="${RTOP - 10}" width="116" height="${RY - RTOP + 70}" rx="58" fill="#FFFDF6" opacity=".5" stroke="#C9A97A" stroke-width="2"/>`
 + `<circle cx="${x}" cy="${RY}" r="${56 + fl * 8}" fill="${R_COL[i]}" opacity="${0.22 + fl * 0.5}"/><circle cx="${x}" cy="${RY}" r="56" fill="none" stroke="${R_COL[i]}" stroke-width="7"/>`
@@ -3177,18 +3187,18 @@ g += `<rect x="${x - 58}" y="${RTOP - 10}" width="116" height="${RY - RTOP + 70}
 const beat = rhyBeat(), bob = i => dance ? -Math.abs(Math.sin(T * 6 + i)) * 26 : -Math.abs(Math.sin(beat * Math.PI)) * 7;
 R_SIDE.forEach(([k, x], i) => { const sb = GK.sb && GK.sb[k] != null ? hop(GK.sb[k]) : 0;
 g += `<g transform="translate(${x},${690 + bob(i) + sb}) scale(.95)">${gugakBear(GUGAK_BY[k])}</g>`; });
-g += `<g transform="translate(640,${700 + (dance ? bob(9) : hop(GK.bop))}) scale(1.6)">${gugakBear(GUGAK_BY.jang)}</g>`;
+g += `<g transform="translate(640,${700 + (dance ? bob(9) : hop(GK.bop))}) scale(1.6)">${gugakBear(GUGAK_BY[so ? 'sogo' : 'jang'])}</g>`;
 return g;
 }
 function rhyFx() {
 return GK.fx.map(f => { const t = T - f.t0; if (t > 0.7) return ''; const up = -t * 70, op = t < 0.5 ? 1 : 1 - (t - 0.5) / 0.2;
-return `<g opacity="${op.toFixed(2)}" transform="translate(${f.x},${RY - 92 + up}) scale(${(1 + Math.max(0, 0.15 - t)).toFixed(2)})">`
+return `<g opacity="${op.toFixed(2)}" transform="translate(${f.x},${(f.y ?? RY) - 92 + up}) scale(${(1 + Math.max(0, 0.15 - t)).toFixed(2)})">`
 + `<text x="0" y="0" font-family="SM" font-size="40" text-anchor="middle" fill="${f.col}" stroke="#4A2E1A" stroke-width="7" stroke-linejoin="round" paint-order="stroke">${f.s}</text></g>`; }).join('');
 }
 function rhyNoteSVG(x, y, lane, op) {
 const c = R_COL[lane];
 return `<g opacity="${op.toFixed(2)}"><circle cx="${x}" cy="${y + 5}" r="${RN}" fill="#4A2E1A" opacity=".3"/><circle cx="${x}" cy="${y}" r="${RN}" fill="${c}" stroke="#FFFDF6" stroke-width="5"/>`
-+ tx(x, y + 12, ['쿵', '덕', '덩'][lane], { f: 'SM', fs: 30, c: lane === 2 ? '#4A2E1A' : '#FFFDF6' }) + `</g>`;
++ tx(x, y + 12, ['쿵', '덕', '덩', '톡'][lane], { f: 'SM', fs: 30, c: lane === 2 ? '#4A2E1A' : '#FFFDF6' }) + `</g>`;
 }
 function rhyPlayDraw() {
 SND.rhyTick();
@@ -3197,22 +3207,23 @@ if (tn > GK.end + 1.0) { rhyFinish(); return rhyEndDraw(); }
 let g = rhyScene(false), notes = '';
 for (const n of GK.notes) {
 if (n.t - tn > RFALL + 0.4) break;
-if (n.g) { const t = T - n.at; if (t < 0.25) notes += `<circle cx="${n.lane === 2 ? 640 : RX[n.lane]}" cy="${RY}" r="${RN + t * 160}" fill="none" stroke="${R_COL[n.lane]}" stroke-width="${6 * (1 - t / 0.25)}"/>`; continue; }
+if (n.g) { const t = T - n.at; if (t < 0.25) notes += `<circle cx="${laneX(n.lane)}" cy="${laneY(n.lane)}" r="${RN + t * 160}" fill="none" stroke="${R_COL[n.lane]}" stroke-width="${6 * (1 - t / 0.25)}"/>`; continue; }
 if (tn - n.t > RG && !n.miss) { n.miss = 1; GK.combo = 0; }
-const y = RY - (n.t - tn) * sp; if (y > RY + 110) continue;
-const op = Math.min(1, (y - RTOP + 40) / 70) * (n.miss ? Math.max(0, 1 - (y - RY) / 110) * 0.6 : 1); if (op <= 0) continue;
+const LY = laneY(n.lane), y = LY - (n.t - tn) * sp;
+const op = Math.min(1, (y - RTOP + 40) / 70) * (n.miss ? Math.max(0, 1 - (y - LY) / 110) * 0.6 : 1); if (op <= 0) continue;
 if (n.lane === 2) notes += `<rect x="${RX[0]}" y="${y - 8}" width="${RX[1] - RX[0]}" height="16" rx="8" fill="${R_COL[2]}" opacity="${(op * 0.6).toFixed(2)}"/>` + rhyNoteSVG(RX[0], y, 2, op) + rhyNoteSVG(RX[1], y, 2, op);
-else notes += rhyNoteSVG(RX[n.lane], y, n.lane, op);
+else notes += rhyNoteSVG(laneX(n.lane), y, n.lane, op);
 }
 g += notes + rhyFx();
 if (tn < 0) { const k = GK.lead - Math.ceil(-tn / (3 * GK.step)), s = ['하나', '둘', '셋', '넷'][k] || '준비';
-RX.forEach((x, i) => { g += `<rect x="${x - 54}" y="408" width="108" height="64" rx="16" fill="#4A2E1A" opacity=".85"/>` + tx(x, 434, i ? '오른쪽' : '왼쪽', { fs: 22, c: '#FBF0D6' }) + tx(x, 462, i ? '톡 = 덕' : '톡 = 쿵', { fs: 22, c: '#FBF0D6' }); });
+RX.forEach((x, i) => { const L = GK.inst === 'sogo' ? [['아무 데나', '톡!'], ['톡 = 소고', '딱!']][i] : [['왼쪽', '톡 = 쿵'], ['오른쪽', '톡 = 덕']][i];
+g += `<rect x="${x - 54}" y="408" width="108" height="64" rx="16" fill="#4A2E1A" opacity=".85"/>` + tx(x, 434, L[0], { fs: 22, c: '#FBF0D6' }) + tx(x, 462, L[1], { fs: 22, c: '#FBF0D6' }); });
 g += `<circle cx="640" cy="330" r="92" fill="#FFFDF6" opacity=".88" stroke="${C_GOLD}" stroke-width="5"/>` + tx(640, 358, s, { f: 'SM', fs: s.length > 1 ? 62 : 80, c: C_INK }); }
 g += title(GK.R.name, '', undefined, 40);
 const pr = Math.max(0, Math.min(1, tn / GK.end));
 g += `<rect x="470" y="138" width="340" height="10" rx="5" fill="#4A2E1A" opacity=".35"/><rect x="470" y="138" width="${(340 * pr).toFixed(1)}" height="10" rx="5" fill="${C_GOLD}"/>`;
 if (GK.combo >= 3) g += tx(960, 112, `연속 ${GK.combo}`, { f: 'SM', fs: 30, c: C_SEAL });
-return g + pill(40, 70, 170, '곡 고르기', rhyMenu, { fs: 24 });
+return g + pill(40, 70, 170, '곡 고르기', () => rhyMenu(true), { fs: 24 });
 }
 function rhyEndDraw() {
 const r = GK.res, R = GK.R;
@@ -3223,7 +3234,7 @@ g += tx(640, 262, `${R.name} 다 쳤어요!`, { f: 'SM', fs: 44, c: C_INK });
 g += `<g transform="translate(${540 + i * 100},${342}) scale(${Math.max(0, s).toFixed(2)})">${rStar(0, 0, 44, on)}</g>`; });
 if (r.nw) g += `<g transform="translate(862,372) rotate(12)"><rect x="-62" y="-24" width="124" height="48" rx="8" fill="none" stroke="${C_SEAL}" stroke-width="4"/>${tx(0, 10, '새 기록!', { f: 'SM', fs: 26, c: C_SEAL })}</g>`;
 g += tx(640, 432, `얼쑤 ${r.p} · 좋다 ${r.g} · 장단 ${r.N}개`, { fs: 28, c: C_INK2 });
-g += btn(372, 476, 170, 72, '다시', () => rhyPlay(GK.key), { fs: 30 }) + btn(555, 476, 170, 72, '곡 고르기', rhyMenu, { fs: 28 }) + btn(738, 476, 170, 72, '무대로', () => { SND.gakStop(); GK = { ph: 'home', t0: T }; }, { fs: 28 });
+g += btn(372, 476, 170, 72, '다시', () => rhyPlay(GK.key), { fs: 30 }) + btn(555, 476, 170, 72, '곡 고르기', () => rhyMenu(true), { fs: 28 }) + btn(738, 476, 170, 72, '무대로', () => { SND.gakStop(); GK = { ph: 'home', t0: T }; }, { fs: 28 });
 return g;
 }
 function rhyFreeDraw() {
@@ -3234,8 +3245,8 @@ g += title('마음대로 두들기기', '', undefined, 36);
 const cw = 150, gap = 12, x0 = 640 - (RHY_FREE.length * cw + (RHY_FREE.length - 1) * gap) / 2;
 RHY_FREE.forEach(([k, s], i) => { const on = GK.key === k;
 g += pill(x0 + i * (cw + gap), 150, cw, s, () => { if (GK.key !== k) rhyFree(k); }, { fs: 23, h: 46, col: on ? '#4A2E1A' : '#FFFDF6', ink: on ? '#FBF0D6' : C_INK }); });
-g += `<rect x="350" y="214" width="580" height="40" rx="20" fill="#4A2E1A" opacity=".85"/>` + tx(640, 242, '양쪽 함께 = 덩 · 옆 곰을 톡 하면 그 악기 소리', { fs: 22, c: '#FBF0D6' });
-return g + pill(40, 70, 170, '곡 고르기', rhyMenu, { fs: 24 });
+g += `<rect x="350" y="214" width="580" height="40" rx="20" fill="#4A2E1A" opacity=".85"/>` + tx(640, 242, GK.inst === 'sogo' ? '아무 데나 톡 = 소고 · 옆 곰을 톡 하면 그 악기 소리' : '양쪽 함께 = 덩 · 옆 곰을 톡 하면 그 악기 소리', { fs: 22, c: '#FBF0D6' });
+return g + pill(40, 70, 170, '곡 고르기', () => rhyMenu(true), { fs: 24 });
 }
 const RM_FRONT = [['sema', 'jang', 230], ['gut', 'buk', 500], ['jaj', 'kkw', 780], ['free', 'sogo', 1050]];
 const RM_BACK = [['pgy', 300, 382, 0.5], ['aj', 440, 376, 0.52], ['danso', 575, 372, 0.52], ['piri', 705, 372, 0.52], ['jing', 840, 376, 0.52], ['pjo', 980, 382, 0.5],
@@ -3279,28 +3290,53 @@ return g;
 }
 const rmDrum = (x, y) => `<g transform="translate(${x},${y})"><path d="M-46,0 L-60,64 M46,0 L60,64 M0,10 L0,64" stroke="#6E4524" stroke-width="7" stroke-linecap="round"/><ellipse cx="0" cy="-6" rx="58" ry="58" fill="#B5352D" stroke="#6E2420" stroke-width="5"/><circle cx="0" cy="-6" r="44" fill="#F3E2BE" stroke="#8A5A36" stroke-width="3"/>`
 + `<g transform="translate(0,-6)"><circle r="30" fill="#2F62B0"/><path d="M-30,0 A30,30 0 0 1 30,0 A15,15 0 0 0 0,0 A15,15 0 0 1 -30,0Z" fill="#C8323A"/></g>${[...Array(12)].map((_, i) => { const a = i * Math.PI / 6; return `<circle cx="${(Math.cos(a) * 52).toFixed(1)}" cy="${(-6 + Math.sin(a) * 52).toFixed(1)}" r="3.2" fill="#E9B21C"/>`; }).join('')}</g>`;
+const RM_INST = [['jang', '장구', 430, '#2E8B57'], ['sogo', '소고', 850, '#7A3FA0']];
+const RM_DECO = [['buk', 165, '쿵'], ['kkw', 1115, '덕']];
+const RM_SIGN = [['sema', 270, 505], ['gut', 495, 425], ['jaj', 785, 425], ['free', 1010, 505]];
+const RM_C = [640, 660, 1.45];
 function rhyMenuDraw() {
-let g = rhyYard() + rhyCrowd() + rhyYardFront() + rhyFeast(); const B = rhyBest();
+let g = rhyYard() + rhyCrowd() + rhyYardFront() + rhyFeast(); const B = rhyBest(), SEL = GK.sel;
 const bob = (i, a = 5) => -Math.abs(Math.sin(T * 2.2 + i * 0.9)) * a, jmp = k => GK.mb && GK.mb.k === k ? hop(GK.mb.t0) : 0;
 RM_BACK.forEach(([k, x, y, sc], i) => {
-hit(x - 70 * sc / 0.6, y - 120 * sc / 0.6, 140 * sc / 0.6, 125 * sc / 0.6, () => { GK.mb = { k, t0: T }; const S0 = RM_SND[k] || RHY_INS[k]; if (!S0) return; if (S0[0] === 'jang') SND.jang(S0[1]); else { const n = GK.ins[k] = ((GK.ins[k] ?? -1) + 1) % S0[1].length; SND.rhyNote(S0[0], S0[1][n]); } });
+if (!SEL) hit(x - 70 * sc / 0.6, y - 120 * sc / 0.6, 140 * sc / 0.6, 125 * sc / 0.6, () => { GK.mb = { k, t0: T }; const S0 = RM_SND[k] || RHY_INS[k]; if (!S0) return; if (S0[0] === 'jang') SND.jang(S0[1]); else { const n = GK.ins[k] = ((GK.ins[k] ?? -1) + 1) % S0[1].length; SND.rhyNote(S0[0], S0[1][n]); } });
 g += `<g transform="translate(${x},${y + bob(i) + jmp(k)}) scale(${sc})">${gugakBear(GUGAK_BY[k])}</g>`;
 });
 { const db = GK.mb && GK.mb.k === 'drum' ? T - GK.mb.t0 : 9, s = db < 0.3 ? 1 + 0.08 * Math.sin(db / 0.3 * Math.PI) : 1;
-hit(570, 400, 140, 140, () => { GK.mb = { k: 'drum', t0: T }; SND.jang('쿵'); });
+if (!SEL) hit(570, 400, 140, 140, () => { GK.mb = { k: 'drum', t0: T }; SND.jang('쿵'); });
 g += `<g transform="translate(640,462) scale(${s.toFixed(3)})">${rmDrum(0, 0)}</g>`; }
-RM_FRONT.forEach(([key, k, x], i) => {
-const R = RHY[key], col = R ? R.col : '#8A5A36', pk = GK.pick && GK.pick.key === key;
-hit(x - 110, 470, 220, 230, () => { if (GK.pick) return; SND.jang('덩'); const P0 = GK.pick = { key, t0: T };
-setTimeout(() => { if (GK.pick !== P0 || S !== 'gak' || GK.ph !== 'rmenu') return; if (R) rhyPlay(key); else rhyFree('gut'); }, 450); });
-g += `<ellipse cx="${x}" cy="636" rx="112" ry="22" fill="${col}" opacity=".85" stroke="#5A3A22" stroke-width="3"/>`;
-g += `<g transform="translate(${x},${634 + (pk ? hop(GK.pick.t0) * 2.4 : bob(i + 3, 8))}) scale(1.08)">${gugakBear(GUGAK_BY[k])}</g>`;
-const label = R ? R.name : '마음대로', w = label.length * 26 + (R ? 92 : 30);
-g += `<rect x="${x - w / 2}" y="${662}" width="${w}" height="36" rx="8" fill="#4A2E1A" stroke="${col}" stroke-width="3"/>` + tx(R ? x - 40 : x, 689, label, { f: 'SM', fs: 22, c: '#FBF0D6' });
-if (R) [0, 1, 2].forEach(j => { const on = j < (B[key] || 0); g += `<g opacity="${on ? 1 : 0.3}">${rStar(x + w / 2 - 70 + j * 24, 680, 10, on)}</g>`; });
+RM_DECO.forEach(([k, x, sd], i) => { if (!SEL) hit(x - 90, 500, 180, 190, () => { GK.mb = { k, t0: T }; SND.jang(sd); });
+g += `<g transform="translate(${x},${640 + bob(i + 7, 6) + jmp(k)}) scale(.95)">${gugakBear(GUGAK_BY[k])}</g>`; });
+RM_INST.forEach(([k, name, x, col], i) => {
+if (!SEL) hit(x - 115, 470, 230, 235, () => { gkMem('ri', k); SND.rhyHit(k === 'sogo' ? '소고' : '덩'); GK.sel = { inst: k, t0: T }; });
+g += `<ellipse cx="${x}" cy="636" rx="118" ry="23" fill="${col}" opacity=".85" stroke="#5A3A22" stroke-width="3"/>`;
+if (SEL && SEL.inst === k) return;
+g += `<g transform="translate(${x},${634 + bob(i + 3, 8)}) scale(1.15)">${gugakBear(GUGAK_BY[k])}</g>`;
+const w = name.length * 30 + 40; g += `<rect x="${x - w / 2}" y="662" width="${w}" height="38" rx="8" fill="#4A2E1A" stroke="${col}" stroke-width="3"/>` + tx(x, 690, name, { f: 'SM', fs: 25, c: '#FBF0D6' });
 });
-g += title('덩더꿍 장구', '', undefined, 44);
-g += `<rect x="440" y="194" width="400" height="36" rx="18" fill="#4A2E1A" opacity=".8"/>` + tx(640, 219, '앞줄 곰을 톡! 같이 장단을 쳐요', { fs: 22, c: '#FBF0D6' });
+g += title('곰실곰실 장단놀이', '', undefined, 38);
+if (!SEL) { const t = T - (GK.t0 ?? T), op = t < 3 ? 1 : Math.max(0, 1 - (t - 3));
+if (op > 0) g += `<g opacity="${op.toFixed(2)}">` + tx(640, 384, '악기 곰을 톡!', { fs: 24, c: '#FFFDF6' }).replace('<text ', '<text stroke="#5A3A22" stroke-width="6" stroke-linejoin="round" paint-order="stroke" ') + `</g>`; }
+else {
+const [k, name, ox, col] = RM_INST.find(r => r[0] === SEL.inst), t = Math.min(1, (T - SEL.t0) / 0.35), e = 1 - Math.pow(1 - t, 3);
+const x = ox + (RM_C[0] - ox) * e, y = 634 + (RM_C[1] - 634) * e - Math.sin(t * Math.PI) * 60, sc = 1.15 + (RM_C[2] - 1.15) * e;
+hit(0, 140, W, H - 140, () => { GK.sel = null; SND.tap(); });
+g += `<rect x="0" y="140" width="${W}" height="${H - 140}" fill="#2A1A10" opacity="${(0.52 * e).toFixed(2)}"/>`;
+g += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) scale(${sc.toFixed(3)})">${gugakBear(GUGAK_BY[k])}</g>`;
+if (T - SEL.t0 > 0.2) {
+g += tx(640, 345, `${name}로 어떤 장단을 칠까요?`, { f: 'SM', fs: 30, c: '#FFFDF6' }).replace('<text ', '<text stroke="#3A2414" stroke-width="7" stroke-linejoin="round" paint-order="stroke" ');
+RM_SIGN.forEach(([key, sx, sy], i) => {
+const R = RHY[key], c = R ? R.col : '#8A5A36', pt = T - SEL.t0 - 0.2 - i * 0.06, ps = pt <= 0 ? 0 : pt < 0.2 ? pt / 0.2 * 1.1 : 1.1 - Math.min(0.1, (pt - 0.2) / 2), pk = GK.pick && GK.pick.key === key;
+hit(sx - 110, sy - 46, 220, 92, () => { if (GK.pick) return; SND.rhyHit(SEL.inst === 'sogo' ? '소고' : '덩'); const P0 = GK.pick = { key, t0: T };
+setTimeout(() => { if (GK.pick !== P0 || S !== 'gak' || GK.ph !== 'rmenu') return; if (R) rhyPlay(key); else rhyFree('gut'); }, 350); });
+g += `<g transform="translate(${sx},${sy + (pk ? hop(GK.pick.t0) : 0)}) scale(${Math.max(0, ps).toFixed(3)})">`
++ `<rect x="-108" y="-40" width="216" height="88" rx="14" fill="#5A3A22" opacity=".45"/><rect x="-108" y="-46" width="216" height="88" rx="14" fill="#FFFDF6" stroke="${c}" stroke-width="5"/>`
++ `<path d="M-108,-32 a14,14 0 0 1 14,-14 h188 a14,14 0 0 1 14,14 v8 h-216Z" fill="${c}"/>`
++ tx(0, R ? 2 : 10, R ? R.name : '마음대로', { f: 'SM', fs: R ? 30 : 30, c: C_INK })
++ (R ? tx(-46, 32, R.tag, { fs: 20, c }) + [0, 1, 2].map(j => { const on = j < (B[rhyBestKey(key, SEL.inst)] || 0); return `<g opacity="${on ? 1 : 0.3}">${rStar(22 + j * 24, 25, 10, on)}</g>`; }).join('') : tx(0, 34, '두들기기', { fs: 20, c }))
++ `</g>`;
+});
+}
+}
 return g + gkTop(true);
 }
 function drawRhy() {
@@ -4636,7 +4672,7 @@ if (holdStart(x, y)) return;
 tapAt(x, y);
 });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(n => window.addEventListener(n, holdEnd));
-window.__mini = { RHY, rhyMenu, rhyPlay, rhyFree, rhyHit, rhyIns, gkRhyTouch, rhyNotes, rhyBest, rhyClock, GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, janGo, janPawTap, janPawPick, J_PAW_SEAT, janChopTap, janChopPick, J_CHOP_SEAT, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
+window.__mini = { RHY, rhyInst, rhyMenu, rhyPlay, rhyFree, rhyHit, rhyIns, gkRhyTouch, rhyNotes, rhyBest, rhyClock, GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, janGo, janPawTap, janPawPick, J_PAW_SEAT, janChopTap, janChopPick, J_CHOP_SEAT, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
 Object.defineProperties(window.__mini, Object.getOwnPropertyDescriptors(HW_TEST));
 const START_JAN = typeof location !== 'undefined' && /[?&]g=jan/.test(location.search || '');
 const START_GAK = typeof location !== 'undefined' && /[?&]g=gak/.test(location.search || '');
