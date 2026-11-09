@@ -5449,7 +5449,7 @@ if (k === 'sdk') { const f = chSdkN(); return [f, ...CH_SDK.filter(n => n !== f 
 if (k === 'std') { const f = chStdPick(), L = [f.m + f.lv]; ['pull', ...(stdCutOpen() ? ['cut'] : [])].forEach(m => { for (let lv = Math.min(1, stdLv(m)); lv >= 0; lv--) if (!L.includes(m + lv)) L.push(m + lv); }); return L; }
 if (k === 'hwk') { const f = chHwB(); return [f, ...HW_B.map((b, i) => i).filter(i => i !== f && !hwDone(i)), ...HW_B.map((b, i) => i).filter(i => i !== f && hwDone(i))].map(String); }
 if (k === 'rhy') { const f = chRhyKey(); return [f, ...chRhyKeys().filter(x => x !== f)]; }
-if (k === 'chk') { const L = CK_BOOKS.map(b => b.k), nd = L.filter(x => !ckDone(x)), f = (nd.length ? nd : L)[chHash(chDay() + 'chk') % (nd.length || L.length)]; return [f, ...L.filter(x => x !== f)]; }
+if (k === 'chk') { const L = CK_BOOKS.map(b => b.k).filter(x => x !== 'hj7'), nd = L.filter(x => !ckDone(x)), f = (nd.length ? nd : L)[chHash(chDay() + 'chk') % (nd.length || L.length)]; return [f, ...L.filter(x => x !== f)]; }
 return [''];
 }
 function chPickV(list, n, used, cnt, pg) {
