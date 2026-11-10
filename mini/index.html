@@ -2689,12 +2689,121 @@ g += foot(0, -6) + foot(100, -6);
 for (let r = 0; r < 2; r++) for (let i = 0; i < 8; i++) g += hang(8 + i * 12, r ? -86 : -134, r * 8 + i);
 return g;
 }
-const gkPhoenix = (x, y) => `<g transform="translate(${x},${y})"><path d="M14,4 Q2,2 -2,-6 Q4,-12 10,-8 Q8,-4 14,-2Z" fill="#2F62B0" stroke="${GK_L}" stroke-width="1.2"/><path d="M-2,-6 l-5,-1 l5,3z" fill="#E9B21C"/><circle cx="4" cy="-7" r="1" fill="#fff"/><path d="M6,-11 q2,-6 7,-6 q-3,2 -3,6z" fill="#C8323A"/></g>`;
-const gkDragon = (x, y) => `<g transform="translate(${x},${y})"><path d="M14,4 Q0,4 -4,-4 Q0,-12 10,-9 Q9,-4 14,-2Z" fill="#2E7D5B" stroke="${GK_L}" stroke-width="1.2"/><path d="M-4,-4 l-4,2 l4,1z" fill="#E9B21C"/><circle cx="3" cy="-6" r="1.1" fill="#fff"/><path d="M6,-10 l1,-6 l3,5 M9,-10 l3,-5 l1,5" stroke="#E9B21C" stroke-width="1.4" fill="none"/></g>`;
+const gkBongdu = (L = GK_L, w = 3) => `<path d="M24,-16 Q44,-14 62,-13 L62,18 Q42,18 20,16Z" fill="#3A6FC0" stroke="${L}" stroke-width="${w}"/>`
++ [[30, -8], [42, -8], [54, -8], [36, 2], [48, 2], [30, 11], [42, 11], [54, 11]].map(([x, y]) => `<path d="M${x - 5},${y + 2} q5,-7 10,0" fill="none" stroke="#BFD3F2" stroke-width="${w * 0.7}"/>`).join('')
++ `<path d="M4,-26 Q10,-52 34,-56 Q48,-56 46,-44 Q40,-50 32,-46 Q20,-40 16,-24Z" fill="#E2483C" stroke="${L}" stroke-width="${w}" stroke-linejoin="round"/>`
++ `<path d="M14,-24 Q26,-44 48,-40 Q60,-37 55,-27 Q49,-34 40,-32 Q30,-28 25,-18Z" fill="#E9B21C" stroke="${L}" stroke-width="${w}" stroke-linejoin="round"/>`
++ `<path d="M-6,-24 Q-10,-46 5,-55 Q15,-60 17,-50 Q9,-51 7,-43 Q5,-33 6,-26Z" fill="#2E8B57" stroke="${L}" stroke-width="${w}" stroke-linejoin="round"/>`
++ `<path d="M-22,-4 Q-20,-24 0,-28 Q20,-30 30,-16 Q40,-6 50,-2 L50,14 Q30,14 18,18 Q0,22 -12,14 Q-22,8 -22,-4Z" fill="#EE8C86" stroke="${L}" stroke-width="${w}"/>`
++ `<path d="M6,-22 q6,4 12,0 M2,-16 q6,4 12,0" fill="none" stroke="#C85A5A" stroke-width="${w * 0.6}" opacity=".7"/>`
++ `<path d="M4,6 Q16,2 26,8 Q34,16 26,24 Q22,14 10,14Z" fill="#2E8B57" stroke="${L}" stroke-width="${w * 0.8}"/>`
++ `<path d="M-8,13 Q2,30 18,28 Q8,23 4,15Z" fill="#2F62B0" stroke="${L}" stroke-width="${w * 0.8}"/>`
++ `<path d="M-6,-8 Q2,-15 13,-9 Q4,-2 -6,-8Z" fill="#FFFDF6" stroke="${L}" stroke-width="${w * 0.7}"/><circle cx="3" cy="-8.5" r="3" fill="${L}"/><path d="M12,-9 l7,-3" stroke="${L}" stroke-width="${w * 0.7}" stroke-linecap="round"/>`
++ `<path d="M-20,-9 Q-33,-9 -40,2 Q-31,-2 -20,-1Z" fill="#E9B21C" stroke="${L}" stroke-width="${w * 0.8}" stroke-linejoin="round"/><path d="M-20,2 Q-29,4 -33,9 Q-25,9 -20,6Z" fill="#E8822C" stroke="${L}" stroke-width="${w * 0.8}" stroke-linejoin="round"/>`
++ `<circle cx="-37" cy="7" r="3" fill="none" stroke="#C8323A" stroke-width="${w * 0.8}"/>`;
+const gkPhoenix = (x, y) => `<g transform="translate(${x + 16 - 62 * 0.27},${y - 1}) scale(.27)">${gkBongdu(GK_L, 4.2)}</g>`;
+const gkYongdu = (L = GK_L, w = 3) => `<path d="M22,-16 Q44,-14 62,-13 L62,18 Q42,18 18,16Z" fill="#E9B21C" stroke="${L}" stroke-width="${w}"/>`
++ [[30, -7], [42, -7], [54, -7], [36, 3], [48, 3], [30, 12], [42, 12], [54, 12]].map(([x, y]) => `<path d="M${x - 5},${y + 2} q5,-7 10,0" fill="none" stroke="#B8862A" stroke-width="${w * 0.7}"/>`).join('')
++ `<path d="M10,-22 Q14,-44 26,-48 Q22,-38 30,-36 Q34,-50 46,-50 Q40,-40 48,-32 Q56,-36 60,-28 Q50,-22 40,-18Z" fill="#E2483C" stroke="${L}" stroke-width="${w}" stroke-linejoin="round"/>`
++ `<path d="M0,-26 Q-2,-44 8,-52 M8,-26 Q10,-42 22,-48" stroke="${L}" stroke-width="${w * 2.4}" fill="none" stroke-linecap="round"/><path d="M0,-26 Q-2,-44 8,-52 M8,-26 Q10,-42 22,-48" stroke="#F6E7B8" stroke-width="${w * 1.2}" fill="none" stroke-linecap="round"/>`
++ `<path d="M-30,-14 Q-26,-30 -4,-30 Q22,-32 32,-14 Q40,0 30,10 L-8,10 Q-26,6 -30,-4Z" fill="#2F62B0" stroke="${L}" stroke-width="${w}"/>`
++ `<path d="M-28,4 Q-34,8 -38,16 Q-20,22 0,20 Q14,20 20,12 L-8,10Z" fill="#2F62B0" stroke="${L}" stroke-width="${w}"/><path d="M-26,6 Q-14,14 4,12" fill="#C8323A" stroke="none"/>`
++ `<path d="M-27,0 l3,6 l3,-5 l3,6 l3,-6 l3,6 l3,-6" fill="#FFFDF6" stroke="${L}" stroke-width="${w * 0.5}" stroke-linejoin="round"/>`
++ `<path d="M-30,-10 q-10,-6 -16,2 M-30,-6 q-8,6 -14,14" stroke="#E9B21C" stroke-width="${w * 0.9}" fill="none" stroke-linecap="round"/><circle cx="-26" cy="-16" r="2.6" fill="${L}"/>`
++ `<path d="M14,-4 Q26,-8 34,0 Q38,10 28,16 Q26,6 16,6Z" fill="#2E8B57" stroke="${L}" stroke-width="${w * 0.8}"/>`
++ `<ellipse cx="6" cy="-17" rx="8" ry="6.5" fill="#FFFDF6" stroke="${L}" stroke-width="${w * 0.8}"/><circle cx="3" cy="-17" r="3.4" fill="${L}"/><path d="M-4,-25 Q6,-30 16,-23" stroke="#E2483C" stroke-width="${w}" fill="none" stroke-linecap="round"/>`
++ `<circle cx="-37" cy="9" r="3" fill="none" stroke="#C8323A" stroke-width="${w * 0.8}"/>`;
+const gkDragon = (x, y) => `<g transform="translate(${x + 16 - 62 * 0.27},${y - 1}) scale(.27)">${gkYongdu(GK_L, 4.2)}</g>`;
 const gkBird = (x, y) => `<g transform="translate(${x},${y})"><ellipse cx="0" cy="-5" rx="10" ry="6" fill="#FBFBF8" stroke="${GK_L}" stroke-width="1.3"/><circle cx="-8" cy="-12" r="4" fill="#FBFBF8" stroke="${GK_L}" stroke-width="1.3"/><path d="M-12,-12 l-4,1 l4,1z" fill="#E9B21C"/><rect x="-11" y="-1" width="22" height="5" rx="1" fill="#7A2420"/></g>`;
-const gkLion = (x, y) => `<g transform="translate(${x},${y})"><ellipse cx="0" cy="-6" rx="11" ry="7" fill="#E9B21C" stroke="${GK_L}" stroke-width="1.3"/><circle cx="-8" cy="-12" r="6" fill="#C98A1E" stroke="${GK_L}" stroke-width="1.3"/><circle cx="-8" cy="-12" r="3.4" fill="#E9B21C"/><rect x="-12" y="-1" width="24" height="5" rx="1" fill="#7A2420"/></g>`;
+const gkLion = (x, y) => `<g transform="translate(${x},${y})"><rect x="-14" y="-4" width="28" height="4" fill="#6E2A20" stroke="${GK_L}" stroke-width="1"/><rect x="-12" y="-19" width="24" height="15" fill="#9A3A2E" stroke="${GK_L}" stroke-width="1.2"/><rect x="-9" y="-16.5" width="18" height="10" rx="1.5" fill="#2F8F7A"/><ellipse cx="0" cy="-11.5" rx="5" ry="2" fill="#F6E7B8"/><rect x="-13" y="-22" width="26" height="3.5" fill="#E9B21C" stroke="${GK_L}" stroke-width=".9"/>`
++ `<path d="M-12,-22 Q-13,-30 -6,-32 L6,-32 Q13,-30 12,-22Z" fill="#2F62B0" stroke="${GK_L}" stroke-width="1.2"/>`
++ `<path d="M12,-25 q5,-1 5,-7 q0,-3 -3,-3" stroke="${GK_L}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M12,-25 q5,-1 5,-7 q0,-3 -3,-3" stroke="#2F62B0" stroke-width="1.4" fill="none" stroke-linecap="round"/><circle cx="14" cy="-35" r="1.8" fill="#E2483C" stroke="${GK_L}" stroke-width=".6"/>`
++ [-6, 6].map(dx => `<path d="M${dx - 3},-22 v-4 q3,-2 6,0 v4Z" fill="#2F62B0" stroke="${GK_L}" stroke-width="1"/><path d="M${dx - 2},-22 v-1.6 M${dx},-22 v-1.6 M${dx + 2},-22 v-1.6" stroke="${GK_L}" stroke-width=".6"/>`).join('')
++ [...Array(11)].map((_, i) => { const a = Math.PI * (0.85 + i * 0.13), cx = (Math.cos(a) * 8.5).toFixed(1), cy = (-36 + Math.sin(a) * 8.5).toFixed(1); return `<circle cx="${cx}" cy="${cy}" r="2.6" fill="${i % 2 ? '#E2483C' : '#2E8B57'}" stroke="${GK_L}" stroke-width=".6"/>`; }).join('')
++ `<circle cx="0" cy="-35" r="7" fill="#2F62B0" stroke="${GK_L}" stroke-width="1.1"/>`
++ `<circle cx="-2.8" cy="-37" r="2.2" fill="#FFFDF6" stroke="${GK_L}" stroke-width=".5"/><circle cx="2.8" cy="-37" r="2.2" fill="#FFFDF6" stroke="${GK_L}" stroke-width=".5"/><circle cx="-2.6" cy="-36.8" r="1" fill="${GK_L}"/><circle cx="2.6" cy="-36.8" r="1" fill="${GK_L}"/>`
++ `<path d="M-4.6,-39.6 q1.8,-1.4 3.6,0 M1,-39.6 q1.8,-1.4 3.6,0" stroke="#E9B21C" stroke-width=".9" fill="none"/><ellipse cx="0" cy="-34.4" rx="1.6" ry="1" fill="#E98A86"/>`
++ `<path d="M-3.6,-32.6 Q0,-29 3.6,-32.6Z" fill="#C8323A" stroke="${GK_L}" stroke-width=".6"/><path d="M-2.6,-32.4 h5.2" stroke="#FFFDF6" stroke-width=".9"/></g>`;
 const gkStoneL = (x, y) => `<path d="M${x},${y + 3} V${y + 6}" stroke="#C8323A" stroke-width="1"/><path d="M${x - 4.5},${y + 8.5} L${x},${y + 6} L${x + 3.2},${y + 20}" fill="none" stroke="${GK_L}" stroke-width="4.4" stroke-linejoin="round" stroke-linecap="round"/><path d="M${x - 4.5},${y + 8.5} L${x},${y + 6} L${x + 3.2},${y + 20}" fill="none" stroke="${GK_STONE}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>`;
-const gkBell = (x, y) => `<path d="M${x},${y + 3} V${y + 6}" stroke="#C8323A" stroke-width="1"/><path d="M${x - 3},${y + 6} Q${x - 4.5},${y + 14} ${x - 5},${y + 19} L${x + 5},${y + 19} Q${x + 4.5},${y + 14} ${x + 3},${y + 6}Z" fill="${GK_BRASS}" stroke="${GK_L}" stroke-width="1"/><circle cx="${x}" cy="${y + 14}" r="1.3" fill="#A97A1E"/>`;
+const gkBell = (x, y) => `<path d="M${x - 2},${y + 3} h4" stroke="#2F8F7A" stroke-width="2" stroke-linecap="round"/><path d="M${x},${y + 4} V${y + 7}" stroke="#C8323A" stroke-width="1"/>`
++ `<path d="M${x - 2.4},${y + 7} Q${x - 4},${y + 7.4} ${x - 4},${y + 10.5} L${x - 4.2},${y + 19} Q${x},${y + 17.6} ${x + 4.2},${y + 19} L${x + 4},${y + 10.5} Q${x + 4},${y + 7.4} ${x + 2.4},${y + 7}Z" fill="#5E4A30" stroke="${GK_L}" stroke-width=".9"/>`
++ `<path d="M${x - 4},${y + 10} H${x + 4} M${x - 4.1},${y + 15.4} H${x + 4.1}" stroke="#3A2E1E" stroke-width=".6"/>`
++ [[-1.8, 11.8], [0, 11.8], [1.8, 11.8], [-1.8, 13.6], [0, 13.6], [1.8, 13.6]].map(([dx, dy]) => `<circle cx="${x + dx}" cy="${y + dy}" r=".6" fill="#B89A5E"/>`).join('')
++ `<path d="M${x - 2.6},${y + 8.4} q-.8,4 -.8,9" stroke="#9A8058" stroke-width=".8" fill="none" opacity=".8"/>`;
+const gkPeacock = x => `<g transform="translate(${x},-160)"><path d="M-3.4,0 Q0,-3 3.4,0Z" fill="#E98A86" stroke="${GK_L}" stroke-width=".6"/>`
++ [-14, 0, 14].map(a => `<g transform="rotate(${a} 0 -6)"><path d="M0,-6 Q-2,-11 0,-15 Q2,-11 0,-6Z" fill="#2E8B57" stroke="${GK_L}" stroke-width=".6"/><circle cx="0" cy="-13" r="1" fill="#2F62B0"/></g>`).join('')
++ `<ellipse cx="0" cy="-4.5" rx="3.2" ry="3" fill="#E98A86" stroke="${GK_L}" stroke-width=".6"/><circle cx="-2.6" cy="-7.4" r="1.8" fill="#E98A86" stroke="${GK_L}" stroke-width=".6"/><path d="M-4.4,-7.6 l-1.6,.6 l1.6,.6z" fill="#E9B21C"/><path d="M-1,-5 q2,-2 4,0" stroke="#2F62B0" stroke-width="1" fill="none"/></g>`;
+const gkYuso = x => { let g = `<path d="M${x},-151 V-34" stroke="#C8323A" stroke-width=".9"/>`; for (let i = 0; i < 6; i++) { const y = -140 + i * 18; g += `<circle cx="${x}" cy="${y - 2}" r="1.3" fill="#2E8B57"/><path d="M${x - 1.6},${y} L${x + 1.6},${y} L${x + 2.8},${y + 7} L${x - 2.8},${y + 7}Z" fill="#E98A86" stroke="${GK_L}" stroke-width=".5"/>`; } return g + `<path d="M${x - 1.4},-34 L${x + 1.4},-34 L${x + 2},-26 L${x - 2},-26Z" fill="#2E8B57"/>`; };
+function gkPjoFrame() {
+let g = `<rect x="-4" y="-146" width="7" height="140" fill="#9A3A2E" stroke="${GK_L}" stroke-width="1.6"/><rect x="97" y="-146" width="7" height="140" fill="#9A3A2E" stroke="${GK_L}" stroke-width="1.6"/>`;
+g += gkYuso(-25) + gkYuso(125);
+g += `<rect x="-2" y="-147" width="104" height="10" fill="#2E8B57" stroke="${GK_L}" stroke-width="1.2"/>` + [4, 37, 70].map(x => `<rect x="${x}" y="-145" width="26" height="6" rx="3" fill="#FBF3DC" stroke="#C8323A" stroke-width=".8"/>`).join('')
++ `<rect x="-10" y="-160" width="120" height="13" rx="2" fill="#2F62B0" stroke="${GK_L}" stroke-width="1.6"/>`
++ [...Array(11)].map((_, i) => `<path d="M${-6 + i * 11},-150 q4,-6 8,0" fill="none" stroke="#BFD3F2" stroke-width="1"/>`).join('')
++ [['#E2483C', 38], ['#E9B21C', 42], ['#2E8B57', 46], ['#FBF3DC', 50], ['#C8323A', 54], ['#2F62B0', 58]].map(([c, x]) => `<rect x="${x}" y="-159" width="4" height="11" fill="${c}"/>`).join('');
+g += [10, 30, 50, 70, 90].map(gkPeacock).join('');
+g += gkDragon(-14, -152) + `<g transform="translate(114,0) scale(-1,1)">${gkDragon(0, -152)}</g>`;
+g += [-134, -86].map(y => `<rect x="-2" y="${y - 1}" width="104" height="5" fill="#7A2420" stroke="${GK_L}" stroke-width=".8"/>` + [8, 32, 56, 80].map(x => `<path d="M${x + 4},${y - 1} q-3,-6 0,-8 q3,2 0,8" fill="#2E8B57"/>`).join('')).join('');
+for (let r = 0; r < 2; r++) for (let i = 0; i < 8; i++) g += gkBell(8 + i * 12, r ? -86 : -134);
+return g + gkLion(0, 0) + `<g transform="translate(100,0) scale(-1,1)">${gkLion(0, 0)}</g>`;
+}
+function gkBipa() {
+let g = `<rect x="-3" y="-66" width="6" height="56" fill="#7A4A22" stroke="${GK_L}" stroke-width="1.4"/><rect x="-4.5" y="-76" width="9" height="12" rx="2" fill="#5E3A1E" stroke="${GK_L}" stroke-width="1.4"/>`
++ [-73, -68].map(y => `<path d="M-8,${y} H8" stroke="${GK_L}" stroke-width="2.2" stroke-linecap="round"/>`).join('')
++ `<path d="M0,-16 C15,-16 20,6 13,18 Q0,27 -13,18 C-20,6 -15,-16 0,-16Z" fill="#B8742E" stroke="${GK_L}" stroke-width="1.8"/><path d="M0,-12 C11,-12 15,5 10,15 Q0,21 -10,15 C-15,5 -11,-12 0,-12Z" fill="#D9A25A"/>`
++ `<path d="M-9,4 q4,-5 8,0 q4,-5 8,0" fill="none" stroke="#8A4E1E" stroke-width="1.2"/><rect x="-7" y="10" width="14" height="3.5" rx="1" fill="#5E3A1E"/>`;
+for (let i = 0; i < 8; i++) g += `<rect x="-4" y="${-60 + i * 6}" width="8" height="1.6" fill="#E9D8A6"/>`;
+for (let i = 0; i < 5; i++) g += `<path d="M${-2 + i},-64 L${-4 + i * 2},12" stroke="#FFF6DA" stroke-width=".55"/>`;
+return g;
+}
+function gkNodo(x) {
+const drum = (y, side) => side
+? `<rect x="${x - 13}" y="${y - 7}" width="26" height="14" rx="3" fill="#C8323A" stroke="${GK_L}" stroke-width="1.6"/><ellipse cx="${x - 13}" cy="${y}" rx="3" ry="7" fill="#FBF3DC" stroke="${GK_L}" stroke-width="1.4"/><ellipse cx="${x + 13}" cy="${y}" rx="3" ry="7" fill="#FBF3DC" stroke="${GK_L}" stroke-width="1.4"/>`
+: `<circle cx="${x}" cy="${y}" r="9" fill="#FBF3DC" stroke="${GK_L}" stroke-width="1.6"/><circle cx="${x}" cy="${y}" r="9" fill="none" stroke="#C8323A" stroke-width="2.4"/>`;
+const ear = (x1, y1, x2, y2) => `<path d="M${x1},${y1} Q${(x1 + x2) / 2},${y2 + 4} ${x2},${y2}" stroke="#7A4A22" stroke-width="1.4" fill="none"/><circle cx="${x2}" cy="${y2}" r="2.2" fill="${GK_L}"/>`;
+return `<rect x="${x - 2}" y="-140" width="4" height="132" fill="${GK_WOOD}" stroke="${GK_L}" stroke-width="1.2"/>`
++ `<g transform="translate(${x},-140)"><path d="M-1,0 Q0,-3 1,0" stroke="${GK_L}" stroke-width="1"/><ellipse cx="1" cy="-6" rx="7.5" ry="4.6" fill="#FBFBF8" stroke="${GK_L}" stroke-width="1.2"/><path d="M7,-7 L13,-4 L7,-4Z" fill="#FBFBF8" stroke="${GK_L}" stroke-width="1"/>`
++ `<path d="M-5,-8 Q-8,-14 -5,-18" stroke="${GK_L}" stroke-width="3.6" fill="none" stroke-linecap="round"/><path d="M-5,-8 Q-8,-14 -5,-18" stroke="#FBFBF8" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="-4.5" cy="-19.5" r="3" fill="#FBFBF8" stroke="${GK_L}" stroke-width="1"/>`
++ `<path d="M-7.2,-19.8 L-12,-18.6 L-7.2,-18.2Z" fill="#E9B21C" stroke="${GK_L}" stroke-width=".5"/><circle cx="-5" cy="-20.2" r=".8" fill="${GK_L}"/><path d="M-1,-7 q4,-3 7,0" stroke="#C9C2B0" stroke-width="1" fill="none"/></g>`
++ drum(-124, true) + ear(x - 13, -124, x - 22, -114) + ear(x + 13, -124, x + 22, -114)
++ drum(-104, false) + ear(x - 9, -104, x - 18, -94) + ear(x + 9, -104, x + 18, -94);
+}
+function gkEo() {
+let g = `<rect x="4" y="-8" width="96" height="8" fill="#6E4524" stroke="${GK_L}" stroke-width="1.4"/><rect x="10" y="-30" width="84" height="22" fill="#9A3A2E" stroke="${GK_L}" stroke-width="1.6"/>`
++ [14, 41, 68].map(x => `<rect x="${x}" y="-26" width="22" height="14" rx="2" fill="#2F8F7A"/><ellipse cx="${x + 11}" cy="-19" rx="6" ry="2.4" fill="#E9B21C" opacity=".85"/>`).join('')
++ `<rect x="6" y="-34" width="92" height="5" fill="#E9B21C" stroke="${GK_L}" stroke-width="1.2"/>`;
+let saw = 'M18,-56'; for (let i = 0; i < 27; i++) saw += ` l1.2,-4.2 l1.2,4.2`;
+g += `<path d="${saw} L84,-56 Z" fill="#F6F0DE" stroke="${GK_L}" stroke-width="1"/>`
++ `<path d="M12,-34 Q6,-44 14,-54 Q20,-58 50,-58 Q78,-58 86,-50 L86,-34Z" fill="#F8F4EA" stroke="${GK_L}" stroke-width="1.8"/>`
++ `<path d="M12,-44 q-8,-2 -8,-10" stroke="${GK_L}" stroke-width="3.4" fill="none" stroke-linecap="round"/><path d="M12,-44 q-8,-2 -8,-10" stroke="#F8F4EA" stroke-width="1.8" fill="none" stroke-linecap="round"/>`
++ [20, 27, 34, 41, 48, 55, 62, 69, 76].map(x => `<path d="M${x},-57 q-4,8 1,15" stroke="#3A2414" stroke-width="2.2" fill="none" stroke-linecap="round"/>`).join('')
++ `<circle cx="86" cy="-60" r="3.6" fill="#F8F4EA" stroke="${GK_L}" stroke-width="1.4"/><circle cx="99" cy="-60" r="3.6" fill="#F8F4EA" stroke="${GK_L}" stroke-width="1.4"/>`
++ `<path d="M80,-46 Q80,-60 92,-60 Q104,-60 105,-48 Q106,-36 94,-35 L82,-35Z" fill="#F8F4EA" stroke="${GK_L}" stroke-width="1.8"/>`
++ `<path d="M90,-59 v4 M94,-59 v4 M86,-57 l2,3 M98,-57 l-2,3" stroke="${GK_L}" stroke-width="1.3" stroke-linecap="round"/>`
++ `<circle cx="99" cy="-50" r="2.6" fill="#FFFDF6" stroke="${GK_L}" stroke-width="1"/><circle cx="99.6" cy="-50" r="1.3" fill="${GK_L}"/><path d="M95,-54 q4,-2 7,0" stroke="${GK_L}" stroke-width="1.2" fill="none"/>`
++ `<rect x="94" y="-44" width="11" height="5" rx="1.5" fill="#FFFDF6" stroke="${GK_L}" stroke-width="1.2"/><path d="M96.7,-44 v5 M99.5,-44 v5 M102.3,-44 v5" stroke="${GK_L}" stroke-width=".9"/>`
++ `<path d="M84,-46 q3,3 0,6 M88,-42 q3,2 1,6" stroke="${GK_L}" stroke-width="1.3" fill="none"/>`
++ `<path d="M24,-36 q2,4 6,3 M70,-36 q2,4 6,3" stroke="${GK_L}" stroke-width="1.4" fill="none"/>`;
+return g;
+}
+const gkWhisk = (x1, y1, x2, y2) => `<path d="M${x1},${y1} L${x2 - 8},${(y1 + y2) / 2}" stroke="#C9A86A" stroke-width="3" stroke-linecap="round"/>`
++ [-3, 0, 3].map(d => `<path d="M${x2 - 8},${(y1 + y2) / 2} L${x2},${y2 + d}" stroke="#C9A86A" stroke-width="1.4" stroke-linecap="round"/>`).join('');
+function gkBak(x, y) {
+let g = '';
+for (let i = 0; i < 6; i++) g += `<g transform="translate(${x},${y}) rotate(${-14 + i * 5})"><rect x="-3" y="0" width="6" height="50" rx="1.5" fill="${i % 2 ? '#5E3A2E' : '#6E4636'}" stroke="${GK_L}" stroke-width="1"/></g>`;
+return g + `<circle cx="${x}" cy="${y + 3}" r="2.2" fill="#C9A86A" stroke="${GK_L}" stroke-width=".8"/>`
++ `<path d="M${x + 2},${y + 4} Q${x + 18},${y + 10} ${x + 18},${y + 30}" stroke="#C8323A" stroke-width="1.6" fill="none"/>` + [12, 20, 28].map(d => `<circle cx="${x + 17 + (d === 20 ? 1 : 0)}" cy="${y + d}" r="2.4" fill="${d === 20 ? '#2F62B0' : '#C8323A'}"/>`).join('')
++ `<path d="M${x + 15},${y + 32} L${x + 21},${y + 32} L${x + 23},${y + 46} L${x + 13},${y + 46}Z" fill="#7A3A6A" stroke="${GK_L}" stroke-width="1"/>`;
+}
+function gkUnra(x, y) {
+const gong = (cx, cy) => `<path d="M${cx},${cy - 7.5} V${cy - 5}" stroke="#F07A6A" stroke-width="1.2"/><circle cx="${cx}" cy="${cy}" r="5.2" fill="${GK_BRASS}" stroke="${GK_L}" stroke-width="1.1"/><circle cx="${cx}" cy="${cy}" r="3.2" fill="#B8862A"/>`;
+let g = `<rect x="${x - 2}" y="${y}" width="4" height="26" fill="#5E3A1E" stroke="${GK_L}" stroke-width="1"/>`
++ `<path d="M${x - 17},${y} V${y - 44} M${x + 17},${y} V${y - 44} M${x - 17},${y} H${x + 17} M${x - 20},${y - 44} H${x + 20} M${x - 6},${y - 44} V${y - 60} M${x + 6},${y - 44} V${y - 60} M${x - 12},${y - 60} Q${x},${y - 64} ${x + 12},${y - 60}" stroke="#6E3A22" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
++ [y - 30, y - 16].map(yy => `<path d="M${x - 17},${yy} H${x + 17}" stroke="#6E3A22" stroke-width="1.6"/>`).join('');
+g += gong(x, y - 52);
+for (let r = 0; r < 3; r++) for (let c = 0; c < 3; c++) g += gong(x - 11 + c * 11, y - 37 + r * 14);
+return g + [-1, 1].map(d => `<path d="M${x + d * 20},${y - 44} V${y - 20}" stroke="#8E1E24" stroke-width="1.6"/><path d="M${x + d * 20 - 2},${y - 20} L${x + d * 20 + 2},${y - 20} L${x + d * 20 + 3},${y - 10} L${x + d * 20 - 3},${y - 10}Z" fill="#8E1E24"/>`).join('');
+}
 const GUGAK = [
 { k: 'geo', c: 'blue', kind: '현악기 · 고구려', name: '거문고', l1: '고구려 왕산악이 고쳐 만든 여섯 줄 악기', l2: '술대로 줄을 퉁겨 낮고 굵은 소리를 내요',
 draw: () => { let inn = `<rect x="-70" y="-43" width="20" height="14" rx="2" fill="#5A3A22"/>`; for (let i = 0; i < 16; i++) { const x = -40 + i * 5, h = 6 - i * 0.3; inn += `<rect x="${x}" y="${-40 - h / 2}" width="2.4" height="${h}" fill="#F1E2B8" stroke="${GK_L}" stroke-width=".5"/>`; }
@@ -2749,8 +2858,20 @@ play: (col, cf) => gkA('M-20,-66 Q-34,-86 -38,-90', col) + gPaw(-39, -90, cf) + 
 frame: () => gkFrame(gkPhoenix, gkBird, (x, y) => gkStoneL(x, y)), bx: -44,
 play: (col, cf) => gArm('M-20,-66 Q-36,-58 -30,-52', col) + gPaw(-30, -51, cf) + gArm('M20,-66 Q34,-60 40,-62', col) + gPaw(41, -62, cf) + gkStick(41, -62, 58, -70, '#E9D8A6', 2.6) + `<circle cx="59" cy="-70" r="2.6" fill="#F6F0DE" stroke="${GK_L}" stroke-width="1"/>` },
 { k: 'pjo', c: 'yel', kind: '타악기 · 쇠로 만든 악기', name: '편종', l1: '크기가 같은 종 16개를 두 단에 매달아요', l2: '종이 두꺼울수록 높은 소리가 나요',
-frame: () => gkFrame(gkDragon, gkLion, (x, y) => gkBell(x, y)), bx: -44,
+frame: () => gkPjoFrame(), bx: -44,
 play: (col, cf) => gArm('M-20,-66 Q-36,-58 -30,-52', col) + gPaw(-30, -51, cf) + gArm('M20,-66 Q34,-60 40,-62', col) + gPaw(41, -62, cf) + gkStick(41, -62, 58, -70, '#E9D8A6', 2.6) + `<circle cx="59" cy="-70" r="2.6" fill="#F6F0DE" stroke="${GK_L}" stroke-width="1"/>` },
+{ k: 'bipa', c: 'blue', kind: '현악기 · 줄을 퉁겨요', name: '비파', l1: '물방울 모양 몸통 · 향비파는 줄이 다섯 개', l2: '신라 삼현은 거문고 · 가야금 · 비파',
+play: (col, cf) => gkA('M-20,-66 Q-38,-62 -27,-72', col) + `<g transform="translate(12,-30) rotate(-40)">${gkBipa()}</g>` + gPaw(-27, -73, cf)
++ gkA('M20,-66 Q36,-50 14,-38', col) + gkStick(13, -40, 4, -30, '#E9D8A6', 2.6) + gPaw(14, -39, cf) },
+{ k: 'nodo', c: 'white', kind: '타악기 · 돌려 치는 북', name: '노도', l1: '작은 북 두 개를 긴 자루에 엇갈려 꽂아요', l2: '자루를 돌리면 북에 달린 끈이 북을 쳐요',
+play: (col, cf) => gkNodo(48) + gkA('M20,-66 Q40,-64 47,-74', col) + gPaw(48, -74, cf) + gkA('M-20,-66 Q4,-36 44,-44', col) + gPaw(47, -44, cf) },
+{ k: 'eo', c: 'blue', kind: '타악기 · 나무 호랑이', name: '어', l1: '등에 톱니 27개가 있는 흰 나무 호랑이', l2: '머리를 세 번 치고 등을 긁어 음악을 마쳐요',
+frame: () => gkEo(), bx: -40,
+play: (col, cf) => gArm('M-20,-66 Q-34,-52 -31,-40', col) + gPaw(-31, -36, cf) + gArm('M20,-66 Q34,-66 44,-70', col) + gkWhisk(45, -70, 94, -61) + gPaw(45, -70, cf) },
+{ k: 'bak', c: 'yel', kind: '타악기 · 나무판 여섯 쪽', name: '박', l1: '나무판 여섯 쪽을 엮어 부채처럼 펴고 접어요', l2: '시작에 한 번, 끝에 세 번 쳐요',
+play: (col, cf) => gkA('M20,-66 Q34,-74 40,-90', col) + gkBak(42, -94) + gPaw(41, -92, cf) + gkA('M-20,-66 Q2,-40 34,-46', col) + gPaw(36, -47, cf) },
+{ k: 'unra', c: 'red', kind: '타악기 · 작은 징 열 개', name: '운라', l1: '같은 크기 작은 징 10개를 나무틀에 매달아요', l2: '두꺼운 징일수록 높은 소리가 나요',
+play: (col, cf) => gkUnra(48, -66) + gkA('M20,-66 Q36,-54 46,-46', col) + gPaw(48, -44, cf) + gkA('M-20,-66 Q-4,-48 18,-58', col) + gkStick(19, -59, 36, -80, '#B07A3A', 2.6) + `<circle cx="37" cy="-81" r="3" fill="#E9D8A6" stroke="${GK_L}" stroke-width="1"/>` + gPaw(19, -59, cf) },
 ];
 const GUGAK_BY = Object.fromEntries(GUGAK.map(I => [I.k, I]));
 function gkBuk(cx, cy, r = 21) {
@@ -2909,6 +3030,10 @@ const GK_INSQ = [
 { card: 'geo', q: '술대로 줄을 퉁겨 소리 내는 악기는?', ans: '거문고', opts: ['거문고', '가야금', '해금'] },
 { card: 'gaya', q: '무릎에 얹고 손가락으로 줄을 뜯는 악기는?', ans: '가야금', opts: ['가야금', '해금', '대금'] },
 { card: 'kkw', q: '농악에서 상쇠가 치며 모두를 이끄는 악기는?', ans: '꽹과리', opts: ['꽹과리', '징', '북'] },
+{ card: 'eo', q: '등을 긁어 음악이 끝났다고 알리는 호랑이 악기는?', ans: '어', opts: ['어', '박', '노도'] },
+{ card: 'bak', q: '시작에 한 번, 끝에 세 번 치는 나무 악기는?', ans: '박', opts: ['박', '어', '장구'] },
+{ card: 'unra', pic: 1, q: '운라에 달린 작은 징은 몇 개일까요?', ans: '열 개', opts: ['열 개', '두 개', '여섯 개'] },
+{ card: 'bipa', pic: 1, q: '향비파 줄은 몇 개일까요?', ans: '다섯 개', opts: ['다섯 개', '두 개', '열두 개'] },
 { card: 'jd_sema', q: '아리랑 · 도라지타령을 부르는 장단은?', ans: '세마치', opts: ['세마치', '굿거리', '자진모리'] },
 { card: 'jd_gut', q: '풍년가를 부르는 장단은?', ans: '굿거리', opts: ['굿거리', '세마치', '중중모리'] },
 ].map(f => ({ kind: 'fact', ...f }));
@@ -2917,6 +3042,7 @@ const GK_OX = [
 ['geo', '거문고 줄은 여섯 개예요', 1], ['gaya', '가야금 줄은 여섯 개예요', 0], ['gaya', '가야금은 고구려에서 만들었어요', 0],
 ['hae', '해금은 활로 문질러 소리를 내요', 1], ['aj', '아쟁은 활로 줄을 문질러 소리를 내요', 1], ['aj', '아쟁은 높은 소리를 내는 악기예요', 0], ['dae', '대금은 세로로 들고 불어요', 0], ['piri', '피리는 대나무 서를 꽂아 소리를 내요', 1],
 ['danso', '단소는 맑고 깨끗한 소리를 내요', 1], ['jang', "장구 채편 소리는 '덕'이에요", 1], ['kkw', "꽹과리의 별명은 '쇠'예요", 1],
+['nodo', '노도는 자루를 돌려서 소리를 내요', 1], ['unra', '운라의 작은 징은 크기가 모두 달라요', 0], ['eo', '어는 음악을 시작할 때 쳐요', 0], ['bak', '박은 나무판 여섯 쪽으로 만들어요', 1], ['bipa', '향비파 줄은 열두 개예요', 0],
 ['jing', '징은 장단의 시작과 끝을 알려요', 1], ['pgy', '편경은 쇠로 만든 악기예요', 0], ['pjo', '편종은 종이 두꺼울수록 소리가 낮아져요', 0],
 ['samul', '사물놀이 네 악기에 가야금이 있어요', 0], ['sj_jgb', '정간보는 세종 때 만든 우리 악보예요', 1], ['bk_akh', '『악학궤범』은 세종 때 만든 책이에요', 0],
 ['bk_sg', '『삼국사기』는 김부식 등이 만들었어요', 1], ['jang', '진양조가 가장 빠른 장단이에요', 0], ['jd_gut', '굿거리는 풍년가를 부르는 장단이에요', 1],
@@ -2994,8 +3120,9 @@ return `<rect x="468" y="438" width="344" height="16" rx="4" fill="#9A6A3A" stro
 + [['pgy', 548], ['pjo', 722]].map(([k, x]) => { const pt = GK.pg ? T - GK.pg.t0 : null, up = pt != null && pt < 0.5 ? Math.sin(pt / 0.5 * Math.PI) * -46 : 0;
 return `<g transform="translate(${x},${438 + up + Math.abs(Math.sin(T * 2 + x)) * -4}) scale(0.7)">${gugakBear(GUGAK_BY[k])}</g>`; }).join('');
 }
-const GK_BAN = [['sogo', 150, 440, 0.6], ['pgy', 262, 440, 0.52], ['aj', 480, 432, 0.56], ['pjo', 600, 440, 0.52], ['kkw', 830, 440, 0.6], ['jing', 960, 440, 0.6], ['buk', 1120, 440, 0.6],
-['geo', 165, 534, 0.66], ['gaya', 330, 534, 0.66], ['hae', 480, 534, 0.7], ['dae', 615, 534, 0.7], ['piri', 760, 534, 0.72], ['danso', 880, 534, 0.72], ['jang', 1060, 534, 0.66]];
+const GK_BAN = [['sogo', 118, 440, 0.5], ['pgy', 214, 440, 0.44], ['aj', 350, 432, 0.48], ['pjo', 420, 440, 0.44], ['kkw', 552, 440, 0.5], ['jing', 636, 440, 0.5], ['buk', 760, 440, 0.5],
+['nodo', 836, 440, 0.5], ['bak', 912, 440, 0.5], ['unra', 990, 440, 0.5], ['eo', 1078, 440, 0.46],
+['geo', 150, 534, 0.62], ['gaya', 290, 534, 0.62], ['hae', 420, 534, 0.66], ['dae', 540, 534, 0.66], ['piri', 660, 534, 0.68], ['danso', 770, 534, 0.68], ['jang', 900, 534, 0.62], ['bipa', 1040, 534, 0.66]];
 const GK_SIL = {};
 const gkSil = k => GK_SIL[k] || (GK_SIL[k] = gugakBear(GUGAK_BY[k]).replace(/fill="(?!none)[^"]*"/g, 'fill="#CDBF9F"').replace(/stroke="(?!none)[^"]*"/g, 'stroke="#CDBF9F"'));
 function gkBan() {
@@ -3656,9 +3783,9 @@ const pgStageBg = () => (EXK = 'stage', '') + `<rect width="${W}" height="${H}" 
 + [...Array(9)].map((_, i) => `<path d="M0,${640 + i * 10} H${W}" stroke="#9A6A3A" stroke-width="2" opacity=".5"/>`).join('');
 const pgPeacock = x => `<g transform="translate(${x},183) scale(.95)"><path d="M-3,-6 Q-6,-30 -2,-50 Q2,-60 7,-52 Q9,-30 4,-6Z" fill="#2E8B57" stroke="#3A2414" stroke-width="2"/><circle cx="2" cy="-44" r="3.4" fill="#2F62B0"/><circle cx="2" cy="-30" r="3" fill="#E9B21C"/>`
 + `<path d="M-2,-14 Q-16,-22 -20,-8 Q-12,-10 -4,-6Z M6,-14 Q20,-22 24,-8 Q16,-10 8,-6Z" fill="#E9B21C" stroke="#3A2414" stroke-width="1.6"/><ellipse cx="1" cy="-4" rx="9" ry="6" fill="#E2575C" stroke="#3A2414" stroke-width="2"/></g>`;
-const pgHead = sx => `<g transform="translate(${sx > 0 ? 66 : 1214},190) scale(${sx},1)"><path d="M0,0 Q-6,-26 18,-30 Q40,-32 44,-12 L64,-6 L64,14 L40,16 Q20,26 4,18Z" fill="#2E8B57" stroke="#3A2414" stroke-width="3"/>`
-+ `<path d="M6,-6 Q12,-22 28,-20" fill="none" stroke="#E2575C" stroke-width="5" stroke-linecap="round"/><path d="M-2,4 L-14,8 L0,12Z" fill="#E9B21C" stroke="#3A2414" stroke-width="2"/><circle cx="14" cy="-2" r="4" fill="#FFFDF6" stroke="#3A2414" stroke-width="2"/><circle cx="15" cy="-2" r="1.6" fill="#3A2414"/></g>`;
-const pgTassels = x => `<path d="M${x},208 V600" stroke="#C8323A" stroke-width="2.5"/>` + [0, 1, 2, 3, 4, 5].map(k => { const y = 236 + k * 62;
+const PG_HX = 92;
+const pgHead = sx => `<g transform="translate(${sx > 0 ? PG_HX : W - PG_HX},192) scale(${sx},1)">${gkBongdu()}</g>`;
+const pgTassels = x => `<path d="M${x},202 V600" stroke="#C8323A" stroke-width="2.5"/>` + [0, 1, 2, 3, 4, 5].map(k => { const y = 236 + k * 62;
 return `<circle cx="${x}" cy="${y - 10}" r="4" fill="${['#2F62B0', '#E9B21C', '#2E8B57'][k % 3]}" stroke="#3A2414" stroke-width="1.4"/><path d="M${x - 5},${y - 4} L${x + 5},${y - 4} L${x + 11},${y + 26} L${x - 11},${y + 26}Z" fill="#C99A4E" stroke="#6E4524" stroke-width="2"/>`
 + `<path d="M${x - 6},${y + 6} L${x - 8},${y + 24} M${x},${y + 4} V${y + 25} M${x + 6},${y + 6} L${x + 8},${y + 24}" stroke="#8A6030" stroke-width="1.4"/>`; }).join('');
 const pgDuck = (x, sx) => `<g transform="translate(${x},630) scale(${sx},1)"><rect x="-74" y="0" width="148" height="30" fill="#C8323A" stroke="#3A2414" stroke-width="3"/><rect x="-62" y="5" width="124" height="20" rx="4" fill="#2E8B57"/>`
@@ -3675,7 +3802,7 @@ g += `<defs><pattern id="pgWave" width="22" height="12" patternUnits="userSpaceO
 g += [[202, 288], [500, 280], [790, 288]].map(([x, w]) => `<rect x="${x}" y="214" width="${w}" height="20" fill="#2E8B57" stroke="#3A2414" stroke-width="2"/><rect x="${x + w / 2 - 34}" y="220" width="68" height="8" rx="4" fill="#FFFDF6" stroke="#1F5A3C" stroke-width="1.5"/>`).join('');
 g += [242, 426].map(y => `<rect x="202" y="${y - 2}" width="876" height="10" fill="#B5352D" stroke="#3A2414" stroke-width="2"/>`).join('');
 g += [260, 450, 640, 830, 1020].map(pgPeacock).join('');
-g += pgHead(-1) + pgHead(1) + pgTassels(98) + pgTassels(1182) + pgDuck(189, 1) + pgDuck(1091, -1);
+g += pgHead(-1) + pgHead(1) + pgTassels(PG_HX - 37) + pgTassels(W - PG_HX + 37) + pgDuck(189, 1) + pgDuck(1091, -1);
 return PG_FRAME = g;
 }
 const pgNote = (x, y) => `<g transform="translate(${x},${y})"><ellipse cx="-6" cy="8" rx="9" ry="7" fill="#2F8F8A" stroke="#FFFDF6" stroke-width="2.5" transform="rotate(-20,-6,8)"/><path d="M2,6 V-22 Q10,-16 16,-8" fill="none" stroke="#2F8F8A" stroke-width="4" stroke-linecap="round"/></g>`;
@@ -4790,18 +4917,18 @@ if (!TU || TU.ph !== 'aim') return false;
 const r = tuLaunch(px, py); if (!r) return false;
 TU.arrow = r; TU.ouch = null; TU.ph = 'fly'; TU.t0 = T; TU.lastT = T; TU.first = false; SND.swish(); return true;
 }
-function tuFinish() { TU.ph = 'over'; TU.over = T; TU.newBest = TU.score > (tuMem('best') || 0); if (TU.newBest || tuMem('best') == null) tuMem('best', Math.max(TU.score, tuMem('best') || 0)); TU.score >= 6 ? SND.fanfare() : SND.stamp(); }
+function tuFinish() { chDone('tuh'); TU.ph = 'over'; TU.over = T; TU.newBest = TU.score > (tuMem('best') || 0); if (TU.newBest || tuMem('best') == null) tuMem('best', Math.max(TU.score, tuMem('best') || 0)); TU.score >= 6 ? SND.fanfare() : SND.stamp(); }
 function tuArrow(x, y, s, ang) {
-return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${s.toFixed(3)})"><path d="M-56,0 L50,0" stroke="#3A2414" stroke-width="7.5" stroke-linecap="round"/><path d="M-56,0 L50,0" stroke="#B88A50" stroke-width="4.5" stroke-linecap="round"/>`
-+ `<path d="M28,0 L54,0" stroke="#2F4F9E" stroke-width="5.5" stroke-linecap="round"/><path d="M22,0 L28,0" stroke="#F2D27A" stroke-width="5.5"/>`
-+ `<path d="M-56,0 L-40,-9 L-32,-9 L-44,0 L-32,9 L-40,9Z" fill="#FBF6EA" stroke="#8A6A4A" stroke-width="1.6"/></g>`;
+return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${s.toFixed(3)})"><path d="M-56,0 L40,0" stroke="#3A2414" stroke-width="7.5" stroke-linecap="round"/><path d="M-56,0 L40,0" stroke="#B88A50" stroke-width="4.5" stroke-linecap="round"/>`
++ `<path d="M-57,0 L-30,0" stroke="#3A2414" stroke-width="8.5" stroke-linecap="round"/><path d="M-57,0 L-30,0" stroke="#2F4F9E" stroke-width="5.5" stroke-linecap="round"/><path d="M-30,0 L-25,0" stroke="#F2D27A" stroke-width="5.5"/>`
++ `<path d="M38,-6 L58,0 L38,6 L42,0Z" fill="#FBF6EA" stroke="#8A6A4A" stroke-width="1.8" stroke-linejoin="round"/></g>`;
 }
 function tuPotSVG(x, y, s, o = {}) {
 const P = n => (n * s).toFixed(1), body = '#8A5A2E', dark = '#5E3A1E', band = '#C99A5E';
 let g = `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><ellipse cx="0" cy="${P(4)}" rx="${P(52)}" ry="${P(10)}" fill="#000" opacity=".16"/>`;
 (o.arrows || []).forEach(a => { if (a.ear) return; g += tuArrow(a.dx * s, -TU_MH * s - 36 * s, s * 0.95, 90 + a.a); });
 (o.arrows || []).forEach(a => { if (!a.ear) return; g += tuArrow(a.ear * TU_EAR * s, -TU_EH * s - 62 * s, s * 0.8, 90 + a.a * 0.3); });
-const ear = d => `<rect x="${P(d * TU_EAR - 10)}" y="${P(-TU_EH - 26)}" width="${P(20)}" height="${P(36)}" rx="${P(4)}" fill="${body}" stroke="${dark}" stroke-width="${P(2.5)}"/><ellipse cx="${P(d * TU_EAR)}" cy="${P(-TU_EH - 26)}" rx="${P(10)}" ry="${P(4)}" fill="#2A1A10" stroke="${dark}" stroke-width="${P(2)}"/><path d="M${P(d * 20)},${P(-TU_EH)} L${P(d * (TU_EAR - 10))},${P(-TU_EH)}" stroke="${dark}" stroke-width="${P(5)}"/>`;
+const ear = d => [-TU_EH - 14, -TU_EH + 2].map(yy => `<path d="M${P(d * 8)},${P(yy)} L${P(d * (TU_EAR - 8))},${P(yy)}" stroke="${dark}" stroke-width="${P(8)}" stroke-linecap="round"/><path d="M${P(d * 8)},${P(yy)} L${P(d * (TU_EAR - 8))},${P(yy)}" stroke="${band}" stroke-width="${P(4)}" stroke-linecap="round"/>`).join('') + `<rect x="${P(d * TU_EAR - 10)}" y="${P(-TU_EH - 26)}" width="${P(20)}" height="${P(36)}" rx="${P(4)}" fill="${body}" stroke="${dark}" stroke-width="${P(2.5)}"/><ellipse cx="${P(d * TU_EAR)}" cy="${P(-TU_EH - 26)}" rx="${P(10)}" ry="${P(4)}" fill="#2A1A10" stroke="${dark}" stroke-width="${P(2)}"/>`;
 g += ear(-1) + ear(1);
 g += `<path d="M${P(-14)},${P(-TU_MH)} L${P(-12)},${P(-80)} C${P(-50)},${P(-66)} ${P(-48)},${P(-10)} ${P(-26)},0 L${P(26)},0 C${P(48)},${P(-10)} ${P(50)},${P(-66)} ${P(12)},${P(-80)} L${P(14)},${P(-TU_MH)}Z" fill="${body}" stroke="${dark}" stroke-width="${P(3)}"/>`
 + `<path d="M${P(-36)},${P(-30)} Q0,${P(-24)} ${P(36)},${P(-30)} M${P(-40)},${P(-48)} Q0,${P(-42)} ${P(40)},${P(-48)}" stroke="${band}" stroke-width="${P(3)}" fill="none"/>`
@@ -4910,7 +5037,7 @@ if (S !== 'jegi' || !JG || (JG.ph !== 'ready' && JG.ph !== 'play')) return false
 if (y < 150 + EX && (x < 160 || x > 1040)) return false;
 return jgTap(x);
 }
-function jgFinish() { JG.ph = 'over'; JG.over = T; JG.newBest = JG.n > (jgMem('best') || 0); if (JG.newBest || jgMem('best') == null) jgMem('best', Math.max(JG.n, jgMem('best') || 0)); JG.n >= 10 ? SND.fanfare() : SND.stamp(); }
+function jgFinish() { chDone('jeg'); JG.ph = 'over'; JG.over = T; JG.newBest = JG.n > (jgMem('best') || 0); if (JG.newBest || jgMem('best') == null) jgMem('best', Math.max(JG.n, jgMem('best') || 0)); JG.n >= 10 ? SND.fanfare() : SND.stamp(); }
 function jgJegi(x, y, s, rot = 0) {
 const st = ['#FBF6EA', '#E2483C', '#FBF6EA', '#2F4F9E', '#FBF6EA', '#F2C230', '#FBF6EA', '#E2483C', '#FBF6EA'];
 let g = `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${rot.toFixed(1)}) scale(${s})">`;
@@ -5650,7 +5777,7 @@ return out.slice(0, 10);
 }
 function ckQuizStart(k) { CK = { ph: 'quiz', k, b: ckBook(k), qs: ckMakeQuiz(k), i: 0, ok: 0, pick: null, t0: T }; if (S !== 'chaek') go('chaek'); SND.whoosh(); }
 function ckAnswer(o) { if (CK.pick != null) return; const Q = CK.qs[CK.i]; CK.pick = o; CK.at = T; if (o === Q.ans) { CK.ok++; SND.right(); } else SND.wrong(); }
-function ckNext() { SND.tap(); if (CK.i < CK.qs.length - 1) { CK.i++; CK.pick = null; } else { CK.ph = 'qend'; CK.t0 = T; const qb = ckMem('qb') || {}; if ((qb[CK.k] || 0) < CK.ok) { qb[CK.k] = CK.ok; ckMem('qb', qb); } CK.ok >= 7 ? SND.fanfare() : SND.stamp(); } }
+function ckNext() { SND.tap(); if (CK.i < CK.qs.length - 1) { CK.i++; CK.pick = null; } else { CK.ph = 'qend'; CK.t0 = T; chDone('ckq', CK.k); const qb = ckMem('qb') || {}; if ((qb[CK.k] || 0) < CK.ok) { qb[CK.k] = CK.ok; ckMem('qb', qb); } CK.ok >= 7 ? SND.fanfare() : SND.stamp(); } }
 function drawCkQuiz() {
 let g = frame() + soundBtns(0, 98) + closeBtn() + pill(130, 70, 150, '곰 서원', () => go('sdk'), { fs: 24 });
 if (CK.ph === 'qmenu') {
@@ -5686,18 +5813,22 @@ g += pill(1040, 624, 150, CK.i < CK.qs.length - 1 ? '다음' : '끝', () => ckNe
 return g;
 }
 const CH_NEED = 0;
-const CH_LEARN = ['dal', 'sdk', 'std', 'hwk', 'hak', 'gkq', 'chk'], CH_FUN = ['jan', 'rhy', 'bsk', 'yut', 'okt'];
+const CH_LEARN = ['dal', 'sdk', 'std', 'hwk', 'hak', 'gkq', 'chk', 'ckq'],
+CH_FUN = ['jan', 'rhy', 'bsk', 'yut', 'okt', 'tuh', 'jeg'];
 const CH_ASK = {
 dal: { n: '곰 달력', at: [520, 318], s: v => `곰 달력 ${DAL_PAGES[v != null && v !== '' ? +v : chDalPg().pg].t} 쪽 채워 줄래?`, play: '곰 달력', go: v => go('dal', { ph: 'book', pg: v != null && v !== '' ? +v : chDalPg().pg }) },
 sdk: { n: '스도쿠', at: [948, 298], s: v => { const n = v ? +v : chSdkN(); return `서원 스도쿠 ${n}×${n} 풀어 줘!`; }, play: '곰 서원 · 스도쿠', go: v => { go('sdk'); sdkBegin(v ? +v : chSdkN()); } },
 std: { n: '소떡소떡', at: [1022, 310], s: v => { const o = chStdV(v); return `소떡소떡 ${o.m === 'pull' ? '뽑기' : '썰기'} ${STD_MAX[o.lv]}까지 한 판 해 줘!`; }, play: '곰 서원 · 소떡소떡', go: v => { const o = chStdV(v); go('std'); stdBegin(o.m, o.lv); } },
 hwk: { n: '십중팔구', at: [1132, 298], s: v => `십중팔구 「${HW_B[v ? +v : chHwB()].name}」 같이 할래?`, play: '곰 서원 · 십중팔구', go: v => go('hwak', { b: v ? +v : chHwB() }) },
 chk: { n: '책', at: [990, 318], s: v => `「${(CK_BOOKS.find(b => b.k === (v || 'hm')) || CK_BOOKS[0]).t}」 책 한 쪽 채워 줄래?`, play: '곰 서원 · 책', go: v => { go('sdk'); ckOpen(v || 'hm'); } },
+ckq: { n: '책 퀴즈', at: [1180, 300], s: v => `「${(CK_BOOKS.find(b => b.k === (v || 'hm')) || CK_BOOKS[0]).t}」 책 퀴즈 풀어 볼래?`, play: '곰 서원 · 책 퀴즈', go: v => { go('sdk'); ckQuizStart(v || 'hm'); } },
 hak: { n: '띠 카드', at: [86, 520], s: '올해 띠 카드 꾸며 줄래?', play: '곰 학당 · 띠 카드', go: () => { go('wheel', { y: THIS_YEAR }); openDeco(THIS_YEAR); } },
 gkq: { n: '국악 퀴즈', at: [690, 426], s: '국악 퀴즈 한 번 풀어 볼래?', play: '곰 국악단 · 퀴즈', go: () => { go('gak'); gkQuizStart(); } },
 jan: { n: '송편 잔치', at: [1188, 552], s: '송편 잔치 한 판 같이 하자!', play: '송편 잔치', go: () => go('jan') },
 rhy: { n: '장단놀이', at: [590, 426], s: v => `「${RHY[v || chRhyKey()].name}」 장단 같이 칠래?`, play: '곰 국악단 · 장단놀이', go: v => chRhyGo(v) },
 bsk: { n: '비석치기', at: [392, 598], s: '비석치기 한 판 어때?', play: '비석치기', go: () => go('bsk') },
+tuh: { n: '투호', at: [392, 598], s: '투호 화살 던지러 갈래?', play: '민속놀이 · 투호', go: () => go('tuho') },
+jeg: { n: '제기차기', at: [392, 598], s: '제기 몇 번 차나 볼까?', play: '민속놀이 · 제기차기', go: () => go('jegi') },
 yut: { n: '윷놀이', at: [1043, 512], s: '곰이랑 윷 한 판 놀자!', play: '윷놀이', go: () => { go('yut'); ytBegin('gom'); } },
 okt: { n: '옥토끼', at: [912, 612], s: '달나라 떡방아 찧으러 갈래?', play: '옥토끼 방앗간', go: () => go('okt') },
 };
@@ -5717,6 +5848,7 @@ if (k === 'sdk') { const f = chSdkN(); return [f, ...CH_SDK.filter(n => n !== f 
 if (k === 'std') { const f = chStdPick(), L = [f.m + f.lv]; ['pull', ...(stdCutOpen() ? ['cut'] : [])].forEach(m => { for (let lv = Math.min(1, stdLv(m)); lv >= 0; lv--) if (!L.includes(m + lv)) L.push(m + lv); }); return L; }
 if (k === 'hwk') { const f = chHwB(); return [f, ...HW_B.map((b, i) => i).filter(i => i !== f && !hwDone(i)), ...HW_B.map((b, i) => i).filter(i => i !== f && hwDone(i))].map(String); }
 if (k === 'rhy') { const f = chRhyKey(); return [f, ...chRhyKeys().filter(x => x !== f)]; }
+if (k === 'ckq') { const qb = (typeof ckMem === 'function' && ckMem('qb')) || {}, L = ['hm', 'hj8', 'kj', 'kr']; return [...L].sort((a, b) => (qb[a] != null ? qb[a] + 1 : 0) - (qb[b] != null ? qb[b] + 1 : 0) || (chHash(chDay() + a) % 7) - (chHash(chDay() + b) % 7)); }
 if (k === 'chk') { const L = CK_BOOKS.map(b => b.k).filter(x => x !== 'hj7'), nd = L.filter(x => !ckDone(x)), f = (nd.length ? nd : L)[chHash(chDay() + 'chk') % (nd.length || L.length)]; return [f, ...L.filter(x => x !== f)]; }
 return [''];
 }
@@ -8045,7 +8177,7 @@ GIM_V[ph] = GIM_V[ph].replace(/( id="|url\(#|href="#)([^")]+)/g, (m, pre, id) =>
 return GIM_V[ph];
 }
 function gimCardsSVG() {
-const CW = 1240, CH = 1560, cw = 180, ch = 240, gap = 16, cols = 6, n = gkCount();
+const cw = 180, ch = 240, gap = 16, cols = 6, n = gkCount(), CW = 1240, CH = 170 + Math.ceil(GK_ALL.length / cols) * (ch + gap) + 70;
 let g = `<rect width="${CW}" height="${CH}" fill="#FBF6EA"/><rect x="14" y="14" width="${CW - 28}" height="${CH - 28}" rx="18" fill="none" stroke="#8A5A36" stroke-width="4"/>`
 + tx(CW / 2, 92, '곰 국악단 카드 모음', { f: 'SM', fs: 52, c: C_INK }) + tx(CW / 2, 138, `${n} / ${GK_ALL.length}장`, { fs: 30, c: C_INK2 });
 GK_ALL.forEach((k, i) => { const r = Math.floor(i / cols), inRow = Math.min(cols, GK_ALL.length - r * cols), x0 = (CW - (inRow * cw + (inRow - 1) * gap)) / 2;
