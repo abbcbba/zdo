@@ -3548,7 +3548,7 @@ const JM_HEON = [['jingo', 70, 612, .55], ['pjo', 250, 612, .52], ['bh', 420, 61
 const JM_RED_C = {};
 const jmBear = k => JM_RED_C[k] || (JM_RED_C[k] = { ...GUGAK_BY[k], doll: undefined, c: 'red' });
 let JM_PAL_TAP = false;
-function jmStart() { GK = { ph: 'jm', t0: T }; }
+function jmStart() { GK = { ph: 'jm', t0: T }; if (!gkMem('jmv')) gkMem('jmv', 1); }
 const JM_SAY = [[0.4, 3.6, '곰을 톡! 악기 카드가 나와요'], [4.2, 7.4, '바구니 곰도 톡 해 봐요!']];
 function jmBubble(x, y, s, a) {
 const w = s.length * 21 + 40;
@@ -3558,15 +3558,34 @@ return `<g opacity="${a.toFixed(2)}"><path d="M${x},${y} l14,-22 h20Z" fill="#FF
 const JM_KEEP = { x: 1074, y: 646, w: 190, h: 46 };
 function jmKeepBtn() {
 const { x, y, w, h } = JM_KEEP;
-hit(x, y - 6, w, h + 12, () => { SND.pop(); keepSVG({ svg: jmSceneSVG(), W, H, name: '곰국악단_종묘제례악.png' }, '종묘제례악'); });
+hit(x, y - 6, w, h + 12, () => { SND.pop(); JM_PICK = T; });
 return `<rect x="${x}" y="${y + 4}" width="${w}" height="${h}" rx="${h / 2}" fill="#5A3A22" opacity=".45"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${h / 2}" fill="#FFFDF6" stroke="${C_SEAL}" stroke-width="3"/>${brushIcon(x + 32, y + h / 2 + 3, 0.4)}`
 + tx(x + w / 2 + 16, y + h / 2 + 8, '그림 간직하기', { fs: 22, c: '#7A1E1E' });
 }
-function jmSceneSVG() {
+let JM_PICK = null;
+function jmKeep(names) { JM_PICK = null; SND.pop(); keepSVG({ svg: jmSceneSVG(names), W, H, name: names ? '곰국악단_종묘제례악_이름.png' : '곰국악단_종묘제례악.png' }, '종묘제례악'); }
+function jmPickDraw() {
+if (JM_PICK == null) return '';
+const k = Math.min(1, (T - JM_PICK) / 0.2), pw = 400, ph = 225, gx = 640 - pw - 20, gy = 250;
+hit(0, -EX, W, H + 2 * EX, () => { JM_PICK = null; SND.tap(); });
+let g = `<g opacity="${k.toFixed(2)}"><rect ${FULLR()} fill="#1E120A" opacity=".6"/><rect x="${gx - 40}" y="${gy - 100}" width="${pw * 2 + 120}" height="${ph + 200}" rx="24" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`
++ tx(640, gy - 46, '어떤 그림으로 간직할까요?', { f: 'SM', fs: 34, c: C_INK });
+[[true, '이름 있게'], [false, '이름 없이']].forEach(([nm, t], i) => { const x = gx + i * (pw + 40);
+hit(x - 6, gy - 6, pw + 12, ph + 80, () => jmKeep(nm));
+g += `<rect x="${x}" y="${gy + 5}" width="${pw}" height="${ph}" rx="8" fill="#3A1D12" opacity=".25"/><use href="#jmPic${nm ? 1 : 0}" x="${x}" y="${gy}" width="${pw}" height="${ph}"/><rect x="${x}" y="${gy}" width="${pw}" height="${ph}" rx="8" fill="none" stroke="#8A5A2E" stroke-width="5"/>`
++ `<rect x="${x + pw / 2 - 90}" y="${gy + ph + 16}" width="180" height="50" rx="25" fill="${nm ? '#B5352D' : '#FFFDF6'}" stroke="#8A3424" stroke-width="3"/>` + tx(x + pw / 2, gy + ph + 50, t, { fs: 26, c: nm ? '#FFF6DC' : '#7A1E1E' }); });
+return g + `</g>` + jmPicDefs(pw, ph);
+}
+let JM_PIC_DEFS = null;
+function jmPicDefs() { return JM_PIC_DEFS || (JM_PIC_DEFS = `<defs>${[1, 0].map(n => `<symbol id="jmPic${n}" viewBox="0 0 ${W} ${H}">${jmSceneSVG(!!n).replace(/ id="([^"]+)"/g, ` id="$1_p${n}"`).replace(/url\(#([^)]+)\)/g, `url(#$1_p${n})`).replace(/href="#([^"]+)"/g, `href="#$1_p${n}"`)}</symbol>`).join('')}</defs>`); }
+function jmSceneSVG(names = false) {
 let g = jmBG() + jmDoors(99) + jmHwi(48, 446, .5);
 [...JM_DEUNG, ...JM_HEON].forEach(([k, x, y, sc]) => { g += `<g transform="translate(${x},${y}) scale(${sc})">${gugakBear(jmBear(k))}</g>`; });
+if (names) [...JM_DEUNG, ...JM_HEON].forEach(([k, x, y, sc]) => { const nm = GUGAK_BY[k].name, fs = sc > 0.5 ? 17 : 15, w = nm.length * fs + 14, cx = x;
+const ly = y - 46 * sc; g += `<rect x="${cx - w / 2}" y="${ly - (fs + 8) / 2}" width="${w}" height="${fs + 8}" rx="${(fs + 8) / 2}" fill="#4A2E1A" opacity=".85"/>` + tx(cx, ly + fs * 0.36, nm, { fs, c: '#FBF0D6' }); });
 const lab = (x, y, t, s2) => `<rect x="${x - 66}" y="${y - 25}" width="132" height="36" rx="18" fill="#4A2E1A" opacity=".88"/>` + tx(x - 16, y + 1, t, { f: 'SM', fs: 22, c: '#FBF0D6' }) + tx(x + 36, y + 1, s2, { fs: 18, c: '#E9C98A' });
-return g + lab(640, 360, '등가', '登歌') + lab(640, 562, '헌가', '軒架') + title('종묘제례악', '', undefined, 40) + `<rect x="490" y="680" width="300" height="32" rx="16" fill="#3A2414" opacity=".8"/>` + tx(640, 703, '곰 국악단 · zdogame.com/mini', { fs: 19, c: '#FFF4D8' });
+return g + (names ? lab(640, 360, '등가', '登歌') + lab(640, 562, '헌가', '軒架') : '') + title('종묘제례악', '', undefined, 40) + (names ? `<rect x="1000" y="22" width="260" height="30" rx="15" fill="#3A2414" opacity=".75"/>` + tx(1130, 43, '곰 국악단 · zdogame.com/mini', { fs: 17, c: '#FFF4D8' })
+: `<rect x="490" y="680" width="300" height="32" rx="16" fill="#3A2414" opacity=".8"/>` + tx(640, 703, '곰 국악단 · zdogame.com/mini', { fs: 19, c: '#FFF4D8' }));
 }
 const JM_BSK = { x: 1198, y: 534 };
 function jmBasketBear(x, y) {
@@ -3595,6 +3614,7 @@ return g;
 }
 function drawJm() {
 EXK = 'yard';
+if (!GK.jmv) { GK.jmv = 1; if (!gkMem('jmv')) gkMem('jmv', 1); }
 const st0 = T - GK.t0; if (st0 >= JM_DOOR.at && !GK.bak) { GK.bak = 1; SND.bak(); }
 let g = jmBG() + (st0 >= JM_DOOR.at ? jmDoors(st0) : '') + jmHwi(48, 446, .5);
 [...JM_DEUNG, ...JM_HEON].forEach(([k, x, y, sc], i) => {
@@ -3623,6 +3643,7 @@ g += `<g opacity="${a.toFixed(2)}"><g transform="translate(860,500) scale(${pu.t
 hit(530, 404, 620, 170, () => { SND.pop(); palStart(); }); } }
 if (GK.toast && T < GK.toast.until) g += `<rect x="290" y="660" width="700" height="44" rx="22" fill="#4A2E1A" opacity=".92"/>` + tx(640, 690, GK.toast.t, { fs: 23, c: '#FBF0D6' });
 if (GK.big) g += gkBig();
+g += jmPickDraw();
 return g;
 }
 function jmArt() {
@@ -3938,8 +3959,8 @@ const RM_SIGN_SOGO = [['ari', 160, 545], ['sema', 320, 465], ['mil', 480, 416], 
 const RM_SIGN = [['ari', 160, 545], ['sema', 352, 452], ['mil', 546, 400], ['gut', 740, 400], ['jaj', 934, 452], ['free', 1122, 545]];
 const RM_SC = 0.8;
 const RM_C = [640, 660, 1.45];
-const RM_POS = { geo: [140, 652], pgy: [305, 600], sogo: [548, 560], jang: [762, 560], danso: [955, 600], gaya: [1138, 652] };
-const RM_DRUM = [640, 430, 0.8];
+const RM_POS = { geo: [140, 652], pgy: [305, 600], sogo: [496, 560], jang: [800, 560], danso: [962, 600], gaya: [1138, 652] };
+const RM_DRUM = [640, 404, 0.8];
 let RM_SIGN_STYLE = 'fan';
 function rmSignArt(name, tag, c, stars) {
 const fs = name.length > 4 ? 26 : 30, st = (x, y, r = 10) => stars == null ? '' : [0, 1, 2].map(j => `<g opacity="${j < stars ? 1 : 0.3}">${rStar(x + j * (r * 2.4), y, r, j < stars)}</g>`).join('');
@@ -3982,11 +4003,13 @@ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="12" fill="#FBF5E6
 function rhyMenuDraw() {
 let g = rhyYard(); const B = rhyBest(), SEL = GK.sel; g += rmPeekDraw(SEL) + rhyYardFront();
 const bob = (i, a = 5) => -Math.abs(Math.sin(T * 2.2 + i * 0.9)) * a, jmp = k => GK.mb && GK.mb.k === k ? hop(GK.mb.t0) : 0;
-let drumHit = null;
+let drumHit = null, drumTag = null;
 { const db = GK.mb && GK.mb.k === 'drum' ? T - GK.mb.t0 : 9, s = db < 0.3 ? 1 + 0.08 * Math.sin(db / 0.3 * Math.PI) : 1;
 const [dx, dy, ds] = RM_DRUM; if (!SEL) drumHit = () => hit(dx - 70 * ds, dy - 62 * ds, 140 * ds, 140 * ds, () => { if (GK.mb && GK.mb.k === 'drum' && T - GK.mb.t0 < 0.5) return; GK.mb = { k: 'drum', t0: T }; SND.jang('쿵'); SND.jingGong(0.2); const M0 = GK.mb;
 setTimeout(() => { if (GK.mb !== M0 || S !== 'gak' || GK.ph !== 'rmenu' || GK.sel) return; tsStart(); }, 450); });
-g += `<g transform="translate(${dx},${dy}) scale(${(s * ds).toFixed(3)})">${rmDrum(0, 0)}</g>`; }
+g += `<ellipse cx="${dx}" cy="${dy + 58}" rx="78" ry="17" fill="#B5352D" opacity=".85" stroke="#5A3A22" stroke-width="3"/>`;
+g += `<g transform="translate(${dx},${dy}) scale(${(s * ds).toFixed(3)})">${rmDrum(0, 0)}</g>`;
+drumTag = () => { const nm = '따라 치기', w = 128; return `<rect x="${dx - w / 2}" y="${dy + 66}" width="${w}" height="34" rx="8" fill="#4A2E1A" stroke="#B5352D" stroke-width="3"/>` + tx(dx, dy + 90, nm, { f: 'SM', fs: 20, c: '#FBF0D6' }); }; }
 RM_INST.forEach(([k, name, x0, col], i) => { const [x, y] = RM_POS[k];
 if (!SEL) hit(x - 96, y - 150, 192, 196, () => { rmPeekNudge(); gkMem('ri', k); if (k === 'pgy') SND.stone(12); else if (k === 'geo') SND.geoNote(7); else if (k === 'gaya') SND.gayaNote(7); else if (k === 'danso') SND.dansoNote(5); else SND.rhyHit(k === 'sogo' ? '소고' : '덩'); GK.sel = { inst: k, t0: T }; });
 g += `<ellipse cx="${x}" cy="${y + 2}" rx="84" ry="19" fill="${col}" opacity=".85" stroke="#5A3A22" stroke-width="3"/>`;
@@ -3994,10 +4017,11 @@ if (SEL && SEL.inst === k) return;
 g += `<g transform="translate(${x},${y + bob(i + 3, 8)}) scale(1)">${instBear(k)}</g>`;
 const w = name.length * 26 + 34; g += `<rect x="${x - w / 2}" y="${y + 14}" width="${w}" height="34" rx="8" fill="#4A2E1A" stroke="${col}" stroke-width="3"/>` + tx(x, y + 39, name, { f: 'SM', fs: 22, c: '#FBF0D6' });
 });
+if (drumTag) g += drumTag();
 g += title('곰실곰실 장단놀이', '', undefined, 38);
 if (!SEL) g += rhyResetBtn();
 if (!SEL) { const t = T - (GK.t0 ?? T), op = t < 3 ? 1 : Math.max(0, 1 - (t - 3));
-if (op > 0) g += `<g opacity="${op.toFixed(2)}">` + tx(640, 372, '악기 곰을 톡! · 큰 북 = 따라 치기 합주', { fs: 24, c: '#FFFDF6' }).replace('<text ', '<text stroke="#5A3A22" stroke-width="6" stroke-linejoin="round" paint-order="stroke" ') + `</g>`; }
+if (op > 0) g += `<g opacity="${op.toFixed(2)}">` + tx(640, 326, '악기 곰을 톡! · 큰 북 = 따라 치기 합주', { fs: 24, c: '#FFFDF6' }).replace('<text ', '<text stroke="#5A3A22" stroke-width="6" stroke-linejoin="round" paint-order="stroke" ') + `</g>`; }
 else {
 const [k, name, , col] = RM_INST.find(r => r[0] === SEL.inst), [ox, oy] = RM_POS[k], t = Math.min(1, (T - SEL.t0) / 0.35), e = 1 - Math.pow(1 - t, 3);
 const x = ox + (RM_C[0] - ox) * e, y = oy + (RM_C[1] - oy) * e - Math.sin(t * Math.PI) * 60, sc = 1 + (RM_C[2] - 1) * e;
@@ -5507,12 +5531,15 @@ let NY = null, NY_BG = null;
 const NY_SN_NAME = { spring: '봄', summer: '여름', autumn: '가을', winter: '겨울' };
 function nySeason() { const sn = typeof maSeason === 'function' ? maSeason() : 'summer', i = Math.max(0, MA_SEASONS.indexOf(sn)); return { sn, name: NY_SN_NAME[sn] || '', ks: [...new Set(MA_SNACK.slice(i * 6, i * 6 + 6))] }; }
 function nyMem(k, v) { try { const r = JSON.parse(localStorage.getItem('mini_nyam') || '{}'); if (v === undefined) return r[k]; r[k] = v; localStorage.setItem('mini_nyam', JSON.stringify(r)); } catch (e) { } return undefined; }
-function nyStart() { NY = { ph: 'ready', n: 0, cnt: 0, sea: nySeason(), x: NY_X, tx: NY_X, face: 1, items: [], pops: [], t0: T, lastT: T, next: 0, eat: null, ouch: null, drag: false, over: null, seed: 1, first: !nyMem('best'), kk: null, kkNext: 0, rain: false }; NY_BG = null; }
+function nyStart() { NY = { ph: 'ready', n: 0, cnt: 0, sea: nySeason(), x: NY_X, tx: NY_X, face: 1, items: [], pops: [], t0: T, lastT: T, next: 0, eat: null, ouch: null, drag: false, over: null, seed: 1, first: !nyMem('best'), kk: null, kkNext: 0, rain: false, want: null, wantT: 0, combo: 0, wcnt: 0 }; NY.want = nyNewWant(); NY_BG = null; }
+const NY_WANT_SEC = 7;
+function nyNewWant() { const L = NY.sea.ks.filter(k => k !== NY.want); NY.wantT = T; return L[Math.floor(Math.random() * L.length)] || NY.sea.ks[0]; }
 function nyRnd() { NY.seed = (NY.seed * 16807 + 7) % 2147483647; return NY.seed / 2147483647; }
-function nyBegin() { NY.ph = 'play'; NY.t0 = T; NY.lastT = T; NY.next = T + 0.4; NY.kkNext = T + 6 + Math.random() * 2; NY.seed = (Date.now() % 100000) + 1; SND.pop(); }
+function nyBegin() { NY.ph = 'play'; NY.wantT = T; NY.t0 = T; NY.lastT = T; NY.next = T + 0.4; NY.kkNext = T + 6 + Math.random() * 2; NY.seed = (Date.now() % 100000) + 1; SND.pop(); }
 const nyLeft = () => NY.ph === 'play' ? Math.max(0, NY_SEC - (T - NY.t0)) : NY.ph === 'over' ? 0 : NY_SEC;
 function nySpawn() {
-const el = T - NY.t0, k = Math.min(1, el / NY_SEC), ks = nyRnd() < 0.35 ? NY.sea.ks : [...new Set(MA_SNACK)], bam = !NY.rain && el > 4 && nyRnd() < 0.16 + 0.08 * k;
+const el = T - NY.t0, k = Math.min(1, el / NY_SEC), rr = nyRnd(), ks = rr < 0.18 ? [NY.want] : rr < 0.42 ? NY.sea.ks : [...new Set(MA_SNACK)],
+bam = !NY.rain && el > 4 && nyRnd() < 0.16 + 0.08 * k;
 let x = NY_MIN + nyRnd() * (NY_MAX - NY_MIN); const last = NY.items[NY.items.length - 1]; if (last && Math.abs(last.x - x) < 90) x = x < NY_X ? x + 160 : x - 160;
 NY.items.push({ x, y: -40, vy: 190 + 130 * k + nyRnd() * 60, bam, k: bam ? null : ks[Math.floor(nyRnd() * ks.length)], rot: (nyRnd() - 0.5) * 40, spin: (nyRnd() - 0.5) * 120, sw: nyRnd() * 6, s: 2.7 + nyRnd() * 0.5 });
 NY.next = NY.rain ? T + 0.16 + nyRnd() * 0.08 : T + 0.75 - 0.3 * k + nyRnd() * 0.2;
@@ -5523,15 +5550,20 @@ if (NY.ph !== 'play') return;
 const stun = NY.ouch && T - NY.ouch < 1.4;
 if (!stun) { const d = NY.tx - NY.x, mv = Math.sign(d) * Math.min(Math.abs(d), 1500 * dt); if (Math.abs(d) > 2) NY.face = d < 0 ? -1 : 1; NY.x += mv; }
 if (!NY.rain && nyLeft() <= NY_RAIN) { NY.rain = T; SND.jingle(); }
+if (T - NY.wantT > NY_WANT_SEC) NY.want = nyNewWant();
 if (T >= NY.next && nyLeft() > 0.6) nySpawn();
 nyKkTick(dt);
 NY.items.forEach(it => { if (it.gone || it.stolen) return; it.y += it.vy * dt; it.rot += it.spin * dt;
 const dx = Math.abs(it.x - NY.x);
 if (!it.past && it.y > NY_MOUTH - 34 && it.y < NY_MOUTH + 26) {
-if (it.bam && dx < 60 && !stun) { it.gone = T; NY.ouch = T; NY.pops.push({ x: NY.x, y: NY_MOUTH - 70, t0: T, s: '따끔!', c: '#5E7A22' }); SND.thud(); }
-else if (!it.bam && dx < 64 && !stun) { const two = NY.sea.ks.includes(it.k), p0 = NY.n; it.gone = T; NY.cnt++; NY.n += two ? 2 : 1; NY.eat = T;
-NY.pops.push(two ? { x: NY.x, y: NY_MOUTH - 60, t0: T, s: '+2 ' + NY_YUM[NY.cnt % NY_YUM.length], heart: true, c: '#C8780A' } : { x: NY.x, y: NY_MOUTH - 60, t0: T, s: NY_YUM[NY.cnt % NY_YUM.length], heart: NY.cnt % 5 === 0 });
-two ? SND.right() : SND.bbyong(Math.min(6, NY.cnt % 7)); if (Math.floor(NY.n / 10) > Math.floor(p0 / 10)) SND.jingle(); } }
+if (it.bam && dx < 60 && !stun) { it.gone = T; NY.ouch = T; NY.combo = 0; NY.pops.push({ x: NY.x, y: NY_MOUTH - 70, t0: T, s: '따끔!', c: '#5E7A22' }); SND.thud(); }
+else if (!it.bam && dx < 64 && !stun) { const want = it.k === NY.want, two = NY.sea.ks.includes(it.k), p0 = NY.n, nm = MA_SNACK_NAME[it.k] || ''; it.gone = T; NY.cnt++; NY.eat = T;
+if (want) { NY.combo++; NY.wcnt++; const bonus = Math.min(3, NY.combo - 1), add = 3 + bonus; NY.n += add; NY.want = nyNewWant();
+NY.pops.push({ x: NY.x, y: NY_MOUTH - 60, t0: T, s: `+${add} ${nm}!`, heart: true, c: '#D2462E', big: true }); if (NY.combo >= 2) NY.pops.push({ x: NY.x, y: NY_MOUTH - 112, t0: T + 0.05, s: `연속 ${NY.combo}!`, c: '#8A3FB0' }); SND.right(); if (NY.combo >= 2) setTimeout(() => SND.bbyong(Math.min(6, NY.combo + 1)), 160); }
+else { NY.combo = 0; NY.n += two ? 2 : 1;
+NY.pops.push(two ? { x: NY.x, y: NY_MOUTH - 60, t0: T, s: `+2 ${nm}!`, heart: true, c: '#C8780A' } : { x: NY.x, y: NY_MOUTH - 60, t0: T, s: NY_YUM[NY.cnt % NY_YUM.length], heart: NY.cnt % 5 === 0 });
+two ? SND.right() : SND.bbyong(Math.min(6, NY.cnt % 7)); }
+if (Math.floor(NY.n / 10) > Math.floor(p0 / 10)) SND.jingle(); } }
 if (it.y > NY_MOUTH + 26) it.past = true; });
 NY.items = NY.items.filter(it => !(it.gone && T - it.gone > 0.25) && it.y < H + 60 && !(it.stolen && !NY.kk));
 if (nyLeft() <= 0) nyFinish();
@@ -5599,9 +5631,10 @@ if (sc <= 0.05) return;
 if (!it.bam && !it.gone && NY.sea.ks.includes(it.k)) g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(sc * 15).toFixed(1)}" fill="#FFF2A0" opacity=".75"/><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(sc * 15).toFixed(1)}" fill="none" stroke="#F2C230" stroke-width="3" stroke-dasharray="6 6"/>`;
 g += it.bam ? maBamsongi(+x.toFixed(1), +y.toFixed(1), sc * 0.95, +it.rot.toFixed(1)) : `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${it.rot.toFixed(1)}) scale(${sc.toFixed(2)})">${maSnack(0, 0, MA_SNACK.indexOf(it.k))}</g>`; });
 if (NY.kk) g += nyKkachi(NY.kk.x, NY.kk.y, NY.kk.dir, NY.kk.t0);
+if (NY.ph === 'play') g += nyWantBub();
 if (NY.rain && NY.ph === 'play' && T - NY.rain < 1.6) { const a = Math.min(1, (T - NY.rain) / 0.2, (1.6 - (T - NY.rain)) / 0.4); g += `<text x="640" y="120" font-family="Jua" font-size="40" text-anchor="middle" fill="#C8780A" stroke="#FFFDF6" stroke-width="7" paint-order="stroke" opacity="${a.toFixed(2)}">간식 비!</text>`; }
 NY.pops = NY.pops.filter(p => T - p.t0 < 0.8);
-NY.pops.forEach(p => { const a = (T - p.t0) / 0.8; g += (p.heart ? sparkle(p.x, p.y + 30, a) : '') + `<text x="${p.x.toFixed(1)}" y="${(p.y - a * 46).toFixed(1)}" font-family="Jua" font-size="34" text-anchor="middle" fill="${p.c || C_SEAL}" stroke="#FFFDF6" stroke-width="6" paint-order="stroke" opacity="${(1 - a).toFixed(2)}">${esc(p.s)}</text>`; });
+NY.pops.forEach(p => { if (T < p.t0) return; const a = (T - p.t0) / 0.8; g += (p.heart ? sparkle(p.x, p.y + 30, a) : '') + `<text x="${p.x.toFixed(1)}" y="${(p.y - a * 46).toFixed(1)}" font-family="Jua" font-size="${p.big ? 40 : 34}" text-anchor="middle" fill="${p.c || C_SEAL}" stroke="#FFFDF6" stroke-width="6" paint-order="stroke" opacity="${(1 - a).toFixed(2)}">${esc(p.s)}</text>`; });
 g += soundBtns(76, 98) + closeBtn();
 const left = Math.ceil(nyLeft()), hx = 1144, hy = 156;
 g += `<rect x="${hx - 98}" y="${hy - 22}" width="196" height="44" rx="22" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5" opacity=".95"/>`
@@ -5610,17 +5643,26 @@ if (NY.ph !== 'over') { g += `<rect x="${hx - 98}" y="${hy + 28}" width="196" he
 if (NY.ph === 'ready') { const a = (T % 1.4) / 1.4;
 g += `<rect x="370" y="250" width="540" height="200" rx="22" fill="#FFFDF6" stroke="#8A5A36" stroke-width="3" opacity=".96"/>`
 + `<circle cx="440" cy="322" r="38" fill="#FFF2A0" opacity=".8"/><g transform="translate(440,322) rotate(-12) scale(2.6)">${maSnack(0, 0, MA_SNACK.indexOf(NY.sea.ks[0]))}</g>` + maBamsongi(842, 316, 1.7, 10)
-+ tx(640, 312, '냠냠곰을 끌어서', { fs: 32, c: C_INK }) + tx(640, 352, '간식을 받아먹어요', { fs: 32, c: C_INK }) + tx(640, 390, `밤송이는 피하고 · ${NY.sea.name} 간식은 2배!`, { fs: 25, c: '#5E7A22' })
++ tx(640, 312, '냠냠곰을 끌어서', { fs: 32, c: C_INK }) + tx(640, 352, '간식을 받아먹어요', { fs: 32, c: C_INK }) + tx(640, 390, `먹고 싶은 간식 3점 · ${NY.sea.name} 간식 2점 · 밤송이는 피해요`, { fs: 22, c: '#5E7A22' })
 + `<circle cx="560" cy="424" r="${(10 + a * 6).toFixed(1)}" fill="#FFFFFF" opacity="${(0.9 - a * 0.6).toFixed(2)}" stroke="#8A5A36" stroke-width="2.5"/>` + tx(650, 432, '톡 하면 시작!', { fs: 24, c: C_INK2 }); }
 if (NY.ph === 'play' && T - NY.t0 < 2.5) { const a = Math.min(1, (2.5 - (T - NY.t0)) / 0.4); g += `<g opacity="${a.toFixed(2)}">` + tx(NY.x - 150, NY_FY - 50, '◀', { fs: 40, c: '#FFFDF6' }) + tx(NY.x + 150, NY_FY - 50, '▶', { fs: 40, c: '#FFFDF6' }) + `</g>`; }
 if (NY.ph === 'over') g += nyOver();
 return g;
 }
+function nyWantBub() {
+const nm = MA_SNACK_NAME[NY.want] || '', msg = `${nm} 먹고 싶어!`, w = msg.length * 25 + 84, x = Math.max(w / 2 + 12, Math.min(W - w / 2 - 12, NY.x)), y = NY_FY - 234, ct = T - NY.wantT, sc = ct < 0.25 ? 0.7 + 0.3 * ct / 0.25 + Math.sin(ct / 0.25 * Math.PI) * 0.12 : 1, left = Math.max(0, 1 - ct / NY_WANT_SEC);
+const tx0 = Math.max(x - w / 2 + 26, Math.min(x + w / 2 - 26, NY.x));
+return `<g transform="translate(${x.toFixed(1)},${y}) scale(${sc.toFixed(3)})"><rect x="${-w / 2}" y="-30" width="${w}" height="56" rx="28" fill="#FFFDF6" stroke="#D2462E" stroke-width="3.5"/>`
++ `<path d="M${(tx0 - x - 10).toFixed(1)},25 L${(tx0 - x).toFixed(1)},42 L${(tx0 - x + 10).toFixed(1)},25" fill="#FFFDF6" stroke="#D2462E" stroke-width="3.5" stroke-linejoin="round"/><rect x="${(tx0 - x - 12).toFixed(1)}" y="20" width="24" height="8" fill="#FFFDF6"/>`
++ `<circle cx="${-w / 2 + 34}" cy="-2" r="21" fill="#FFF2A0"/><g transform="translate(${-w / 2 + 34},-2) scale(1.45)">${maSnack(0, 0, MA_SNACK.indexOf(NY.want))}</g>`
++ `<text x="${24}" y="7" font-family="Jua" font-size="25" text-anchor="middle" fill="#5A3A22">${esc(msg)}</text>`
++ `<rect x="${-w / 2 + 62}" y="18" width="${((w - 90) * left).toFixed(1)}" height="4" rx="2" fill="#F2C230" opacity=".9"/></g>`;
+}
 function nyOver() {
 const k = Math.min(1, (T - NY.over) / 0.3), x = 290, y = 150, w = 700, h = 440;
 hit(0, -EX, W, H + 2 * EX, () => { });
 let g = `<g opacity="${k}"><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#3A1D12" opacity=".35"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`;
-g += tx(640, y + 70, `냠냠 ${NY.n}점!`, { f: 'SM', fs: 46, c: C_SEAL }) + tx(640, y + 112, `간식 ${NY.cnt}개를 먹었어요`, { fs: 26, c: C_INK });
+g += tx(640, y + 70, `냠냠 ${NY.n}점!`, { f: 'SM', fs: 46, c: C_SEAL }) + tx(640, y + 112, `간식 ${NY.cnt}개 · 냠냠곰 주문 ${NY.wcnt}개`, { fs: 26, c: C_INK });
 const ks = [...new Set(MA_SNACK)]; ks.slice(0, Math.min(ks.length, Math.max(1, Math.ceil(NY.cnt / 3)))).forEach((q, i, a) => { g += `<g transform="translate(${640 + (i - (a.length - 1) / 2) * 52},${y + 170}) scale(1.9)">${maSnack(0, 0, MA_SNACK.indexOf(q))}</g>`; });
 g += tx(640, y + 260, '잘 먹었습니다!', { fs: 28, c: C_INK }) + tx(640, y + 300, NY.newBest ? '최고 기록!' : `최고 기록 ${nyMem('best') || 0}점`, { fs: 26, c: NY.newBest ? C_SEAL : C_INK2 });
 g += btn(x + 90, y + h - 100, 240, 66, '다시 하기', () => nyStart(), { fs: 30 }) + btn(x + w - 330, y + h - 100, 240, 66, '마을', () => go('maeul'), { fs: 30 });
@@ -6410,9 +6452,15 @@ function chHash(s) { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)
 function chPick(list, n, lp, seed) {
 return list.map((k, i) => ({ k, t: lp[k] || 0, r: (chHash(seed + k) + i) % 97 })).sort((a, b) => a.t - b.t || a.r - b.r).slice(0, n).map(o => o.k);
 }
+const CH_NEW = ['nym', 'tsj'];
+function chNewFun(r, skip = []) { return CH_NEW.find(k => CH_FUN.includes(k) && !(r.ak || {})[k] && !skip.includes(k)); }
 function chAsks(r) {
-const day = chDay(); if (r.day === day && r.asks.length) return r.asks;
-r.day = day; r.asks = [...chPick(CH_LEARN, 2, r.lp, day), ...chPick(CH_FUN, 1, r.lp, day)].map(k => ({ k, v: chVars(k)[0], done: 0 })); chSave(r); return r.asks;
+const day = chDay(); r.ak = r.ak || {};
+if (r.day === day && r.asks.length) {
+if (r.nv !== 1) { r.nv = 1; const a = r.asks.find(x => CH_FUN.includes(x.k) && !x.done), nk = a && !CH_NEW.includes(a.k) && chNewFun(r, r.asks.map(x => x.k)); if (nk) { a.k = nk; a.v = chVars(nk)[0]; } r.asks.forEach(x => { r.ak[x.k] = 1; }); chSave(r); }
+return r.asks; }
+const nk = chNewFun(r);
+r.day = day; r.nv = 1; r.asks = [...chPick(CH_LEARN, 2, r.lp, day), ...(nk ? [nk] : chPick(CH_FUN, 1, r.lp, day))].map(k => ({ k, v: chVars(k)[0], done: 0 })); r.asks.forEach(x => { r.ak[x.k] = 1; }); chSave(r); return r.asks;
 }
 function chIpchun(y) { const L = dalList(y), e = L && L.find(x => x.n === '입춘'); return e ? e.d : null; }
 function chBookY(date) { const d = date || new Date(), y = d.getFullYear(), s = chIpchun(y); return s != null && dalDays(d) < s ? y - 1 : y; }
@@ -7309,8 +7357,9 @@ let TK_SHOWN = false;
 function tkStop() { TK_PREV = 0; TK_PV = null; TK_PVK = null; TK_IN = null; TK_C.t = -9; }
 function tkEnter() {
 const k = tkKind(); if (!k) { TK_IN = null; return; }
-if (!TK_SHOWN || TK_PREV) { TK_SHOWN = true;
-const m = tkMem(), day = new Date().toDateString(), dur = !TK_PREV && m.popDay === day ? TK_SHORT : TK_LONG; if (!TK_PREV) { m.popDay = day; tkSave(m); }
+const m = tkMem(), day = new Date().toDateString();
+if ((!TK_SHOWN && m.popDay !== day) || TK_PREV) { TK_SHOWN = true;
+const dur = TK_LONG; if (!TK_PREV) { m.popDay = day; tkSave(m); }
 TK_IN = { t0: T + 0.3, sf: {}, dur, k }; if (typeof CH_POP !== 'undefined' && CH_POP) CH_POP.t0 += dur + 1; if (typeof CH_GIL !== 'undefined' && CH_GIL && CH_GIL.kind === 'teuk') CH_GIL.t0 = TK_IN.t0 + dur + 0.8; }
 }
 let TK_PVD = null;
@@ -7522,6 +7571,7 @@ g += tkIntro();
 if (TK_UI) g += tkPanel();
 return g;
 }
+const TK_TXT = { bday: ['#FF4F8B', '#FF9A1F', '#22B573', '#2F9BEA', '#A65CE8', '#F5B800'], xmas: ['#E03A3A', '#2E9E4F', '#E8A21E'], seol: ['#E8566A', '#3A86D8', '#F2A21E', '#3FA05A', '#B06AD0'], get chu() { return HG_TXT; } };
 const TK_WORD = { bday: '생일 축하해!', xmas: '메리 크리스마스!', seol: '새해 복 많이 받아!', chu: '즐거운 한가위!' };
 function tkIntro() {
 if (!TK_IN) return ''; const t = T - TK_IN.t0; if (t < 0) return ''; const dur = TK_IN.dur || TK_LONG; if (t > dur + 0.6 || TK_IN.out && T - TK_IN.out > 0.5) { TK_IN = null; return ''; }
@@ -7548,7 +7598,7 @@ g += `<g transform="translate(${bx},${by}) scale(${bs.toFixed(3)})"><path d="M-1
 const fs = Math.min(86, Math.floor(590 / word.reduce((p, c) => p + (c === ' ' ? 0.35 : c === '!' ? 0.45 : 0.98), 0))), adv = word.map(c => c === ' ' ? fs * 0.35 : c === '!' ? fs * 0.45 : fs * 0.98), tw = adv.reduce((p, q) => p + q, 0); let cx = -tw / 2;
 word.forEach((c, i) => { const w = adv[i], x = cx + w / 2; cx += w; if (c === ' ') return; const lt = t - 0.9 - i * 0.14; if (lt < 0) return;
 const sc = lt < 0.2 ? 1.6 - 0.6 * lt / 0.2 : lt < 0.4 ? 1 + Math.sin((lt - 0.2) / 0.2 * Math.PI) * 0.15 : 1, wob = Math.sin(T * 5 + i) * 5;
-g += `<g transform="translate(${x.toFixed(1)},${(28 - (86 - fs) * 0.35).toFixed(1)}) rotate(${wob.toFixed(1)}) scale(${sc.toFixed(3)})">${K === 'chu' ? `<text x="0" y="0" font-family="SM" font-size="${fs}" text-anchor="middle" fill="${HG_TXT[i % HG_TXT.length]}" stroke="#FFFDF6" stroke-width="14" stroke-linejoin="round" paint-order="stroke">${c}</text>` : `<text x="0" y="0" font-family="SM" font-size="${fs}" text-anchor="middle" fill="url(#tkGold)" stroke="#5A1E10" stroke-width="13" stroke-linejoin="round" paint-order="stroke">${c}</text>`}</g>`; });
+g += `<g transform="translate(${x.toFixed(1)},${(28 - (86 - fs) * 0.35).toFixed(1)}) rotate(${wob.toFixed(1)}) scale(${sc.toFixed(3)})"><text x="0" y="0" font-family="SM" font-size="${fs}" text-anchor="middle" fill="${TK_TXT[K][i % TK_TXT[K].length]}" stroke="#FFFDF6" stroke-width="14" stroke-linejoin="round" paint-order="stroke">${c}</text></g>`; });
 g += `</g>`; }
 if (t > 1.5 && !TK_IN.out) hit(-400, -400, 2080, 1520, () => { TK_IN.out = T; SND.pop(); });
 else hit(-400, -400, 2080, 1520, () => { });
@@ -8415,13 +8465,17 @@ if (MA_TTI_T == null) return ''; const t = T - MA_TTI_T; if (t > 1.6) return '';
 const a = Math.min(1, t / 0.15, (1.6 - t) / 0.3), A = ANI[ANI_ORDER[MA_TTI]], msg = A.n + '띠', w = msg.length * 24 + 30, x = 92, y = 496;
 return `<g opacity="${a.toFixed(2)}"><rect x="${x - w / 2}" y="${y - 26}" width="${w}" height="42" rx="21" fill="#FFFDF6" stroke="${A.line}" stroke-width="3"/><path d="M${x - 7},${y + 15} L${x},${y + 27} L${x + 7},${y + 15}" fill="#FFFDF6" stroke="${A.line}" stroke-width="3" stroke-linejoin="round"/><rect x="${x - 8}" y="${y + 11}" width="16" height="6" fill="#FFFDF6"/>` + tx(x, y + 5, msg, { fs: 24 }) + `</g>`;
 }
-const MA_SNK_SEC = 5;
+const MA_SNK_SEC = 6;
 function maSnackMsg() { const j = maJeolRow(), k = MA_SNACK_NAME[MA_SNACK[((maJi() % 24) + 24) % 24]]; return (j ? `오늘은 ${j[0]}! ` : '') + `${k} 냠냠`; }
 function maSnackTop() {
 if (!MA_SNK) return ''; const t = T - MA_SNK.t0; if (t > MA_SNK_SEC) { MA_SNK = null; return ''; }
-const a = Math.min(1, t / 0.2, (MA_SNK_SEC - t) / 0.3), msg = maSnackMsg(), link = '같이 먹기', w = (msg.length + link.length + 1) * 19 + 34, x = 424, bx = Math.max(w / 2 + 8, x + 40), by = 380;
-hit(bx - w / 2 - 8, by - 26, w + 16, 46, () => { MA_SNK = null; SND.pop(); go('nyam'); });
-let g = `<g opacity="${a.toFixed(2)}"><path d="M${bx - w / 2},${by - 24} H${bx + w / 2} Q${bx + w / 2 + 8},${by - 24} ${bx + w / 2 + 8},${by - 16} V${by + 10} Q${bx + w / 2 + 8},${by + 18} ${bx + w / 2},${by + 18} H${x + 12} L${x + 2},${by + 34} L${x - 4},${by + 18} H${bx - w / 2} Q${bx - w / 2 - 8},${by + 18} ${bx - w / 2 - 8},${by + 10} V${by - 16} Q${bx - w / 2 - 8},${by - 24} ${bx - w / 2},${by - 24}Z" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5"/>` + `<text x="${bx}" y="${by + 4}" font-family="Jua" font-size="21" text-anchor="middle"><tspan fill="#5A3A22">${esc(msg)}</tspan><tspan fill="#8A5A36" dx="10" text-decoration="underline">${link}</tspan></text></g>`;
+const a = Math.min(1, t / 0.2, (MA_SNK_SEC - t) / 0.3), msg = maSnackMsg(), x = 424, w = Math.max(msg.length * 21 + 40, 230), bx = Math.max(w / 2 + 8, x + 40), by = 380, top = by - 84, bot = by + 18;
+hit(bx - w / 2 - 8, top, w + 16, bot - top + 8, () => { MA_SNK = null; SND.pop(); go('nyam'); });
+const pw = 186, ph = 42, py = by - 32, pu = 1 + Math.sin(T * 6) * 0.04;
+let g = `<g opacity="${a.toFixed(2)}"><path d="M${bx - w / 2},${top} H${bx + w / 2} Q${bx + w / 2 + 8},${top} ${bx + w / 2 + 8},${top + 8} V${bot - 8} Q${bx + w / 2 + 8},${bot} ${bx + w / 2},${bot} H${x + 12} L${x + 2},${bot + 16} L${x - 4},${bot} H${bx - w / 2} Q${bx - w / 2 - 8},${bot} ${bx - w / 2 - 8},${bot - 8} V${top + 8} Q${bx - w / 2 - 8},${top} ${bx - w / 2},${top}Z" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5"/>`
++ `<text x="${bx}" y="${top + 30}" font-family="Jua" font-size="22" text-anchor="middle" fill="#5A3A22">${esc(msg)}</text>`
++ `<g transform="translate(${bx},${py + ph / 2}) scale(${pu.toFixed(3)})"><rect x="${-pw / 2}" y="${-ph / 2 + 3}" width="${pw}" height="${ph}" rx="${ph / 2}" fill="#9A3A12" opacity=".35"/><rect x="${-pw / 2}" y="${-ph / 2}" width="${pw}" height="${ph}" rx="${ph / 2}" fill="#E8742A" stroke="#9A3A12" stroke-width="2.5"/>`
++ `<text x="0" y="9" font-family="Jua" font-size="27" text-anchor="middle" fill="#FFFDF6">같이 먹기 ▶</text></g></g>`;
 [[-10, 0], [12, 0.35], [2, 0.7]].forEach(([dx, d]) => { const u = (t - d) / 1.4; if (u < 0 || u > 1) return; const hx = x + dx + Math.sin(u * 8 + dx) * 4, hy = 440 - u * 46, hs = 0.35 + u * 0.15;
 g += `<g opacity="${(1 - u).toFixed(2)}" transform="translate(${hx.toFixed(1)},${hy.toFixed(1)}) scale(${hs.toFixed(2)})"><path d="M0,12 C-22,-2 -14,-20 0,-8 C14,-20 22,-2 0,12Z" fill="#F06A8A" stroke="#B83A5A" stroke-width="2"/></g>`; });
 return g;
@@ -8725,7 +8779,7 @@ g += (maMoveMem().mv.dal ? `<g transform="translate(0,${maNbHop('dal')})">` + su
 + (nt ? '' : `<g transform="rotate(${(Math.sin(T * 0.9) * 3).toFixed(1)} 990 366)">${chimaGom(990, 366 + bob(13, 2), { k: 3, s: 0.36, T, arms: MA_POSE.book('#8E2C5A') })}</g>`)
 ; }
 if (!nt) { const st = MA_SNK ? T - MA_SNK.t0 : 9, b = Math.abs(Math.sin(T * 2.4)) * -2 + (st < 0.5 ? -Math.sin(st / 0.5 * Math.PI) * 16 : 0), k = 0.27;
-g += dollBear(424, 459 + b, { s: k, stripe: 'pink', arms: 'hold' }) + maSnack(424, 459 + b - 50 * k, maJi()); }
+g += dollBear(418, 459 + b, { s: k, stripe: 'pink', arms: 'down', mouth: Math.sin(T * 3) > 0.6 ? 'o' : '' }) + `<g transform="translate(437,${(452 + b * 0.3).toFixed(1)}) scale(.62)">${maSnack(0, 0, maJi())}</g>`; }
 g += `<g transform="translate(0,${maHop('gim')})">${maPainter(1196, 372, 0.56, T, nt)}</g>`;
 g += maJidoGom(o);
 if (ph === 'eve') g += `<rect ${o.pic ? `width="${W}" height="${H}"` : FULLR()} fill="#8A3420" opacity=".2"/>`;
@@ -8830,12 +8884,12 @@ const GIM = [
 { n: '마을 저녁', o: 'L', c: [0, 0, 1280, 720], ph: 'eve', lock: '저녁에 마을에 오면' },
 { n: '마을 밤', o: 'L', c: [0, 0, 1280, 720], ph: 'night', lock: '밤에 마을에 오면' },
 { n: '국악단 무대', o: 'L', k: 'stage', lock: '카드를 다 모으면' },
-{ n: '종묘제례악', o: 'L', k: 'jm' },
+{ n: '종묘제례악', o: 'L', k: 'jm', lock: '종묘에 가 보면' },
 { n: '사물놀이', o: 'L', k: 'samul', lock: '사물놀이 카드를 열면' },
 { n: '국악단 카드 모음', o: 'L', k: 'cards' },
 { n: '24절기 표', o: 'D', k: 'dal', lock: '달력을 다 채우면' },
 { n: '농악', o: 'L', k: 'nong' },
-{ n: '원두막 간식', o: 'L', k: 'snack' },
+{ n: '원두막 간식', o: 'L', k: 'snack', lock: '냠냠 놀이를 하면' },
 ];
 GIM.forEach((it, i) => {
 if (i < 3) Object.assign(it, { x: 640 - 430 + i * 300, y: 166, w: 260 });
@@ -8843,7 +8897,7 @@ else if (i < 6) Object.assign(it, { x: 640 - 330 + (i - 3) * 230, y: 354, w: 200
 else Object.assign(it, { x: 640 - 438 + (i - 6) * 222, y: 512, w: 196 });
 it.h = it.o === 'L' ? it.w * 9 / 16 : it.o === 'P' ? it.w * 4 / 3 : it.w * 820 / 1200;
 if (it.o === 'D') { const w0 = it.w; it.h = w0 * 9 / 16; it.w = it.h * 1200 / 820; it.x += (w0 - it.w) / 2; } });
-const gimLocked = it => it.c ? !maPhHas(it.ph || 'day') : it.k === 'stage' ? gkCount() < GK_ALL.length : it.k === 'dal' ? !dalMem('done') : it.k === 'samul' ? !gkHas('samul') : false;
+const gimLocked = it => it.c ? !maPhHas(it.ph || 'day') : it.k === 'stage' ? gkCount() < GK_ALL.length : it.k === 'dal' ? !dalMem('done') : it.k === 'samul' ? !gkHas('samul') : it.k === 'snack' ? nyMem('best') == null : it.k === 'jm' ? !gkMem('jmv') : false;
 function gimItems() { return GIM.map(it => ({ n: it.n, lock: gimLocked(it) })); }
 let GIM_V = null;
 function gimVillage(ph = 'day') {
@@ -8887,7 +8941,7 @@ g += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${rot.toFi
 [[300, 470], [930, 470], [470, 90], [1180, 330], [90, 300], [760, 280]].forEach(([x, y], i) => { g += `<path d="M${x},${y - 9} L${x + 3},${y - 3} L${x + 9},${y} L${x + 3},${y + 3} L${x},${y + 9} L${x - 3},${y + 3} L${x - 9},${y} L${x - 3},${y - 3}Z" fill="#FFF6B0" opacity=".9"/>`; });
 g += tx(640, 74, '냠냠곰의 원두막 간식', { f: 'SM', fs: 52, c: '#3A2414' });
 const S2 = 3.3, X = 560, GY = 712, lx = -2, ly = -49, bk = 0.32;
-g += `<g transform="translate(${X},${GY}) scale(${S2})">${maWondu(0, 0, 'summer')}${dollBear(lx, ly, { s: bk, stripe: 'pink', arms: 'hold' })}<g transform="translate(${lx},${ly - 38 * bk}) scale(.8)">${maSnack(0, 0, maJi())}</g></g>`;
+g += `<g transform="translate(${X},${GY}) scale(${S2})">${maWondu(0, 0, 'summer')}${dollBear(lx - 6, ly, { s: bk, stripe: 'pink', arms: 'down' })}<g transform="translate(${lx + 14},${ly - 7}) scale(.62)">${maSnack(0, 0, maJi())}</g></g>`;
 g += tx(1110, 708, '곰 놀이 마을 · zdogame.com/mini', { fs: 16, c: '#3E6E32' });
 return { svg: `<svg width="1920" height="1080" viewBox="0 0 1280 720">${g}</svg>`, W: 1920, H: 1080, name: '곰마을_원두막간식.png' };
 }
@@ -8901,7 +8955,7 @@ if (it.k === 'dal') return dalKeepSVG();
 const [BW, BH] = it.o === 'L' ? [1920, 1080] : [1536, 2048], [x, y, w, h] = it.c;
 return { svg: `<svg width="${BW}" height="${BH}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice">${gimVillage(it.ph)}</svg>`, W: BW, H: BH, name: `곰마을_${it.n.replace(/[\s·]/g, '')}.png` };
 }
-function gimSave(i) { const it = GIM[i]; if (gimLocked(it)) { SND.tap(); P.msg = { t: `${it.lock} 간직할 수 있어요`, until: T + 2.4 }; return; } SND.pop(); keepSVG(gimPic(it), it.n); }
+function gimSave(i) { const it = GIM[i]; if (gimLocked(it)) { SND.tap(); P.msg = { t: `${it.lock} 간직할 수 있어요`, until: T + 2.4 }; return; } if (it.k === 'jm') { SND.pop(); JM_PICK = T; return; } SND.pop(); keepSVG(gimPic(it), it.n); }
 function gimLayer(on) {
 let el = document.getElementById('gbg');
 if (!on) { if (el && el.innerHTML) { el.innerHTML = ''; GIM_V = null; } return; }
@@ -8927,7 +8981,9 @@ g += `<rect x="${640 - 120}" y="132" width="240" height="28" rx="15" fill="#8A5A
 g += tx(1150, 396, '그림을 누르면', { f: 'SM', fs: 22, c: '#7A5A3A' }) + tx(1150, 426, '크게 보여요', { f: 'SM', fs: 22, c: '#7A5A3A' }) + tx(1150, 458, '아이패드 · 아이폰은', { fs: 16, c: C_INK2 }) + tx(1150, 480, '꾹 눌러 사진에 저장', { fs: 16, c: C_INK2 });
 g += maPainter(1168, 664, 0.8, T);
 if (P.msg && T < P.msg.until) { const w = P.msg.t.length * 22 + 60; g += `<rect x="${640 - w / 2}" y="520" width="${w}" height="54" rx="27" fill="#3A1D12" opacity=".88"/>` + tx(640, 556, P.msg.t, { fs: 24, c: '#FFF4D8' }); }
-return g + villageBtn() + soundBtns(76, 98);
+g += villageBtn() + soundBtns(76, 98);
+if (JM_PICK != null) { HITS.length = 0; g += jmPickDraw(); }
+return g;
 }
 const W = 1280, H = 720, THIS_YEAR = 2026;
 let T = 0, S = 'menu', HITS = [], P = {};
@@ -9029,6 +9085,7 @@ P.nudgeAt = (P.closes === 1 || rnd(3) === 0) ? T + NUDGE_WAIT : null;
 }
 const NUDGE_WAIT = 8, NUDGE_STAY = 12;
 function go(s, o = {}) {
+if (typeof JM_PICK !== "undefined") JM_PICK = null;
 S = s; P = { t0: T, page: 0, ...o }; if (s === 'maeul') { MA_GREETED = {}; MA_JIDO_Q = null; chEnter(); tkEnter(); }
 if (s === 'wheel') { P.y = o.y || THIS_YEAR; P.gv = P.y; if (o.intro) { P.y = P.gv = THIS_YEAR - 60; spinBy(60, 4.5, false, 'intro'); } }
 if (s === 'jan') janStart();
