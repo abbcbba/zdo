@@ -4432,8 +4432,10 @@ return g + pill(40, 70, 170, '곡 고르기', () => rhyMenu(true), { fs: 24 }) +
 }
 const TS_ORDER = ['jang', 'buk', 'sogo', 'kkw', 'jing', 'danso', 'dae', 'piri', 'hae', 'gaya', 'geo', 'aj', 'pgy', 'pjo'];
 const TS_ROW = [[0, 5, 706, 0.95, 245], [5, 9, 562, 0.82, 280], [9, 14, 420, 0.7, 240]];
+const tsLives = () => GK.n >= 8 ? 3 : 2;
+const TS_COL = ['#C8323A', '#2F62B0', '#E9B21C', '#2E8B57', '#7A3FA0'], tsCol = k => TS_COL[TS_ORDER.indexOf(k) % 5];
 const tsLen = n => 2 + Math.floor((n - 1) / 2);
-function tsStart() { SND.rhyStop(); GK = { ph: 'rsim', z: tsBig(2), n: 2, seq: [], step: 0, mode: 'intro', t0: T, at: {}, cur: {}, join: {}, retry: false, wrong: null, fx: [] }; TS_ORDER.slice(0, 2).forEach(k => { GK.cur[k] = tsTarget(k).x; }); tsNewSeq(null); }
+function tsStart() { SND.rhyStop(); GK = { ph: 'rsim', z: tsBig(2), n: 2, seq: [], step: 0, mode: 'intro', t0: T, at: {}, cur: {}, join: {}, miss: 0, wrong: null, fx: [] }; TS_ORDER.slice(0, 2).forEach(k => { GK.cur[k] = tsTarget(k).x; }); tsNewSeq(null); }
 const tsBig = n => n <= 2 ? 1.6 : n <= 5 ? 1.3 : 1;
 function tsTarget(k) { const i = TS_ORDER.indexOf(k), [a, b, y, s, gap] = TS_ROW.find(r => i >= r[0] && i < r[1]), m = Math.min(GK.n, b) - a, j = i - a, z = GK.z || 1; return { x: 640 + (j - (m - 1) / 2) * gap * Math.min(z, 1.15), y, s: s * z }; }
 function tsBears() { return TS_ORDER.slice(0, GK.n); }
@@ -4453,13 +4455,13 @@ if (i > GK.pi && i < GK.seq.length) { GK.pi = i; const k = GK.seq[i]; GK.at[k] =
 if (t > 0.3 + GK.seq.length * tsGap() + 0.3) { GK.mode = 'play'; GK.t0 = T; GK.step = 0; } }
 else if (GK.mode === 'ok' && t > 1.1) {
 if (GK.n >= TS_ORDER.length) { GK.mode = 'done'; GK.t0 = T; jamAll(); SND.fanfare(); tsSave(); chDone('tsj'); return; }
-GK.n++; const nk = TS_ORDER[GK.n - 1]; GK.join[nk] = T; GK.cur[nk] = tsTarget(nk).x; GK.retry = false; tsNewSeq(nk); GK.mode = 'join'; GK.t0 = T; SND.jingle(); tsSave(); }
+GK.n++; const nk = TS_ORDER[GK.n - 1]; GK.join[nk] = T; GK.cur[nk] = tsTarget(nk).x; GK.miss = 0; tsNewSeq(nk); GK.mode = 'join'; GK.t0 = T; SND.jingle(); tsSave(); }
 else if (GK.mode === 'join' && t > 1.6) { GK.mode = 'listen'; GK.t0 = T; GK.pi = -1; }
 else if (GK.mode === 'again' && t > 1.3) { GK.mode = 'listen'; GK.t0 = T; GK.pi = -1; }
 else if (GK.mode === 'oops' && t > 1.0) { GK.mode = 'over'; GK.t0 = T; tsSave(); chDone('tsj'); SND.stamp(); }
 }
 function tsSave() { const b = gkMem('ts') || 0; GK.newBest = GK.n > b; if (GK.n > b) gkMem('ts', GK.n); }
-function tsNote(k) { const p = tsTarget(k); GK.fx.push({ x: GK.cur[k] + 40 * p.s, y: p.y - 150 * p.s, t0: T, c: ['#C8323A', '#2F62B0', '#E9B21C', '#2E8B57', '#7A3FA0'][TS_ORDER.indexOf(k) % 5] }); if (GK.fx.length > 12) GK.fx.shift(); }
+function tsNote(k) { const p = tsTarget(k); GK.fx.push({ x: GK.cur[k] + 40 * p.s, y: p.y - 150 * p.s, t0: T, c: tsCol(k) }); if (GK.fx.length > 12) GK.fx.shift(); }
 function tsAt(x, y) {
 const ks = tsBears();
 for (let j = ks.length - 1; j >= 0; j--) { const k = ks[j], p = tsTarget(k), bx = GK.cur[k] ?? p.x, w = 230 * p.s, h = 190 * p.s; if (x >= bx - w / 2 + 10 * p.s && x <= bx + w / 2 + 30 * p.s && y >= p.y - h && y <= p.y + 12) return k; }
@@ -4470,7 +4472,7 @@ if (GK.mode !== 'play') { if (GK.mode === 'done') { GK.at[k] = T; tsSound(k); ts
 GK.at[k] = T; tsSound(k); tsNote(k);
 if (k === GK.seq[GK.step]) { GK.step++; if (GK.step >= GK.seq.length) { GK.mode = 'ok'; GK.t0 = T; setTimeout(() => SND.right(), 250); } return; }
 GK.wrong = { k, t0: T }; SND.wrong();
-if (!GK.retry) { GK.retry = true; GK.mode = 'again'; GK.t0 = T; } else { GK.mode = 'oops'; GK.t0 = T; }
+GK.miss++; if (GK.miss < tsLives()) { GK.mode = 'again'; GK.t0 = T; } else { GK.mode = 'oops'; GK.t0 = T; }
 }
 function tsTouch(x, y) { for (const h of HITS) if (x >= h.x && x <= h.x + h.w && y >= h.y && y <= h.y + h.h) return false; const k = tsAt(x, y); if (!k) return false; tsHit(k); render(); return true; }
 function tsStage(n) {
@@ -4500,12 +4502,31 @@ if (jt < 1.6) g += sparkle(GK.cur[k], p.y - 90 * p.s, Math.min(1, jt / 0.9)) + t
 if (GK.wrong && GK.wrong.k === k && T - GK.wrong.t0 < 0.8) g += tx(GK.cur[k], p.y - 200 * p.s, '앗!', { fs: 30, c: '#8A5A36' }); });
 g += GK.fx.map(f => { const t = T - f.t0; if (t > 0.9) return ''; return `<g opacity="${(1 - t / 0.9).toFixed(2)}">${pgNote(f.x + t * 26, f.y - t * 60).replace(/#2F8F8A/g, f.c)}</g>`; }).join('');
 if (GK.mode === 'done' && T - GK.t0 < 0.6) g += `<rect ${FULLR()} fill="#FFF6D6" opacity="${(0.35 * (1 - (T - GK.t0) / 0.6)).toFixed(2)}"/>`;
-const msg = { intro: '잘 들어 봐요!', listen: '잘 들어 봐요…', play: `따라 쳐 봐요!  ${GK.step} / ${GK.seq.length}`, ok: '잘했어요!', join: '새 친구가 왔어요!', again: '한 번 더 들어 봐요', oops: '아이고!', over: '', done: '다 모였어요! 다 같이 합주!' }[GK.mode];
+const L = GK.seq.length, msg = { intro: `잘 들어 봐요!  ${L}번`, listen: `잘 들어 봐요…  ${L}번`, play: `따라 쳐 봐요!  ${L}번`, ok: '잘했어요!', join: '새 친구가 왔어요!', again: '한 번 더 들어 봐요', oops: '아이고!', over: '', done: '다 모였어요! 다 같이 합주!' }[GK.mode];
 if (msg) { const w = msg.length * 24 + 60, y = GK.n >= 7 ? 112 : 96; g += `<rect x="${640 - w / 2}" y="${y - 30}" width="${w}" height="56" rx="28" fill="${GK.mode === 'play' ? '#4A2E1A' : '#FFFDF6'}" stroke="#8A5A36" stroke-width="3" opacity=".95"/>` + tx(640, y + 9, msg, { fs: 28, c: GK.mode === 'play' ? '#FBF0D6' : C_INK }); }
+if (msg && /intro|listen|play|again|ok|join/.test(GK.mode)) g += tsDots(GK.n >= 7 ? 112 : 96);
 g += `<rect x="1046" y="140" width="190" height="44" rx="22" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5" opacity=".95"/>` + tx(1141, 171, `곰 ${GK.n} / ${TS_ORDER.length}`, { fs: 24, c: C_INK2 });
+if (!/over|done/.test(GK.mode)) g += tsLifeDraw();
 g += pill(40, 70, 170, '곡 고르기', () => rhyMenu(true), { fs: 24 }) + soundBtns(0, 98);
 if (GK.mode === 'over') g += tsOver();
 if (GK.mode === 'done' && T - GK.t0 > 1.5) g += pill(440, 200, 190, '마음대로 합주', () => jamStart(), { fs: 24 }) + pill(650, 200, 190, '다시 하기', () => tsStart(), { fs: 24 });
+return g;
+}
+function tsDots(my) {
+const L = GK.seq.length, gap = 46, r = 15, y = my + 62, w = L * gap + 24;
+let g = `<rect x="${640 - w / 2}" y="${y - 24}" width="${w}" height="48" rx="24" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2" opacity=".9"/>`;
+GK.seq.forEach((k, i) => { const cx = 640 + (i - (L - 1) / 2) * gap;
+let fill = 'none', op = 1;
+if (GK.mode === 'listen' && i === GK.pi && GK.at[k] != null) { const t = T - GK.at[k]; if (t < 0.45) { fill = tsCol(k); op = (1 - t / 0.45).toFixed(2); } }
+else if (GK.mode === 'play' && i < GK.step) fill = tsCol(k);
+else if (GK.mode === 'ok') fill = tsCol(k);
+g += `<circle cx="${cx}" cy="${y}" r="${r}" fill="#FFFDF6" stroke="#8A5A36" stroke-width="3"/>` + (fill !== 'none' ? `<circle cx="${cx}" cy="${y}" r="${r - 1.5}" fill="${fill}" opacity="${op}"/>` : ''); });
+return g;
+}
+function tsLifeDraw() {
+const n = tsLives(), left = n - GK.miss, gap = 50, x0 = 1141 - (n - 1) * gap / 2, y = 214;
+let g = `<rect x="${1141 - n * gap / 2 - 12}" y="${y - 22}" width="${n * gap + 24}" height="44" rx="22" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5" opacity=".95"/>`;
+for (let i = 0; i < n; i++) { const x = x0 + i * gap; g += `<g opacity="${i < left ? 1 : 0.22}"><rect x="${x - 15}" y="${y - 10}" width="30" height="20" fill="#C8323A" stroke="#5A3A22" stroke-width="2"/><ellipse cx="${x}" cy="${y - 10}" rx="15" ry="5" fill="#F3E2B8" stroke="#5A3A22" stroke-width="2"/><ellipse cx="${x}" cy="${y + 10}" rx="15" ry="5" fill="#C8323A" stroke="#5A3A22" stroke-width="2"/></g>`; }
 return g;
 }
 function tsOver() {
@@ -8955,7 +8976,18 @@ if (it.k === 'dal') return dalKeepSVG();
 const [BW, BH] = it.o === 'L' ? [1920, 1080] : [1536, 2048], [x, y, w, h] = it.c;
 return { svg: `<svg width="${BW}" height="${BH}" viewBox="${x} ${y} ${w} ${h}" preserveAspectRatio="xMidYMid slice">${gimVillage(it.ph)}</svg>`, W: BW, H: BH, name: `곰마을_${it.n.replace(/[\s·]/g, '')}.png` };
 }
-function gimSave(i) { const it = GIM[i]; if (gimLocked(it)) { SND.tap(); P.msg = { t: `${it.lock} 간직할 수 있어요`, until: T + 2.4 }; return; } if (it.k === 'jm') { SND.pop(); JM_PICK = T; return; } SND.pop(); keepSVG(gimPic(it), it.n); }
+const GIM_GO = { jm: () => { go('gak'); jmStart(); }, stage: () => { go('gak'); GK = { ph: 'cards', tab: 'ban', page: 0, t0: T }; }, samul: () => { go('gak'); GK = { ph: 'cards', tab: 'etc', page: 0, t0: T }; },
+dal: () => go('dal', { ph: 'book' }), snack: () => go('nyam') };
+let GIM_ASK = null;
+function gimAskDraw() {
+const it = GIM[GIM_ASK.i], k = Math.min(1, (T - GIM_ASK.t0) / 0.2), w = 620, h = 300, x = 640 - w / 2, y = 200;
+HITS.length = 0; hit(0, -EX, W, H + 2 * EX, () => { GIM_ASK = null; SND.tap(); });
+let g = `<g opacity="${k.toFixed(2)}"><rect ${FULLR()} fill="#1E120A" opacity=".55"/><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="24" fill="#3A1D12" opacity=".3"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="24" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`
++ tx(640, y + 62, `「${it.n}」 그림`, { fs: 24, c: C_INK2 }) + tx(640, y + 124, `${it.lock} 열려요`, { f: 'SM', fs: 36, c: C_INK });
+g += btn(x + 70, y + h - 104, 220, 70, '가 보기', () => { GIM_ASK = null; SND.pop(); GIM_GO[it.k](); }, { fs: 30 }) + btn(x + w - 290, y + h - 104, 220, 70, '닫기', () => { GIM_ASK = null; SND.tap(); }, { fs: 30 });
+return g + `</g>`;
+}
+function gimSave(i) { const it = GIM[i]; if (gimLocked(it)) { SND.tap(); if (GIM_GO[it.k]) { GIM_ASK = { i, t0: T }; return; } P.msg = { t: `${it.lock} 간직할 수 있어요`, until: T + 2.4 }; return; } if (it.k === 'jm') { SND.pop(); JM_PICK = T; return; } SND.pop(); keepSVG(gimPic(it), it.n); }
 function gimLayer(on) {
 let el = document.getElementById('gbg');
 if (!on) { if (el && el.innerHTML) { el.innerHTML = ''; GIM_V = null; } return; }
@@ -8982,6 +9014,7 @@ g += tx(1150, 396, '그림을 누르면', { f: 'SM', fs: 22, c: '#7A5A3A' }) + t
 g += maPainter(1168, 664, 0.8, T);
 if (P.msg && T < P.msg.until) { const w = P.msg.t.length * 22 + 60; g += `<rect x="${640 - w / 2}" y="520" width="${w}" height="54" rx="27" fill="#3A1D12" opacity=".88"/>` + tx(640, 556, P.msg.t, { fs: 24, c: '#FFF4D8' }); }
 g += villageBtn() + soundBtns(76, 98);
+if (GIM_ASK != null) g += gimAskDraw();
 if (JM_PICK != null) { HITS.length = 0; g += jmPickDraw(); }
 return g;
 }
@@ -9086,6 +9119,7 @@ P.nudgeAt = (P.closes === 1 || rnd(3) === 0) ? T + NUDGE_WAIT : null;
 const NUDGE_WAIT = 8, NUDGE_STAY = 12;
 function go(s, o = {}) {
 if (typeof JM_PICK !== "undefined") JM_PICK = null;
+if (typeof GIM_ASK !== "undefined") GIM_ASK = null;
 S = s; P = { t0: T, page: 0, ...o }; if (s === 'maeul') { MA_GREETED = {}; MA_JIDO_Q = null; chEnter(); tkEnter(); }
 if (s === 'wheel') { P.y = o.y || THIS_YEAR; P.gv = P.y; if (o.intro) { P.y = P.gv = THIS_YEAR - 60; spinBy(60, 4.5, false, 'intro'); } }
 if (s === 'jan') janStart();
