@@ -1,5 +1,5 @@
-const C='333-r3-33bae884fc24', A='333-assets';
-const FILES=['./','index.html','manifest.webmanifest','icon-304fdd7e-180.png','icon-304fdd7e-192.png','icon-304fdd7e-512.png'];
+const C='333-r3-be6230d4ea7f', A='333-assets';
+const FILES=['./','index.html','manifest.webmanifest','icon-deb51c5c-180.png','icon-deb51c5c-192.png','icon-deb51c5c-512.png'];
 const ASSETS=["voice/SG1_1.mp3", "voice/SG1_2.mp3", "voice/SG1_3.mp3", "voice/SG1_4.mp3", "voice/SG1_5.mp3", "voice/SG2_1.mp3", "voice/SG2_2.mp3", "voice/SG2_3.mp3", "voice/SG2_4.mp3", "voice/SG2_5.mp3", "voice/SG3_1.mp3", "voice/SG3_2.mp3", "voice/SG3_3.mp3", "voice/SG3_4.mp3", "voice/SG4_1.mp3", "voice/SG4_2.mp3", "voice/SG4_3.mp3", "voice/SG4_4.mp3", "voice/SG5_1.mp3", "voice/SG5_2.mp3", "voice/SG5_3.mp3", "voice/SG5_4.mp3", "voice/SG6_1.mp3", "voice/SG6_2.mp3", "voice/SG6_3.mp3", "voice/SG6_4.mp3", "voice/SG6_5.mp3", "voice/SG7_1.mp3", "voice/SG7_2.mp3", "voice/SG7_3.mp3", "voice/SG7_4.mp3", "voice/SG7_5.mp3", "voice/SG8_1.mp3", "voice/SG8_2.mp3", "voice/SG8_3.mp3", "voice/SG8_4.mp3", "voice/SGE_1.mp3", "voice/SGE_2.mp3", "voice/SGE_3.mp3", "voice/SGE_4.mp3", "voice/SGP_1.mp3", "voice/SGP_2.mp3", "voice/SGP_3.mp3", "voice/SGP_4.mp3", "voice/SGT_1.mp3"];
 let filling=null;
 function fill(){ if(filling) return filling; filling=caches.open(A).then(async c=>{
