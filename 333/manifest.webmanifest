@@ -1,0 +1,31 @@
+{
+ "name": "천하통일 333",
+ "short_name": "천하통일 333",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "landscape",
+ "background_color": "#C8413D",
+ "theme_color": "#C8413D",
+ "icons": [
+  {
+   "src": "icon-304fdd7e-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-304fdd7e-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-304fdd7e-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
