@@ -641,6 +641,17 @@ rmel: (() => { const M = x => x.trim().split(/\s+/), H = M('C5 - - - D5 C5 B4 C5
 const C = M('C#6 - - - A5 - B5 - C#6 - B5 - A5 - G#5 - F#5 - G#5 - A5 - B5 - G#5 - E5 - A5 - B5 - C#6 - - - A5 - B5 - C#6 - B5 - A5 - G#5 - F#5 - B5 - G#5 - E5 -');
 return [...M('- - - - B4 A4 G#4 A4'), ...H, ...M('C6 - - - A5 - C6 - B5 - A5 - G5 - A5 - B5 - A5 - G5 - A5 - B5 - A5 - G5 - F#5 - E5 - - - B4 A4 G#4 A4'),
 ...H, ...M('C6 - - - A5 - B5 - C6 - B5 - A5 - G#5 - A5 - E5 - F5 - D5 - C5 - - - B4 - - - A4 - - - A5 - B5 -'), ...C, ...M('A5 - - - A5 - B5 -'), ...C, ...M('A5 - - - - - - -')]; })() },
+bee: { bpm: 138, n: 8, bt: 4, jg: ['덩', _, _, _, '덕', _, _, _], mel: ['A4', _, _, _, 'E4', _, _, _],
+bass: (() => { const E = ['E2', 'B2'], A = ['A2', 'E3'], D = ['D3', 'A2'], a = [A, A, A, E], d = [D, D, D, A]; return [E, E, E, E, ...a, ...a, ...d, ...d, ...a, ...a, ['A2', 'A2']]; })(),
+rmel: (() => { const M = x => x.trim().split(/\s+/), I = M('E6 D#6 D6 C#6 D6 C#6 C6 B5 C6 B5 A#5 A5 G#5 G5 F#5 F5 E5 D#5 D5 C#5 D5 C#5 C5 B4 C5 B4 A#4 A4 G#4 G4 F#4 F4');
+const a3 = M('E5 D#5 D5 C#5 C5 F5 E5 D#5 E5 D#5 D5 C#5 C5 C#5 D5 D#5 E5 D#5 D5 C#5 C5 F5 E5 D#5'), b3 = M('A5 G#5 G5 F#5 F5 A#5 A5 G#5 A5 G#5 G5 F#5 F5 F#5 G5 G#5 A5 G#5 G5 F#5 F5 A#5 A5 G#5');
+const A = [...a3, ...M('E5 F5 E5 D#5 D5 C#5 C5 B4')], A2 = [...a3, ...M('A4 A#4 B4 C5 C#5 D5 D#5 E5')], B = [...b3, ...M('A5 A#5 A5 G#5 G5 F#5 F5 E5')];
+return [...I, ...A, ...A2, ...B, ...B, ...A, ...a3, ...M('E5 D#5 D5 C#5 C5 B4 A#4 A4'), ...M('A4 - - - A5 - - -')]; })() },
+ekn: { bpm: 148, n: 16, bt: 4, jg: ['덩', _, _, _, '덕', _, _, _, '쿵', _, _, _, '덕', _, _, _], mel: ['G4', _, _, _, 'D4', _, _, _, 'G4', _, _, _, 'D4', _, _, _],
+bass: (() => { const G = ['G2', 'D3', 'G2', 'D3'], D = ['D2', 'A2', 'D2', 'A2'], S = [G, G, D, D, G, D, G, D, ['G2', 'D3', 'G2', 'D2'], ['G2', 'D2', 'G2', 'G2']]; return [...S, ...S]; })(),
+rmel: (() => { const M = x => x.trim().split(/\s+/), F = M('A5 - F#5 - F#5 - - - - - A5 - C6 - F#5 -'), up = M(`G5 - - - - - D5 - G5 - - - - - D5 -  G5 - D5 - G5 - B5 - D6 - - - - - - -  C6 - - - - - A5 - C6 - - - - - A5 -  C6 - A5 - F#5 - A5 - D5 - - - - - - -
+          G5 - - - G5 - - - - - B5 - A5 - G5 -`).concat(F, M('A5 - G5 - G5 - - - - - B5 - A5 - G5 -'), F, M('G5 - G5 - F#5 - E5 F#5 G5 - G5 - A5 - G5 A5  B5 - B5 - C6 - B5 C6 D6 - - - - - - -'));
+const dn = up.map(m => m === _ ? _ : m.slice(0, -1) + (+m.slice(-1) - 1)); return [...dn, ...up]; })() },
 };
 let gakBus = null;
 function gakPlay(key, rep = 4) {
@@ -4225,6 +4236,8 @@ can: { name: '캉캉', tag: '아주 빠름', col: '#D6457E', step: 60 / 132 / 2,
 mk: { name: '산왕의 궁전', tag: '점점 빨라짐', col: '#5B4A9E', step: 60 / 126 / 2, bars: 20, bt: 2, fast: 1.5, chart: 1 },
 tur: { name: '터키 행진곡', tag: '빠름', col: '#1F8A8A', step: 60 / 126 / 4, bars: 33, bt: 4, fast: 1.5, chart: 1 },
 wt: { name: '윌리엄 텔', tag: '아주 빠름', col: '#B07E10', step: 60 / 144 / 4, bars: 32, bt: 4, fast: 1.5, chart: 1 },
+bee: { name: '왕벌의 비행', tag: '붕붕 연타', col: '#C25A1C', step: 60 / 138 / 4, bars: 29, bt: 4, fast: 1.5, chart: 1, rolls: [[0, 32]] },
+ekn: { name: '아이네 클라이네', tag: '빠름', col: '#2C6FA0', step: 60 / 148 / 4, bars: 20, bt: 4, fast: 1.5, chart: 1 },
 };
 const RHY_FREE = [['gut', '굿거리'], ['jjm', '중중모리'], ['jaj', '자진모리'], ['sema', '세마치'], ['none', '음악 끔']];
 const RX = [400, 880], RY = 540, RTOP = 150, RFALL = 1.3, RN = 38, RP = 0.08, RG = 0.16;
@@ -4484,15 +4497,16 @@ const rmDrum = (x, y) => `<g transform="translate(${x},${y})"><path d="M-46,0 L-
 + `<g transform="translate(0,-6)"><circle r="30" fill="#2F62B0"/><path d="M-30,0 A30,30 0 0 1 30,0 A15,15 0 0 0 0,0 A15,15 0 0 1 -30,0Z" fill="#C8323A"/></g>${[...Array(12)].map((_, i) => { const a = i * Math.PI / 6; return `<circle cx="${(Math.cos(a) * 52).toFixed(1)}" cy="${(-6 + Math.sin(a) * 52).toFixed(1)}" r="3.2" fill="#E9B21C"/>`; }).join('')}</g>`;
 const RM_INST = [['geo', '거문고', 110, '#2F62B0'], ['pgy', '편경', 322, '#2F8F8A'], ['sogo', '소고', 534, '#7A3FA0'], ['jang', '장구', 746, '#2E8B57'], ['danso', '단소', 958, '#C2702A'], ['gaya', '가야금', 1170, '#B5352D']];
 const RM_PICK = { pgy: 1, geo: 1, danso: 1, gaya: 1 };
-const RM_SIGN_SOGO = [['jaj', 160, 545], ['mk', 352, 452], ['tur', 546, 400], ['can', 740, 400], ['wt', 934, 452], ['free', 1122, 545]];
+const RM_SIGN_SOGO = [['jaj', 92, 565], ['ekn', 245, 480], ['tur', 400, 420], ['mk', 562, 392], ['can', 718, 392], ['wt', 880, 420], ['bee', 1035, 480], ['free', 1188, 565]];
 const RM_SIGN = [['ari', 160, 545], ['sema', 352, 452], ['mil', 546, 400], ['gut', 740, 400], ['jaj', 934, 452], ['free', 1122, 545]];
 const RM_SC = 0.8;
+let RM_SC_SOGO = 0.66;
 const RM_C = [640, 660, 1.45];
 const RM_POS = { geo: [140, 652], pgy: [305, 600], sogo: [496, 560], jang: [800, 560], danso: [962, 600], gaya: [1138, 652] };
 const RM_DRUM = [640, 404, 0.8];
 let RM_SIGN_STYLE = 'fan';
 function rmSignArt(name, tag, c, stars) {
-const fs = name.length > 4 ? 26 : 30, st = (x, y, r = 10) => stars == null ? '' : [0, 1, 2].map(j => `<g opacity="${j < stars ? 1 : 0.3}">${rStar(x + j * (r * 2.4), y, r, j < stars)}</g>`).join('');
+const fs = name.length > 7 ? 23 : name.length > 4 ? 26 : 30, st = (x, y, r = 10) => stars == null ? '' : [0, 1, 2].map(j => `<g opacity="${j < stars ? 1 : 0.3}">${rStar(x + j * (r * 2.4), y, r, j < stars)}</g>`).join('');
 const sub = (x, y, col) => stars == null ? tx(0, y, tag, { fs: 20, c: col }) : tx(x, y, tag, { fs: 20, c: col }) + st(x + 68, y - 7);
 if (RM_SIGN_STYLE === 'wood') {
 return `<rect x="-8" y="30" width="16" height="44" fill="#6E4524" stroke="#3A2414" stroke-width="3"/><ellipse cx="0" cy="74" rx="22" ry="6" fill="#5A3A22" opacity=".35"/>`
@@ -4563,9 +4577,10 @@ g += tx(640, 300, RM_PICK[k] ? k === 'danso' ? '단소로 무엇을 불까요?' 
 if (k === 'danso') return g += dsSign(key, sx, sy, i, SEL);
 if (RM_PICK[k]) return g += pgSign(key, sx, sy, i, SEL);
 const R = RHY[key], c = R ? R.col : '#8A5A36', pt = T - SEL.t0 - 0.2 - i * 0.06, ps = pt <= 0 ? 0 : pt < 0.2 ? pt / 0.2 * 1.1 : 1.1 - Math.min(0.1, (pt - 0.2) / 2), pk = GK.pick && GK.pick.key === key;
-hit(sx - 110 * RM_SC, sy - 46 * RM_SC, 220 * RM_SC, 92 * RM_SC, () => { if (GK.pick) return; SND.rhyHit(SEL.inst === 'sogo' ? '소고' : '덩'); const P0 = GK.pick = { key, t0: T };
+const sc = k === 'sogo' ? RM_SC_SOGO : RM_SC;
+hit(sx - 110 * sc, sy - 46 * sc, 220 * sc, 92 * sc, () => { if (GK.pick) return; SND.rhyHit(SEL.inst === 'sogo' ? '소고' : '덩'); const P0 = GK.pick = { key, t0: T };
 setTimeout(() => { if (GK.pick !== P0 || S !== 'gak' || GK.ph !== 'rmenu') return; if (R) rhyPlay(key); else rhyFree('gut'); }, 350); });
-g += `<g transform="translate(${sx},${sy + (pk ? hop(GK.pick.t0) : 0)}) scale(${Math.max(0, ps * RM_SC).toFixed(3)})">`
+g += `<g transform="translate(${sx},${sy + (pk ? hop(GK.pick.t0) : 0)}) scale(${Math.max(0, ps * sc).toFixed(3)})">`
 + rmSignArt(R ? R.name : '마음대로', R ? R.tag : '두들기기', c, R ? (B[rhyBestKey(key, SEL.inst)] || 0) : null) + `</g>`;
 });
 }
@@ -7171,7 +7186,7 @@ function chStdPick() { const m = stdCutOpen() ? 'cut' : 'pull'; return { m, lv: 
 function chHwB() { const i = HW_B.findIndex((b, k) => !hwDone(k)); return i >= 0 ? i : chHash(chDay() + 'hw') % HW_B.length; }
 function chSgB() { const i = SG_B.findIndex((b, k) => !sgDone(k)); return i >= 0 ? i : chHash(chDay() + 'sg') % SG_B.length; }
 function chSgBoost(d) { d = d || new Date(); return d.getFullYear() === 2026 && d.getMonth() === 10; }
-function chRhyKeys() { return rhyInst() === 'sogo' ? ['jaj', 'mk', 'tur', 'can', 'wt'] : ['ari', 'sema', 'mil', 'gut', 'jaj']; }
+function chRhyKeys() { return rhyInst() === 'sogo' ? ['jaj', 'mk', 'tur', 'can', 'wt', 'ekn', 'bee'] : ['ari', 'sema', 'mil', 'gut', 'jaj']; }
 function chRhyKey() { const r = chMem(), rs = r.rs || {}; return chRhyKeys().map((k, i) => ({ k, t: rs[k] || 0, r: (chHash(chDay() + k) + i) % 97 })).sort((a, b) => a.t - b.t || a.r - b.r)[0].k; }
 function chRhyGo(v) { const k = v || chRhyKey(); if (RM_PICK[rhyInst()]) gkMem('ri', 'jang'); go('gak'); rhyMenu(); rhyPlay(k); }
 function chStdV(v) { return v ? { m: v.slice(0, -1), lv: +v.slice(-1) } : chStdPick(); }
@@ -10098,7 +10113,7 @@ const CREDIT_PAGES = [
 ['편경 · 편종 꾸밈 · 종묘제례악 · 삼국사기', '국가유산청 「국가유산사랑」 · 국가유산포털 · 우리역사넷'],
 ['장단 · 편경', '한국민족문화대백과사전 「장단」 「편경」 등'],
 ['캉캉 가락', '오펜바흐 「지옥의 오르페우스」(1858) 「지옥의 갤럽」 · 오래되어 누구나 쓸 수 있는 곡 · 소리는 곰 놀이 마을에서 새로 지음'],
-['소고 클래식 가락', '로시니 「윌리엄 텔」 서곡(1829) · 그리그 「페르 귄트」 「산왕의 궁전에서」(1875) · 모차르트 피아노 소나타 11번 「터키 행진곡」(1783) · 모두 오래되어 누구나 쓸 수 있는 곡 · 소리는 곰 놀이 마을에서 새로 지음'],
+['소고 클래식 가락', '로시니 「윌리엄 텔」 서곡(1829) · 그리그 「페르 귄트」 「산왕의 궁전에서」(1875) · 모차르트 피아노 소나타 11번 「터키 행진곡」(1783) · 모차르트 세레나데 13번 「아이네 클라이네 나흐트무지크」(1787) · 림스키코르사코프 「살탄 황제 이야기」 「왕벌의 비행」(1900) · 모두 오래되어 누구나 쓸 수 있는 곡 · 소리는 곰 놀이 마을에서 새로 지음'],
 ] },
 { t: '곰 달력', L: [
 ['절기 · 명절 · 풍습', '한국민족문화대백과사전 「절기」 「입춘」 「대한」 「동지」 「추석」 등 · 국립민속박물관'],
