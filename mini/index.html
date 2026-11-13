@@ -6577,9 +6577,9 @@ function byBear() {
 const s = BY_BS, x = BY_BX, y = BY_BY, br = Math.sin(T * 1.6) * 1.2, hx = x - 93 * s;
 let g = `<ellipse cx="${x - 50}" cy="${BY_FY + 2}" rx="120" ry="7" fill="#000" opacity=".25"/>`;
 g += `<rect x="${hx - 70}" y="${BY_FY - 12}" width="${x - hx + 110}" height="13" rx="6" fill="#F3E8D2" stroke="#B89E78" stroke-width="2"/>`;
-const px = hx - 36 * s, py = y, pw = 30, ph = 78;
-g += `<rect x="${px - pw / 2}" y="${py - ph / 2}" width="${pw}" height="${ph}" rx="9" fill="#E2457E" stroke="#8E2050" stroke-width="2"/><rect x="${px - pw / 2 + 4}" y="${py - ph / 2 + 5}" width="${pw - 8}" height="${ph - 10}" rx="4" fill="none" stroke="#FFFDF6" stroke-width="2.4"/><rect x="${px - 3}" y="${py - ph / 2 + 8}" width="6" height="${ph - 16}" fill="#9ED36A"/>`
-+ [-1, 1].map(k => `<g transform="translate(${px},${py + k * (ph / 2 + 2)})"><rect x="-15" y="-6" width="30" height="12" rx="3" fill="#FFFDF6" stroke="#8E2050" stroke-width="1.6"/><rect x="-12" y="-4" width="24" height="8" rx="2" fill="#9ED36A"/>${byFlower(0, 0, 0.55, '#E2457E')}</g>`).join('');
+const px = hx - 36 * s, py = y, pw = 28, ph = 54;
+g += `<g transform="rotate(-28 ${px} ${py})"><rect x="${px - pw / 2}" y="${py - ph / 2}" width="${pw}" height="${ph}" rx="9" fill="#E2457E" stroke="#8E2050" stroke-width="2"/><rect x="${px - pw / 2 + 4}" y="${py - ph / 2 + 5}" width="${pw - 8}" height="${ph - 10}" rx="4" fill="none" stroke="#FFFDF6" stroke-width="2.4"/><rect x="${px - 3}" y="${py - ph / 2 + 8}" width="6" height="${ph - 16}" fill="#9ED36A"/>`
++ [-1, 1].map(k => `<g transform="translate(${px},${py + k * (ph / 2 + 2)})"><rect x="-15" y="-6" width="30" height="12" rx="3" fill="#FFFDF6" stroke="#8E2050" stroke-width="1.6"/><rect x="-12" y="-4" width="24" height="8" rx="2" fill="#9ED36A"/>${byFlower(0, 0, 0.55, '#E2457E')}</g>`).join('') + `</g>`;
 g += byPJ(dollBear(x, y, { s, stripe: 'pink', arms: 'down', eyes: 'closed', rot: -90, shadow: false }));
 const L = hx + 30 * s, Rr = x + 40, top = y - 30 * s + br, bot = BY_FY - 6;
 g += `<path d="M${L},${bot} Q${L - 6},${top + 6} ${L + 14},${top} L${Rr - 20},${top + 4} Q${Rr + 8},${top + 8} ${Rr + 6},${bot}Z" fill="#9ED36A" stroke="#4E7A2E" stroke-width="2.4"/>`
@@ -6635,8 +6635,8 @@ return g + P.map(([x, y], i) => okStar5(+x.toFixed(1), +y.toFixed(1), Math.max(2
 }
 function byDream() {
 if (!BY.done || BY.ph === 'play' || BY.ph === 'book' || BY.ph === 'card') return '';
-const t = T - BY.done - 0.5; if (t < 0) return ''; const a = Math.min(1, t / 0.4), hx = BY_BX - 93 * BY_BS, hy = BY_BY - 30, bx = 300, by = 552, bob = Math.sin(T * 1.8) * 3;
-let g = `<g opacity="${a.toFixed(2)}"><circle cx="${hx - 40}" cy="${hy - 6}" r="7" fill="#FFFDF6" opacity=".9"/><circle cx="${hx - 120}" cy="${hy - 22}" r="11" fill="#FFFDF6" opacity=".9"/>`
+const t = T - BY.done - 0.5; if (t < 0) return ''; const a = Math.min(1, t / 0.4), hx = BY_BX - 93 * BY_BS, hy = BY_BY - 30, bx = 1000, by = 482, bob = Math.sin(T * 1.8) * 3;
+let g = `<g opacity="${a.toFixed(2)}"><circle cx="${hx + 146}" cy="${hy - 34}" r="7" fill="#FFFDF6" opacity=".9"/><circle cx="${hx + 226}" cy="${hy - 56}" r="11" fill="#FFFDF6" opacity=".9"/>`
 + `<ellipse cx="${bx}" cy="${by + bob}" rx="104" ry="58" fill="#FFFDF6" opacity=".96" stroke="#C9D6F0" stroke-width="2"/>` + byMini(BY.key, bx, by + bob, 110, { c: '#E9B21C', s: '#E9B21C', w: 2.6, r: 5.4 });
 const zt = (T - BY.done) % 2.4; if (zt < 1.8) g += `<text x="${hx + 6}" y="${(hy - 62 - zt * 10).toFixed(1)}" font-family="Jua" font-size="28" fill="#FFE27A" stroke="#0B1430" stroke-width="5" paint-order="stroke" opacity="${Math.min(1, (1.8 - zt) / 0.4).toFixed(2)}">냠냠…</text>`;
 return g + `</g>`;
@@ -6653,20 +6653,45 @@ let g = `<g transform="translate(${x},${y + bob}) rotate(-7) scale(1.35)"><rect 
 + `</g>` + tx(x, y + 58, `별자리 수첩 ${got}/20`, { fs: 19, c: '#FFF1C2' });
 return g;
 }
-function byCardBody(key, page, x, y, w) {
-const I = BY_INFO[key]; let g = '';
-const L = page ? I.b : I.a;
-g += tx(x + w / 2, y + 40, page ? '② 별자리 이야기' : '① 이렇게 찾아요', { fs: 26, c: '#8A2A10' });
-L.forEach((t, i) => { g += tx(x + 26, y + 84 + i * 36, t, { fs: 23, c: '#3A2414', a: 'start' }); });
-if (page && I.o) g += `<rect x="${x + 18}" y="${y + 92 + L.length * 36}" width="${w - 36}" height="38" rx="10" fill="#EAF0FB" stroke="#9AB0D8" stroke-width="1.6"/>` + tx(x + w / 2, y + 118 + L.length * 36, I.o, { fs: 19, c: '#2E3E6E' });
-return g;
+function byOnePage(key, x, y, w, fs, lh) {
+const I = BY_INFO[key]; let g = '', yy = y;
+[[I.a, '① 이렇게 찾아요'], [I.b, '② 별자리 이야기']].forEach(([L, hd], k) => {
+if (k) { g += `<path d="M${x + 4},${yy + 20} H${x + w - 4}" stroke="#D9C49A" stroke-width="2" stroke-dasharray="6 6"/>`; yy += 26; }
+g += tx(x, yy + fs + 4, hd, { fs: fs + 2, c: '#8A2A10', a: 'start' });
+L.forEach((t, i) => { g += tx(x + 6, yy + fs + 4 + (i + 1) * lh, t, { fs, c: '#3A2414', a: 'start' }); });
+yy += fs + 4 + L.length * lh;
+});
+if (I.o) { const oh = fs + 20; g += `<rect x="${x - 4}" y="${yy + 16}" width="${w + 8}" height="${oh}" rx="10" fill="#EAF0FB" stroke="#9AB0D8" stroke-width="1.6"/>` + tx(x + w / 2, yy + 16 + oh / 2 + (fs - 3) * 0.36, I.o, { fs: fs - 3, c: '#2E3E6E' }); yy += 16 + oh; }
+return [g, yy];
+}
+const BY_TW = {};
+function byTextW(t, fs) { const k = fs + '|' + t; if (BY_TW[k] != null) return BY_TW[k];
+let v = t.length * fs * 0.95; try { const c = byTextW.cv || (byTextW.cv = document.createElement('canvas').getContext('2d')); c.font = `${fs}px Jua`; const m = c.measureText(t).width; if (m > 0) v = m; } catch (e) { }
+return (BY_TW[k] = v); }
+function byKeepIc(x, y) { return `<g transform="translate(${x},${y})"><rect x="-11" y="-9" width="22" height="18" rx="3" fill="#FFFDF6" stroke="#2E3E6E" stroke-width="2.2"/><path d="M-5,-9 v-4 h10 v4" fill="none" stroke="#2E3E6E" stroke-width="2.2"/>${okStar5(0, 0, 5, '#E9B21C')}</g>`; }
+function byKeepBtn(x, y, w, h, fs, what) { return pill(x, y, w, '간직하기', () => { SND.pop(); byKeep(what); }, { h, fs, col: '#EAF0FB', bd: '#5A6E9E', icon: byKeepIc(x + 30, y + h / 2) }); }
+function byKeep(what) {
+const sp = what.sp ? BY_SP.find(c => c.k === what.sp) : null, I = sp ? null : BY_INFO[what.k], name = sp ? sp.n : I.n;
+let r = 11; const R = () => (r = (r * 9301 + 49297) % 233280) / 233280;
+let g = `<rect width="900" height="1200" fill="#1C2A58"/><rect x="14" y="14" width="872" height="1172" rx="26" fill="none" stroke="#E9B21C" stroke-width="3" opacity=".7"/>`;
+for (let i = 0; i < 90; i++) g += `<circle cx="${(30 + R() * 840).toFixed(1)}" cy="${(30 + R() * 500).toFixed(1)}" r="${(0.8 + R() * 1.6).toFixed(2)}" fill="#fff" opacity="${(0.25 + R() * 0.5).toFixed(2)}"/>`;
+g += `<text x="450" y="96" font-family="SM" font-size="58" text-anchor="middle" fill="#FFE27A" stroke="#0B1430" stroke-width="6" paint-order="stroke">${esc(name)}</text>`;
+g += sp ? bySpMini(sp.k, 450, 330, 420, 1) : byMini(what.k, 450, 330, 420, { w: 4, r: 10 });
+g += `<rect x="40" y="556" width="820" height="590" rx="24" fill="#FBF5E6" stroke="#8A5A36" stroke-width="4"/>`;
+if (sp) sp.a.forEach((t, i) => { g += tx(80, 630 + i * 48, t, { fs: 32, c: C_INK, a: 'start' }); });
+else g += byOnePage(what.k, 80, 576, 740, 29, 40)[0];
+g += tx(450, 1176, '곰 놀이 마을 · zdogame.com/mini', { fs: 24, c: '#FFFDF6' });
+keepSVG({ svg: g, W: 900, H: 1200, name: `별자리_${name.replace(/\s/g, '')}.png` }, name);
 }
 function byPanel() {
-const t = T - BY.done - 0.7; if (t < 0) return ''; const a = Math.min(1, t / 0.35), x = 34, y = 92, w = 430, h = 392, I = BY_INFO[BY.key];
+const t = T - BY.done - 0.7; if (t < 0) return ''; const a = Math.min(1, t / 0.35), I = BY_INFO[BY.key], x = 24, y = 124;
+const w = Math.max(430, Math.ceil(Math.max(...I.a.concat(I.b).map(s => byTextW(s, 25))) + 80));
+const [body, end] = byOnePage(BY.key, x + 24, y + 8, w - 48, 25, 35), by = end + 18, h = by + 60 + 18 - y;
 let g = `<g opacity="${a.toFixed(2)}" transform="translate(${((1 - a) * -30).toFixed(1)},0)"><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="20" fill="#000" opacity=".3"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="20" fill="#FBF5E6" stroke="#8A5A36" stroke-width="3"/>`;
-g += byCardBody(BY.key, BY.page, x, y, w);
-g += btn(x + 20, y + h - 66, 120, 50, BY.page ? '◀ 앞' : '이야기 ▶', () => { BY.page = 1 - BY.page; SND.pop(); }, { fs: 22, col: '#EAF0FB', bd: '#5A6E9E' });
-g += btn(x + 156, y + h - 66, 254, 50, BY.round % 3 === 0 && !BY.endSeen ? '오늘 밤 다 모았어요 ▶' : '다음 별자리 ▶', () => { SND.pop(); byAfter(); }, { fs: 23, col: '#FBE7A6', bd: '#B07E10' });
+g += body;
+const bw = Math.round((w - 54) * 0.42);
+g += byKeepBtn(x + 20, by, bw, 60, 24, { k: BY.key });
+g += pill(x + 34 + bw, by, w - 54 - bw, BY.round % 3 === 0 && !BY.endSeen ? '오늘 밤 다 모았어요 ▶' : '다음 별자리 ▶', () => { SND.pop(); byAfter(); }, { h: 60, fs: BY.round % 3 === 0 && !BY.endSeen ? 22 : 26, col: '#FBE7A6', bd: '#B07E10' });
 g += `</g>`;
 const nk = Math.min(1, (T - BY.done) / 0.4);
 g += `<text x="${BY_CX + BY_SHIFT}" y="72" font-family="SM" font-size="${(30 + 16 * nk).toFixed(1)}" text-anchor="middle" fill="#FFE27A" stroke="#0B1430" stroke-width="7" paint-order="stroke" opacity="${nk.toFixed(2)}">${esc(I.n)}</text>`;
@@ -6746,10 +6771,10 @@ const C = BY.card, x = 200, y = 70, w = 880, h = 560, sp = C.sp ? BY_SP.find(c =
 let g = `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#0B1430" opacity=".5"/><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#000" opacity=".3"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF5E6" stroke="#8A5A36" stroke-width="4"/>`;
 g += `<rect x="${x + 24}" y="${y + 24}" width="400" height="${h - 120}" rx="16" fill="#1C2A58"/>`;
 if (sp) { g += bySpMini(sp.k, x + 224, y + 24 + (h - 120) / 2 - 10, 330, 1) + tx(x + 652, y + 66, sp.n, { f: 'SM', fs: 36, c: C_SEAL });
-sp.a.forEach((t, i) => { g += tx(x + 452, y + 120 + i * 40, t, { fs: 24, c: C_INK, a: 'start' }); }); }
-else { const I = BY_INFO[C.k]; g += byMini(C.k, x + 224, y + 24 + (h - 120) / 2, 300, { w: 3, r: 8 }) + tx(x + 652, y + 66, I.n, { f: 'SM', fs: 36, c: C_SEAL }) + byCardBody(C.k, C.page, x + 440, y + 76, 420);
-g += btn(x + 450, y + h - 86, 130, 60, C.page ? '◀ 앞' : '이야기 ▶', () => { C.page = 1 - C.page; SND.pop(); }, { fs: 22, col: '#EAF0FB', bd: '#5A6E9E' })
-+ btn(x + 596, y + h - 86, 150, 60, '다시 잇기', () => { const k = C.k; BY.book = null; BY.card = null; byBegin(k); SND.pop(); }, { fs: 24, col: '#FBE7A6', bd: '#B07E10' }); }
+sp.a.forEach((t, i) => { g += tx(x + 452, y + 120 + i * 40, t, { fs: 24, c: C_INK, a: 'start' }); }); g += byKeepBtn(x + 440, y + h - 86, 150, 60, 22, { sp: sp.k }); }
+else { const I = BY_INFO[C.k]; g += byMini(C.k, x + 224, y + 24 + (h - 120) / 2, 300, { w: 3, r: 8 }) + tx(x + 652, y + 56, I.n, { f: 'SM', fs: 36, c: C_SEAL }) + byOnePage(C.k, x + 452, y + 62, 400, 22, 28)[0];
+g += byKeepBtn(x + 440, y + h - 86, 150, 60, 22, { k: C.k })
++ btn(x + 602, y + h - 86, 150, 60, '다시 잇기', () => { const k = C.k; BY.book = null; BY.card = null; byBegin(k); SND.pop(); }, { fs: 24, col: '#FBE7A6', bd: '#B07E10' }); }
 g += btn(x + w - 120, y + h - 86, 100, 60, '닫기', () => { BY.card = null; SND.pop(); }, { fs: 24 });
 return g;
 }
@@ -6764,7 +6789,7 @@ else if (BY.wrong && T - BY.wrong.t < 1.6) g += byPill(BY_CX - 150, 40, 300, `${
 hit(BY_CX - 420, 110, 840, 400, (x, y) => byTap(x, y));
 }
 if (BY.ph === 'done') g += byPanel();
-const rn = BY.ph === 'play' ? BY.round % 3 : (BY.round - 1) % 3 + 1; g += byPill(40, 652, 300, `${BY_SN[bySnNow()]} 밤하늘 · 이번 판 ${rn} / 3`, { fs: 22 });
+const rn = BY.ph === 'play' ? BY.round % 3 : (BY.round - 1) % 3 + 1; if (BY.ph !== 'done') g += byPill(40, 652, 300, `${BY_SN[bySnNow()]} 밤하늘 · 이번 판 ${rn} / 3`, { fs: 22 });
 g += byBookIcon(1186, 616);
 if (BY.ph === 'end') g += byEnd();
 if (BY.ph === 'book') g += byBook();
@@ -9547,6 +9572,14 @@ if (JI === 17) for (let i = 0; i < 9; i++) { const t = (T * 0.12 + i / 9) % 1, x
 g += maFan(x, y, 7, (T * 90 + i * 40) % 360); }
 return g;
 }
+const MA_CHEOM = { x: 262, y: 236, u: 26 };
+function maCheom(cx, cy, u, fill = '#D9C2A0', st = '#8E6A44', sw = 1.4, win = '#5E4028') { const P = (a, b) => `${(cx + a * u).toFixed(1)},${(cy + b * u).toFixed(1)}`;
+return `<rect x="${cx - 0.36 * u}" y="${cy + 0.38 * u}" width="${0.72 * u}" height="${0.12 * u}" fill="${fill}" stroke="${st}" stroke-width="${sw}"/>`
++ `<path d="M${P(-0.26, 0.38)} C${P(-0.31, 0.05)} ${P(-0.18, -0.18)} ${P(-0.17, -0.32)} L${P(0.17, -0.32)} C${P(0.18, -0.18)} ${P(0.31, 0.05)} ${P(0.26, 0.38)}Z" fill="${fill}" stroke="${st}" stroke-width="${sw}" stroke-linejoin="round"/>`
++ `<path d="M${P(-0.27, 0.2)} L${P(0.27, 0.2)} M${P(-0.22, -0.14)} L${P(0.22, -0.14)}" stroke="${st}" stroke-width="${sw * 0.6}" opacity=".6"/>`
++ `<rect x="${cx - 0.21 * u}" y="${cy - 0.45 * u}" width="${0.42 * u}" height="${0.13 * u}" fill="${fill}" stroke="${st}" stroke-width="${sw}"/>`
++ `<rect x="${cx - 0.065 * u}" y="${cy - 0.05 * u}" width="${0.13 * u}" height="${0.14 * u}" fill="${win}"/>`; }
+function maCheomGo() { if (P.pick) return; SND.twinkle(4); P.pick = { k: 'cheom', t0: T }; setTimeout(() => { if (S === 'maeul' && P.pick && P.pick.k === 'cheom') go('byeol'); }, 600); }
 function maBG(ph = 'day') {
 const SN = maSeason(), JI = maJi(), KEY = ph + SN + JI + (typeof tkWinter === 'function' && tkWinter() ? 'tw' : '') + (typeof okFresh === 'function' && okFresh() ? 'ok' : ''); if (MA_BG[KEY]) return MA_BG[KEY]; const SK = MA_SKY[ph]; MA_SNOW = SN === 'winter'; MA_ROOF = SN !== 'winter' ? 0 : typeof tkWinter === 'function' && tkWinter() ? 2 : JI === 18 ? 0 : JI === 19 ? 1 : 2;
 const SUNY = (120 - 32 * Math.cos(2 * Math.PI * (JI - 9) / 24)).toFixed(1);
@@ -9568,6 +9601,7 @@ g += `<path d="M0,212 L45,200 Q90,188 125,196 Q160,204 193,168 Q226,132 244,142 
 + `<path d="M0,300 Q90,232 190,266 Q280,212 380,262 Q470,300 560,262 Q650,226 760,268 Q860,300 950,252 Q1050,214 1140,258 Q1220,282 1280,252 V380 H0Z" fill="url(#maM2)"/>`
 + `<rect y="282" width="${W}" height="54" fill="url(#maMist)" opacity=".7"/>`
 + `<path d="M0,348 Q140,290 300,318 Q420,284 560,312 Q700,342 840,306 Q980,276 1120,312 Q1220,330 1280,312 V440 H0Z" fill="url(#maM3)"/>`;
+if (ph !== 'night') g += maCheom(MA_CHEOM.x, MA_CHEOM.y, MA_CHEOM.u);
 [[80, 330], [52, 318], [300, 300], [470, 300], [520, 306], [880, 300], [1180, 310], [1230, 302], [720, 322], [760, 318]].forEach(([x, y], i) => { const r = 8 + (i % 3) * 2.5, C = MA_SNOW ? ['#A9B8A8', '#B8C6B6', '#99AA98'] : ['#7E9E7A', '#8FAE88', '#6E8E6C'];
 g += `<path d="M${x},${y + r * 0.6} V${y + r * 1.5}" stroke="#7A6A56" stroke-width="2" opacity=".7"/><ellipse cx="${x}" cy="${y}" rx="${r * 0.9}" ry="${r}" fill="${C[i % 3]}"/><ellipse cx="${x - r * 0.25}" cy="${y - r * 0.3}" rx="${r * 0.5}" ry="${r * 0.55}" fill="${C[(i + 1) % 3]}" opacity=".8"/>` + (MA_SNOW ? `<ellipse cx="${x}" cy="${y - r * 0.75}" rx="${r * 0.6}" ry="${r * 0.25}" fill="#FFFFFF" opacity=".85"/>` : ''); });
 { let p = ''; for (let i = 0; i < 6; i++) { const y = 320 + i * 11; p += `<path d="M${470 + i * 8},${y} Q${640},${y - 16 + i * 1.5} ${820 - i * 8},${y} L${818 - i * 8},${y + 9} Q${640},${y - 7 + i * 1.5} ${472 + i * 8},${y + 9}Z" fill="${maPaddy(SN, JI, i)[0]}" stroke="${maPaddy(SN, JI, i)[1]}" stroke-width="1.2"/>`; } g += p; }
@@ -9959,36 +9993,26 @@ spring: ['논 갈아요! 영차영차', '흙을 부드럽게 갈아 줘요', '�
 plant: ['모내기해요! 한 줄 한 줄', '모를 꼭꼭 심어요', '써레질 끝! 논이 판판해요', '못자리에서 모 데려왔어요', '개굴개굴, 개구리도 왔네', '허리 쭉! 다시 심어요', '새참 먹고 또 심어요'],
 summer: ['풀 뽑고 물꼬 봐요!', '물이 알맞게 들어가요', '물꼬 열어요, 졸졸졸', '호미로 김매요, 쓱쓱', '김매기 끝! 아이 시원해', '벼가 쑥쑥 자라요', '땀 뻘뻘, 새참 먹자'],
 harvest: ['벼 베어요! 올해도 풍년!', '볏단 묶어요!', '낫으로 싹둑싹둑', '벼 이삭이 꾸벅 고개 숙였어요', '허수아비야, 참새 좀 쫓아 줘', '황금 들판이에요!', '볏단 차곡차곡 쌓아요'],
-winter: ['볏짚 날라요! 영차', '내년 농사 준비해요', '새끼 꼬아요, 비비 꼬아', '짚신 삼아 볼까?', '곳간에 쌀이 가득!'],
-night: ['달이 참 밝아요', '별 하나 나 하나', '오늘도 수고했어요', '저기 별이 반짝!', '내일 또 힘내요'] };
+winter: ['볏짚 날라요! 영차', '내년 농사 준비해요', '새끼 꼬아요, 비비 꼬아', '짚신 삼아 볼까?', '곳간에 쌀이 가득!'] };
 let MA_FARM_TAP = null, MA_FARM_N = 0, MA_NT = false;
 function maFarmers() { const A = MA_FARM_AT, t = MA_FARM_TAP ? T - MA_FARM_TAP.t0 : 9, jump = t < 0.5 ? -Math.sin(t / 0.5 * Math.PI) * 12 : 0;
 return `<g transform="translate(${A.x},${(A.y + jump).toFixed(1)}) scale(${A.s}) translate(-640,-380)">${maFarmers0()}</g>`; }
 function maFarmXY() { const A = MA_FARM_AT, job = maFarmJob(), dx = job === 'winter' && !MA_NT ? (T * 7) % 120 - 60 : 0; return { x: A.x + (643 + dx - 640) * A.s, y: A.y }; }
 function maFarmTop() {
 if (!MA_FARM_TAP) return ''; const t = T - MA_FARM_TAP.t0; if (t > 4) { MA_FARM_TAP = null; return ''; }
-const a = Math.min(1, t / 0.2, (4 - t) / 0.3), p = maFarmXY(), msg = MA_FARM_TAP.msg, star = MA_NT && t < 2.5 ? okStar5(p.x - 122, p.y - 132 - t * 6, 9 + Math.abs(Math.sin(t * 6)) * 5, '#FFE27A', t * 90) : '', w = msg.length * 20 + 34, bx = p.x, by = p.y - 96;
+const a = Math.min(1, t / 0.2, (4 - t) / 0.3), p = maFarmXY(), msg = MA_FARM_TAP.msg, star = '', w = msg.length * 20 + 34, bx = p.x, by = p.y - 96;
 return star + `<g opacity="${a.toFixed(2)}"><path d="M${bx - 8},${by + 20} L${bx},${by + 34} L${bx + 8},${by + 20}Z" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2"/><rect x="${bx - w / 2}" y="${by - 22}" width="${w}" height="42" rx="21" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5"/><path d="M${bx - 7},${by + 19} H${bx + 7}" stroke="#FFFDF6" stroke-width="4"/>${tx(bx, by + 8, msg, { fs: 21, c: '#5A3A22' })}</g>`;
 }
 let MA_FARM_BAG = { job: '', q: [] };
-function maFarmTap() { if (P.pick) return; const job = MA_NT ? 'night' : maFarmJob(), L = MA_FARM_SAY[job] || MA_FARM_SAY.spring;
+function maFarmTap() { if (P.pick) return; const job = maFarmJob(), L = MA_FARM_SAY[job] || MA_FARM_SAY.spring;
 if (MA_FARM_BAG.job !== job || !MA_FARM_BAG.q.length) { const last = MA_FARM_BAG.last; MA_FARM_BAG = { job, q: L.map((_, i) => i).sort(() => Math.random() - 0.5), last }; if (MA_FARM_BAG.q[0] === last) MA_FARM_BAG.q.push(MA_FARM_BAG.q.shift()); }
 const i = MA_FARM_BAG.q.shift(); MA_FARM_BAG.last = i; MA_FARM_N++; MA_FARM_TAP = { t0: T, msg: L[i] }; SND.bbyong(); }
-function maFarmNight(man, wom) {
-const pt = MA_FARM_TAP && T - MA_FARM_TAP.t0 < 2.5, sw = i => Math.sin(T * 0.9 + i) * 2;
-const point = (c, cf) => ({ back: '', front: gArm('M-20,-66 Q-42,-76 -56,-98', c) + gPaw(-57, -100, cf) + gArm('M20,-66 Q24,-54 18,-44', c) + gPaw(18, -42, cf) });
-const rest = (c, cf) => ({ back: '', front: gArm('M-20,-66 Q-24,-54 -12,-46', c) + gArm('M20,-66 Q24,-54 12,-46', c) + gPaw(-12, -45, cf) + gPaw(12, -45, cf) });
-const bale = `<path d="M602,374 Q601,364 612,363 L674,363 Q685,364 684,374 Q683,383 672,384 L614,384 Q603,383 602,374Z" fill="#D9BC6C" stroke="#8A6A2A" stroke-width="2"/>`
-+ [610, 620, 630, 640, 650, 660, 670, 678].map((x, i) => `<path d="M${x},${365 + (i % 2)} q1.5,9 0,17" stroke="#B8963A" stroke-width="1.1" fill="none"/>`).join('')
-+ `<path d="M624,363 q-1.5,10 0,21 M662,363 q1.5,10 0,21" stroke="#7A5A28" stroke-width="2.6" fill="none"/>`;
-return `<g transform="rotate(${sw(0).toFixed(1)},624,372)">${wom(624, 375, rest)}</g><g transform="rotate(${sw(1.3).toFixed(1)},662,373)">${man(662, 376, pt ? point : rest)}</g>` + bale;
-}
 function maFarmers0() {
 const job = maFarmJob(), s = 0.32, hop = i => Math.abs(Math.sin(T * 5 + i)) * -1.5;
 const bendT = (x, y, b) => b ? `rotate(${b},${x},${y}) translate(${x},${y}) scale(1,.9) translate(${-x},${-y})` : '';
 const man = (x, y, arms, b = 0) => `<g transform="${bendT(x, y, b)}">${hanbokGom(x, y, { c: 'white', s, T, ears: false, arms })}<g transform="translate(${x},${y}) scale(${s})">${MA_SAKKAT}</g></g>`;
 const wom = (x, y, arms, b = 0) => `<g transform="${bendT(x, y, b)}">${chimaGom(x, y, { k: 3, s, T, arms, ears: false })}<g transform="translate(${x},${y}) scale(${s})">${MA_SUGEON}</g></g>`;
-if (MA_NT) return maFarmNight(man, wom);
+if (MA_NT) return '';
 if (job === 'winter') { const dx = (T * 7) % 120 - 60, a = Math.min(1, (60 - Math.abs(dx)) / 14);
 return `<g opacity="${Math.max(0, a).toFixed(2)}" transform="translate(${dx.toFixed(1)},0)">` + wom(630, 377 + hop(0), MA_FARM.straw()) + man(656, 378 + hop(1), MA_FARM.straw()) + `</g>`; }
 if (job === 'spring') return wom(618, 377, MA_FARM.hoe(T + 1.4)) + man(664, 379, MA_FARM.hoe(T));
@@ -10150,13 +10174,14 @@ g += maSign(pl.sx, pl.sy, nm, act, pl.st) + (typeof tkSignDeco === 'function' &&
 g += maTitle(TK_TITLE[o.bday ? 'bday' : o.xmas ? 'xmas' : o.seol ? 'seol' : o.chu ? 'chu' : tkKind()] || '곰 놀이 마을')
 + `<g transform="translate(1236,664) rotate(-4)"><rect x="-17" y="-24" width="34" height="48" rx="4" fill="${C_SEAL}" opacity=".88"/>${tx(0, -3, '곰', { f: 'SM', fs: 17, c: '#FFF4E4' })}${tx(0, 17, '村', { f: 'SM', fs: 15, c: '#FFF4E4' })}</g>`
 + (o.pic ? '' : soundBtns(76, 98)) + (o.pic || !CH_OPEN ? '' : chBookIcon(CH_BOOK.x, CH_BOOK.y));
-if (P.pick && !o.pic) { const k = P.pick.k === 'chp' ? { sx: CH_BOOK.x, sy: 140 } : P.pick.k === 'okt' ? (nt ? { sx: 318, sy: 168 } : { sx: 880, sy: 640 }) : P.pick.k === 'sng' ? { sx: 384, sy: 560 } : MA_PLACES.find(p => p.k === P.pick.k), t = T - P.pick.t0; if (t < 0.6) g += sparkle(k.sx, k.sy - 40, t / 0.6); }
+if (P.pick && !o.pic) { const k = P.pick.k === 'chp' ? { sx: CH_BOOK.x, sy: 140 } : P.pick.k === 'okt' ? (nt ? { sx: 318, sy: 168 } : { sx: 880, sy: 640 }) : P.pick.k === 'sng' ? { sx: 384, sy: 560 } : P.pick.k === 'cheom' ? { sx: MA_CHEOM.x, sy: MA_CHEOM.y + 30 } : MA_PLACES.find(p => p.k === P.pick.k), t = T - P.pick.t0; if (t < 0.6) g += sparkle(k.sx, k.sy - 40, t / 0.6); }
 if (!o.pic) { const okGo = () => { if (P.pick) return; SND.pop(); P.pick = { k: 'okt', t0: T }; setTimeout(() => { if (S === 'maeul' && P.pick && P.pick.k === 'okt') go('okt'); }, 600); };
 if (nt) { g += okMoonHint(318, 128, 34); hit(318 - 64, 128 - 64, 128, 128, okGo); }
 else hit(812, 596, 140, 124, okGo); }
+if (!o.pic && !nt) hit(MA_CHEOM.x - 22, MA_CHEOM.y - 24, 44, 46, maCheomGo);
 if (!o.pic && !nt) { g += maTtiTop(); hit(54, 526, 66, 76, maTtiTap); }
 if (!o.pic && !nt) hit(356, 524, 98, 76, () => { if (P.pick) return; SND.pop(); P.pick = { k: 'sng', t0: T, at: [384, 520] }; setTimeout(() => { if (S === 'maeul' && P.pick && P.pick.k === 'sng') go('sng'); }, 600); });
-if (!o.pic) { const fp = maFarmXY(); g += maFarmTop(); hit(fp.x - 48, fp.y - 70, 96, 80, maFarmTap); }
+if (!o.pic && !nt) { const fp = maFarmXY(); g += maFarmTop(); hit(fp.x - 48, fp.y - 70, 96, 80, maFarmTap); }
 if (!o.pic && !nt) { g += maSnackTop(); hit(398, 414, 54, 54, () => { if (P.pick) return; MA_SNK = { t0: T }; SND.bbyong(); }); }
 if (!o.pic && nt) { g += maByTop(); hit(372, 404, 112, 106, () => { if (P.pick) return; MA_BYT = { t0: T }; SND.twinkle(4); }); }
 if (!o.pic && !nt) g += maPainterSay();
