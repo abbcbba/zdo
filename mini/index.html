@@ -6890,6 +6890,9 @@ return g;
 const YT_RES = [
 { k: 'bdo', name: '빽도', n: -1 }, { k: 'do', name: '도', n: 1 }, { k: 'gae', name: '개', n: 2 }, { k: 'geol', name: '걸', n: 3 }, { k: 'yut', name: '윷', n: 4 }, { k: 'mo', name: '모', n: 5 }];
 const YT_WAYS = { bdo: 1, do: 3, gae: 6, geol: 4, yut: 1, mo: 1 };
+const YT_REAL = (() => { const q = 0.336, f = 1 - q, C4 = [1, 4, 6, 4, 1], pr = n => C4[n] * f ** n * q ** (4 - n);
+return { bdo: pr(1) / 4, do: pr(1) * 3 / 4, gae: pr(2), geol: pr(3), yut: pr(4), mo: pr(0) }; })();
+const yt100 = v => Math.max(1, Math.round(v * 100));
 const YT_COL = [{ bean: '#E84A5F', bean2: '#F27FB5', name: '빨강', ink: '#B5352D' }, { bean: '#3FA7E0', bean2: '#5CC26B', name: '파랑', ink: '#2F62B0' }];
 const YB = { x: 470, y: 420, r: 200 };
 const YN = (() => { const N = {}, { x, y, r } = YB, L = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
@@ -7162,6 +7165,19 @@ g += card(890, '둘이서', '빨강 · 파랑 번갈아', ytPiece(990, 330, 0, 1
 const w = ytMem('win') || 0; if (w) g += tx(890, 610, `곰을 이긴 판 ${w}`, { fs: 22, c: C_INK2 });
 return g;
 }
+function ytReal(x, y, w, h) {
+let g = tx(640, y + 60, '윷가락을 100번 던지면?', { f: 'SM', fs: 38, c: C_SEAL });
+const lg = (lx, col, s) => `<rect x="${lx}" y="${y + 86}" width="22" height="22" rx="5" fill="${col}" stroke="#8A5A36" stroke-width="1.5"/>` + tx(lx + 30, y + 104, s, { fs: 20, c: C_INK, a: 'start' });
+g += lg(380, '#CFE3F5', '이 게임 윷 (반반)') + lg(640, '#E8806E', '진짜 윷 (실험으로 셈)');
+const bx = 310, gw = 110, base = y + 330, sc = 4.0;
+['bdo', 'do', 'gae', 'geol', 'yut', 'mo'].forEach((k, i) => { const R = YT_RES.find(r => r.k === k), xx = bx + i * gw, a = yt100(YT_WAYS[k] / 16), r = yt100(YT_REAL[k]);
+g += `<rect x="${xx}" y="${base - a * sc}" width="40" height="${a * sc}" rx="6" fill="#CFE3F5" stroke="#8A5A36" stroke-width="1.8"/>` + tx(xx + 20, base - a * sc - 8, `${a}`, { fs: 20, c: C_INK2 })
++ `<rect x="${xx + 46}" y="${base - r * sc}" width="40" height="${Math.max(3, r * sc)}" rx="6" fill="#E8806E" stroke="#8A5A36" stroke-width="1.8"/>` + tx(xx + 66, base - r * sc - 8, `${r}`, { fs: 22, c: '#8A2A10' })
++ tx(xx + 43, base + 32, R.name, { f: 'SM', fs: 26, c: C_INK }); });
+g += tx(640, base + 68, '진짜 윷은 평평한 면이 더 잘 나와요(셋 중 둘쯤) → 걸 · 윷이 많고 모는 아주 드물어요', { fs: 19, c: C_INK2 });
+g += tx(640, base + 94, '윷가락 하나를 1,000번 던진 실험(1995)으로 셈 · 윷 모양과 던지는 법에 따라 달라요', { fs: 16, c: C_INK2 });
+return g + btn(x + w / 2 - 110, y + h - 70, 220, 56, '◀ 이번 판', () => { YT.pg = 0; }, { fs: 26 });
+}
 function ytBoardMini(x, y) {
 return `<g transform="translate(${x - YB.x * 0.6},${y - YB.y * 0.6}) scale(.6)">${ytBoard()}</g>` + [0, 1, 2, 3].map(i => ytStick(x - 90 + i * 60, y + 200, i % 2 === 1, 0.7, -14 + i * 9, i === 0)).join('');
 }
@@ -7169,14 +7185,15 @@ function ytOver() {
 const k = Math.min(1, (T - YT.over) / 0.3), x = 250, y = 110, w = 780, h = 520;
 hit(0, -EX, W, H + 2 * EX, () => { });
 let g = `<g opacity="${k}"><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#3A1D12" opacity=".35"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`;
+if (YT.pg === 1) return g + ytReal(x, y, w, h) + '</g>';
 const head = YT.vs === 'gom' ? (YT.win === 0 ? '내가 이겼어요!' : '곰이 이겼어요!') : `${YT_COL[YT.win].name} 이겼어요!`;
 g += tx(640, y + 66, head, { f: 'SM', fs: 44, c: YT.vs === 'gom' && YT.win === 1 ? C_INK : C_SEAL });
-const ks = ['bdo', 'do', 'gae', 'geol', 'yut', 'mo'], mx = Math.max(1, ...ks.map(q => YT.cnt[q] || 0)), bx = 330, bw = 70, gap = 34, base = y + 316;
+const ks = ['bdo', 'do', 'gae', 'geol', 'yut', 'mo'], mx = Math.max(1, ...ks.map(q => YT.cnt[q] || 0)), bx = 330, bw = 70, gap = 34, base = y + 300;
 g += tx(640, y + 112, `이번 판에 던진 ${YT.nThrow}번`, { fs: 26, c: C_INK2 });
-ks.forEach((q, i) => { const R = YT_RES.find(r => r.k === q), n = YT.cnt[q] || 0, hh = Math.round(170 * n / mx), xx = bx + i * (bw + gap);
+ks.forEach((q, i) => { const R = YT_RES.find(r => r.k === q), n = YT.cnt[q] || 0, hh = Math.round(160 * n / mx), xx = bx + i * (bw + gap);
 g += `<rect x="${xx}" y="${base - hh}" width="${bw}" height="${Math.max(hh, 3)}" rx="8" fill="${['#F27FB5', '#3FA7E0', '#5CC26B', '#F2D13A', '#F59A2F', '#E84A5F'][i]}" stroke="#8A5A36" stroke-width="2"/>`
-+ tx(xx + bw / 2, base - hh - 10, `${n}`, { fs: 24, c: C_INK }) + tx(xx + bw / 2, base + 32, R.name, { f: 'SM', fs: 26, c: C_INK }) + tx(xx + bw / 2, base + 60, `16 중 ${YT_WAYS[q]}`, { fs: 17, c: C_INK2 }); });
-g += tx(640, base + 90, '윷가락 넷이 엎어지고 젖혀지는 16가지 중 개가 가장 많아요', { fs: 20, c: C_INK2 });
++ tx(xx + bw / 2, base - hh - 10, `${n}`, { fs: 24, c: C_INK }) + tx(xx + bw / 2, base + 32, R.name, { f: 'SM', fs: 26, c: C_INK }) + tx(xx + bw / 2, base + 58, `16 중 ${YT_WAYS[q]}`, { fs: 17, c: C_INK2 }); });
+g += pill(470, base + 74, 340, '진짜 윷이라면? ▶', () => { YT.pg = 1; }, { h: 50, fs: 24, col: '#FBE7A6', bd: '#B07E10' });
 g += btn(x + 70, y + h - 84, 200, 62, '다시 하기', () => ytBegin(YT.vs), { fs: 28 }) + btn(x + 290, y + h - 84, 200, 62, '십중팔구', () => go('hwak'), { fs: 28 }) + btn(x + w - 270, y + h - 84, 200, 62, BYE_TO(), byeMini, { fs: 26 });
 return g + '</g>';
 }
@@ -10728,6 +10745,7 @@ const CREDIT_PAGES = [
 ['간지 · 오방색 · 역사 사건', '한국민족문화대백과사전 「간지」 「정오행」 「색」 등'],
 ['한복 여밈(우임)', '한국학중앙연구원 조선왕조실록사전 「저고리」'],
 ['윷놀이 규칙 · 윷판', '한국민족문화대백과사전 「윷놀이」'],
+['진짜 윷이 나오는 비율', '김미경 · 허명회(1995) 실험 · 오창혁(2010) 「윷놀이와 확률」(학술지)'],
 ['한자 · 임금 · 훈민정음 책', '한국어문회 전국한자능력검정시험 배정한자 · 한국민족문화대백과사전 · 『고려사』 · 훈민정음 언해본 서문 (지도 게임 규장각 책과 같음)'],
 ] },
 { t: '곰 국악단', L: [
