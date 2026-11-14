@@ -5860,9 +5860,13 @@ const TU_N = 12, TU_PER = 3, TU_X0 = 640, TU_Y0 = 640;
 const TU_POT = [{ x: 640, y: 470 }, { x: 600, y: 440 }, { x: 690, y: 410 }, { x: 640, y: 380 }];
 const TU_MH = 120, TU_MOUTH = 22, TU_BODY = 46, TU_EAR = 44, TU_EH = 92, TU_EAR_R = 11;
 let TU = null;
+const TU_TWO_N = 8, TU_PL = [{ name: '빨강 곰', col: '#D8403A', ink: '#B5352D', qx: 170, wx: 300, bx: TU_X0 - 120 }, { name: '파랑 곰', col: '#2F4F9E', ink: '#2F62B0', qx: 1110, wx: 980, bx: TU_X0 + 120 }];
 function tuMem(k, v) { try { const r = JSON.parse(localStorage.getItem('mini_tuho') || '{}'); if (v === undefined) return r[k]; r[k] = v; localStorage.setItem('mini_tuho', JSON.stringify(r)); } catch (e) { } return undefined; }
-function tuStart() { TU = { i: 0, score: 0, ph: 'aim', t0: T, arrow: null, drag: null, inPot: [], res: null, over: null, first: !tuMem('best') && tuMem('best') !== 0, potFrom: null }; }
-const tuPot = () => TU_POT[Math.min(TU_POT.length - 1, Math.floor(TU.i / TU_PER))];
+function tuStart() { TU = { ph: 'menu', t0: T }; }
+function tuBegin(two) { TU = { two: !!two, n: two ? TU_TWO_N * 2 : TU_N, per: two ? 4 : TU_PER, i: 0, score: 0, sc: [0, 0], ph: 'aim', t0: T, arrow: null, drag: null, inPot: [], res: null, over: null, first: !tuMem('best') && tuMem('best') !== 0, potFrom: null }; }
+const tuWho = () => TU.two ? TU.i % 2 : 0;
+const tuLeft = p => (TU.two ? TU_TWO_N - (p === 0 ? Math.ceil(TU.i / 2) : Math.floor(TU.i / 2)) : TU_N - TU.i) - ((TU.ph === 'fly' || TU.ph === 'res') && tuWho() === p ? 1 : 0);
+const tuPot = () => TU_POT[Math.min(TU_POT.length - 1, Math.floor(TU.i / TU.per))];
 function tuPotNow() {
 const p = tuPot(); if (!TU.potFrom) return p;
 const a = Math.min(1, (T - TU.t0) / 0.9), e = a * a * (3 - 2 * a);
@@ -5895,34 +5899,34 @@ let go = true; for (let t = 0; t < dt - 1e-9 && go; t += 0.01) { go = tuAdvance(
 if (r.y < BS_WALL && !r.wall) r.wall = { x: r.x };
 if (r.wall && (!go || r.y - r.h * bsSc(r.y) > 238)) { go = false; r.res = 'ouch'; TU.ouch = { x: Math.max(150, Math.min(W - 150, r.wall.x)), t0: T + 0.25, msg: BS_OUCH[TU.i % BS_OUCH.length] }; } }
 if (!go) { TU.ph = 'res'; TU.t0 = T; TU.res = r.res || 'miss';
-if (TU.res === 'in' || TU.res === 'ear') { TU.score++; TU.inPot.push({ ear: TU.res === 'ear' ? r.side : 0, a: (Math.random() - 0.5) * 30, dx: (Math.random() - 0.5) * 14 }); SND.tong(); if (TU.res === 'ear') SND.jingle(); }
+if (TU.res === 'in' || TU.res === 'ear') { TU.score++; TU.sc[tuWho()]++; TU.inPot.push({ col: TU.two ? TU_PL[tuWho()].col : null, ear: TU.res === 'ear' ? r.side : 0, a: (Math.random() - 0.5) * 30, dx: (Math.random() - 0.5) * 14 }); SND.tong(); if (TU.res === 'ear') SND.jingle(); }
 else if (TU.res === 'bump') SND.clack(); else if (TU.res === 'ouch') setTimeout(() => SND.thud(), 200); else SND.thud(); } }
 TU.lastT = T;
 if (TU.ph === 'res' && T - TU.t0 > 1.3) { TU.i++; TU.arrow = null;
-if (TU.i >= TU_N) tuFinish();
-else if (TU.i % TU_PER === 0) { TU.potFrom = TU_POT[TU.i / TU_PER - 1]; TU.ph = 'move'; TU.t0 = T; SND.swish(); }
+if (TU.i >= TU.n) tuFinish();
+else if (TU.i % TU.per === 0) { TU.potFrom = TU_POT[TU.i / TU.per - 1]; TU.ph = 'move'; TU.t0 = T; SND.swish(); }
 else { TU.ph = 'aim'; TU.t0 = T; } }
 if (TU.ph === 'move' && T - TU.t0 > 1.4) { TU.potFrom = null; TU.ph = 'aim'; TU.t0 = T; }
 }
-function tuDown(x, y) { if (S !== 'tuho' || !TU || TU.ph !== 'aim') return false; if (Math.hypot(x - TU_X0, y - (TU_Y0 - 40)) > 120) return false; TU.drag = { x0: x, y0: y, x, y }; return true; }
+function tuDown(x, y) { if (S !== 'tuho' || !TU || TU.ph !== 'aim' || !TU.n) return false; if (Math.hypot(x - TU_X0, y - (TU_Y0 - 40)) > 120) return false; TU.drag = { x0: x, y0: y, x, y }; return true; }
 function tuMove(x, y) { if (TU && TU.drag) { TU.drag.x = x; TU.drag.y = y; } }
 function tuUp() { if (!TU || !TU.drag) return; const d = TU.drag; TU.drag = null; tuThrow(d.x - d.x0, d.y - d.y0); }
 function tuThrow(px, py) {
-if (!TU || TU.ph !== 'aim') return false;
+if (!TU || TU.ph !== 'aim' || !TU.n) return false;
 const r = tuLaunch(px, py); if (!r) return false;
 TU.arrow = r; TU.ouch = null; TU.ph = 'fly'; TU.t0 = T; TU.lastT = T; TU.first = false; SND.swish(); return true;
 }
-function tuFinish() { chDone('tuh'); TU.ph = 'over'; TU.over = T; TU.newBest = TU.score > (tuMem('best') || 0); if (TU.newBest || tuMem('best') == null) tuMem('best', Math.max(TU.score, tuMem('best') || 0)); TU.score >= 6 ? SND.fanfare() : SND.stamp(); }
-function tuArrow(x, y, s, ang) {
+function tuFinish() { chDone('tuh'); TU.ph = 'over'; TU.over = T; if (TU.two) { SND.fanfare(); return; } TU.newBest = TU.score > (tuMem('best') || 0); if (TU.newBest || tuMem('best') == null) tuMem('best', Math.max(TU.score, tuMem('best') || 0)); TU.score >= 6 ? SND.fanfare() : SND.stamp(); }
+function tuArrow(x, y, s, ang, col = '#2F4F9E') {
 return `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(${ang.toFixed(1)}) scale(${s.toFixed(3)})"><path d="M-56,0 L40,0" stroke="#3A2414" stroke-width="7.5" stroke-linecap="round"/><path d="M-56,0 L40,0" stroke="#B88A50" stroke-width="4.5" stroke-linecap="round"/>`
-+ `<path d="M-57,0 L-30,0" stroke="#3A2414" stroke-width="8.5" stroke-linecap="round"/><path d="M-57,0 L-30,0" stroke="#2F4F9E" stroke-width="5.5" stroke-linecap="round"/><path d="M-30,0 L-25,0" stroke="#F2D27A" stroke-width="5.5"/>`
++ `<path d="M-57,0 L-30,0" stroke="#3A2414" stroke-width="8.5" stroke-linecap="round"/><path d="M-57,0 L-30,0" stroke="${col}" stroke-width="5.5" stroke-linecap="round"/><path d="M-30,0 L-25,0" stroke="#F2D27A" stroke-width="5.5"/>`
 + `<path d="M38,-6 L58,0 L38,6 L42,0Z" fill="#FBF6EA" stroke="#8A6A4A" stroke-width="1.8" stroke-linejoin="round"/></g>`;
 }
 function tuPotSVG(x, y, s, o = {}) {
 const P = n => (n * s).toFixed(1), body = '#8A5A2E', dark = '#5E3A1E', band = '#C99A5E';
 let g = `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)})"><ellipse cx="0" cy="${P(4)}" rx="${P(52)}" ry="${P(10)}" fill="#000" opacity=".16"/>`;
-(o.arrows || []).forEach(a => { if (a.ear) return; g += tuArrow(a.dx * s, -TU_MH * s - 36 * s, s * 0.95, 90 + a.a); });
-(o.arrows || []).forEach(a => { if (!a.ear) return; g += tuArrow(a.ear * TU_EAR * s, -TU_EH * s - 62 * s, s * 0.8, 90 + a.a * 0.3); });
+(o.arrows || []).forEach(a => { if (a.ear) return; g += tuArrow(a.dx * s, -TU_MH * s - 36 * s, s * 0.95, 90 + a.a, a.col || undefined); });
+(o.arrows || []).forEach(a => { if (!a.ear) return; g += tuArrow(a.ear * TU_EAR * s, -TU_EH * s - 62 * s, s * 0.8, 90 + a.a * 0.3, a.col || undefined); });
 const ear = d => [-TU_EH - 14, -TU_EH + 2].map(yy => `<path d="M${P(d * 8)},${P(yy)} L${P(d * (TU_EAR - 8))},${P(yy)}" stroke="${dark}" stroke-width="${P(8)}" stroke-linecap="round"/><path d="M${P(d * 8)},${P(yy)} L${P(d * (TU_EAR - 8))},${P(yy)}" stroke="${band}" stroke-width="${P(4)}" stroke-linecap="round"/>`).join('') + `<rect x="${P(d * TU_EAR - 10)}" y="${P(-TU_EH - 26)}" width="${P(20)}" height="${P(36)}" rx="${P(4)}" fill="${body}" stroke="${dark}" stroke-width="${P(2.5)}"/><ellipse cx="${P(d * TU_EAR)}" cy="${P(-TU_EH - 26)}" rx="${P(10)}" ry="${P(4)}" fill="#2A1A10" stroke="${dark}" stroke-width="${P(2)}"/>`;
 g += ear(-1) + ear(1);
 g += `<path d="M${P(-14)},${P(-TU_MH)} L${P(-12)},${P(-80)} C${P(-50)},${P(-66)} ${P(-48)},${P(-10)} ${P(-26)},0 L${P(26)},0 C${P(48)},${P(-10)} ${P(50)},${P(-66)} ${P(12)},${P(-80)} L${P(14)},${P(-TU_MH)}Z" fill="${body}" stroke="${dark}" stroke-width="${P(3)}"/>`
@@ -5932,9 +5936,9 @@ g += `<path d="M${P(-14)},${P(-TU_MH)} L${P(-12)},${P(-80)} C${P(-50)},${P(-66)}
 + `<ellipse cx="0" cy="${P(-TU_MH)}" rx="${P(TU_MOUTH)}" ry="${P(6)}" fill="#2A1A10" stroke="${dark}" stroke-width="${P(2.5)}"/>`;
 return g + `</g>`;
 }
-function tuQuiver(x, y, n) {
+function tuQuiver(x, y, n, col) {
 let g = `<ellipse cx="${x}" cy="${y + 2}" rx="40" ry="9" fill="#000" opacity=".15"/>`;
-for (let i = 0; i < n; i++) { const c = i - (n - 1) / 2; g += tuArrow(x + c * 4.2, y - 120 - Math.abs(c) * 2, 0.95, 90 + c * 3.2); }
+for (let i = 0; i < n; i++) { const c = i - (n - 1) / 2; g += tuArrow(x + c * 4.2, y - 120 - Math.abs(c) * 2, 0.95, 90 + c * 3.2, col); }
 g += `<path d="M${x - 30},${y - 92} L${x - 26},${y - 4} Q${x},${y + 4} ${x + 26},${y - 4} L${x + 30},${y - 92}Z" fill="#8A5A2E" stroke="#5E3A1E" stroke-width="3"/>`
 + `<ellipse cx="${x}" cy="${y - 92}" rx="30" ry="8" fill="#5E3A1E" stroke="#3A2414" stroke-width="2.5"/>`
 + [y - 74, y - 24].map(yy => `<path d="M${x - 29},${yy} Q${x},${yy + 7} ${x + 29},${yy}" stroke="#C99A5E" stroke-width="4" fill="none"/>`).join('')
@@ -5942,10 +5946,11 @@ g += `<path d="M${x - 30},${y - 92} L${x - 26},${y - 4} Q${x},${y + 4} ${x + 26}
 return g + `<rect x="${x - 48}" y="${y - 54}" width="96" height="34" rx="17" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.5" opacity=".95"/>` + tx(x, y - 29, `남은 ${n}개`, { fs: 21, c: C_INK });
 }
 function drawTuho() {
+if (TU.ph === 'menu') return bsYard() + soundBtns(76, 98) + closeBtn() + tuMenu();
 tuTick();
 let g = bsYard() + soundBtns(76, 98) + closeBtn();
-const pot = tuPotNow(), kp = bsSc(pot.y);
-g += chimaGom(pot.x - 190 * kp, pot.y + 6, { k: 4, s: 0.62 * kp / 0.75, T, arms: TU.ph === 'res' && (TU.res === 'in' || TU.res === 'ear') ? 'up' : 'down' });
+const pot = tuPotNow(), kp = bsSc(pot.y), who = tuWho(), PL = TU_PL[who], ok0 = TU.ph === 'res' && (TU.res === 'in' || TU.res === 'ear');
+if (!TU.two) g += chimaGom(pot.x - 190 * kp, pot.y + 6, { k: 4, s: 0.62 * kp / 0.75, T, arms: TU.ph === 'res' && (TU.res === 'in' || TU.res === 'ear') ? 'up' : 'down' });
 const r = TU.arrow, behind = r && (TU.ph === 'fly' || TU.ph === 'res') && r.y < pot.y && !r.res;
 const drawArrow = () => { if (!r) return ''; const k = bsSc(r.y), sx = r.x, sy = r.y - r.h * k;
 if (TU.ph === 'res' && (r.res === 'in' || r.res === 'ear' || r.res === 'ouch')) return '';
@@ -5954,20 +5959,27 @@ return (r.h > 0 ? `<ellipse cx="${sx.toFixed(1)}" cy="${(r.y + 3).toFixed(1)}" r
 if (behind) g += drawArrow();
 g += tuPotSVG(pot.x, pot.y, kp, { arrows: TU.inPot });
 if (!behind) g += drawArrow();
-const bx = TU_X0 - 120, by = TU_Y0 + 28;
-g += gatGom(bx, by, { c: 'white', s: 0.95, T, arms: TU.ph === 'fly' ? 'point' : TU.ph === 'res' && (TU.res === 'in' || TU.res === 'ear') ? 'up' : 'down' });
+const by = TU_Y0 + 28, arms = TU.ph === 'fly' ? 'point' : ok0 ? 'up' : 'down';
+if (!TU.two) g += gatGom(TU_X0 - 120, by, { c: 'white', s: 0.95, T, arms });
+else [0, 1].forEach(p => { const me = p === who && TU.ph !== 'over', x = me ? TU_PL[p].bx : TU_PL[p].wx, o = { s: me ? 0.95 : 0.8, T, arms: me ? arms : 'down' };
+g += p === 0 ? chimaGom(x, by, { ...o, k: 0 }) : gatGom(x, by, { ...o, c: 'blue' });
+if (me && TU.ph === 'aim') { const b = Math.sin(T * 5) * 5; g += `<path d="M${x - 14},${by - 172 + b} L${x + 14},${by - 172 + b} L${x},${by - 152 + b}Z" fill="${C_GOLD}" stroke="#8A5A36" stroke-width="2.5" stroke-linejoin="round"/>`; } });
 g += `<ellipse cx="${TU_X0}" cy="${TU_Y0 + 4}" rx="40" ry="10" fill="none" stroke="#FFFFFF" stroke-width="3" opacity=".6"/>`;
 if (TU.ph === 'aim') { const d = TU.drag, ox = d ? Math.max(-120, Math.min(120, d.x - d.x0)) : 0, oy = d ? Math.max(-40, Math.min(150, d.y - d.y0)) : 0;
 if (d) tuPreview(d.x - d.x0, d.y - d.y0).forEach(([x, y], i) => { g += `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${(7 - i * 0.6).toFixed(1)}" fill="#FFFFFF" opacity="${(0.9 - i * 0.09).toFixed(2)}"/>`; });
 const ang = d && Math.hypot(ox, oy) > 8 ? Math.atan2(-oy - 30, -ox) * 180 / Math.PI : -70;
-g += tuArrow(TU_X0 + ox, TU_Y0 - 40 + oy, 1.0, ang);
+g += tuArrow(TU_X0 + ox, TU_Y0 - 40 + oy, 1.0, ang, TU.two ? PL.col : undefined);
 if (!d && TU.first && TU.i === 0) { const a = (T % 1.6) / 1.6, fy = TU_Y0 - 20 + a * 80;
-g += `<g opacity="${(1 - a).toFixed(2)}"><circle cx="${TU_X0}" cy="${fy}" r="20" fill="#FFFFFF" opacity=".8" stroke="#8A5A36" stroke-width="3"/></g>` + tx(TU_X0 + 270, TU_Y0 - 40, '화살을 뒤로 끌었다가 놓아요!', { fs: 30, c: C_INK }); } }
+g += `<g opacity="${(1 - a).toFixed(2)}"><circle cx="${TU_X0}" cy="${fy}" r="20" fill="#FFFFFF" opacity=".8" stroke="#8A5A36" stroke-width="3"/></g>` + (TU.two ? tx(TU_X0 + 240, TU_Y0 - 135, '화살을 뒤로 끌었다가 놓아요!', { fs: 26, c: C_INK }) : tx(TU_X0 + 270, TU_Y0 - 40, '화살을 뒤로 끌었다가 놓아요!', { fs: 30, c: C_INK })); } }
 g += title('투호', null, undefined, 34);
-g += tuQuiver(170, 664, TU_N - TU.i - (TU.ph === 'fly' || TU.ph === 'res' ? 1 : 0));
+const round = Math.min(TU_POT.length, Math.floor(TU.i / TU.per) + 1);
+if (!TU.two) { g += tuQuiver(170, 664, tuLeft(0));
 g += `<rect x="120" y="140" width="190" height="56" rx="28" fill="#FFFDF6" stroke="#8A5A36" stroke-width="3" opacity=".95"/>` + tx(215, 178, `쏙 ${TU.score}개`, { fs: 30, c: C_SEAL });
-const round = Math.min(TU_POT.length, Math.floor(TU.i / TU_PER) + 1);
-g += nlGuide(`${round}번째 자리`, round === 1 ? '화살을 항아리에 쏙 넣어요' : '항아리가 한 걸음 멀어졌어요');
+g += nlGuide(`${round}번째 자리`, round === 1 ? '화살을 항아리에 쏙 넣어요' : '항아리가 한 걸음 멀어졌어요'); }
+else { [0, 1].forEach(p => { const P = TU_PL[p], me = p === who && TU.ph !== 'over';
+g += tuQuiver(P.qx, 664, tuLeft(p), P.col);
+g += `<rect x="${P.qx - 78}" y="408" width="156" height="52" rx="26" fill="#FFFDF6" stroke="${me ? C_GOLD : P.col}" stroke-width="${me ? 5 : 3}" opacity=".96"/>` + tx(P.qx, 444, `쏙 ${TU.sc[p]}개`, { fs: 28, c: P.ink }); });
+if (TU.ph !== 'over') g += nlGuide(`${PL.name} 차례`, round === 1 ? '화살을 항아리에 쏙 넣어요' : `${round}번째 자리 · 한 걸음 멀리`); }
 if (TU.ph === 'res') { const a = Math.min(1, (T - TU.t0) / 0.25), ok = TU.res === 'in' || TU.res === 'ear';
 g += `<g opacity="${a}">` + tx(930, 470, ok ? (TU.res === 'ear' ? '귀에 쏙!' : '쏙!') : TU.res === 'bump' ? '팅! 아깝다' : '아깝다!', { fs: 52, c: ok ? C_SEAL : C_INK2 }) + `</g>`;
 if (ok) g += sparkle(pot.x + (TU.res === 'ear' ? r.side * TU_EAR * kp : 0), pot.y - TU_MH * kp, Math.min(1, (T - TU.t0) / 0.8)); }
@@ -5980,11 +5992,27 @@ function tuOver() {
 const k = Math.min(1, (T - TU.over) / 0.3), x = 290, y = 150, w = 700, h = 440;
 hit(0, -EX, W, H + 2 * EX, () => { });
 let g = `<g opacity="${k}"><rect x="${x}" y="${y + 6}" width="${w}" height="${h}" rx="22" fill="#3A1D12" opacity=".35"/><rect x="${x}" y="${y}" width="${w}" height="${h}" rx="22" fill="#FBF6EA" stroke="#8A5A36" stroke-width="4"/>`;
+if (TU.two) { const [a, b] = TU.sc, wn = a === b ? -1 : a > b ? 0 : 1;
+g += tx(640, y + 70, wn < 0 ? '비겼어요!' : `${TU_PL[wn].name} 이겼어요!`, { f: 'SM', fs: 40, c: wn < 0 ? C_SEAL : TU_PL[wn].ink });
+g += tuPotSVG(640, y + 272, 0.75, { arrows: TU.inPot });
+[0, 1].forEach(p => { const P = TU_PL[p], cx = p ? 860 : 420; g += (p ? gatGom(cx, y + 250, { c: 'blue', s: 0.75, T, arms: wn === p || wn < 0 ? 'up' : 'down' }) : chimaGom(cx, y + 250, { k: 0, s: 0.75, T, arms: wn === p || wn < 0 ? 'up' : 'down' }))
++ tx(cx, y + 300, `쏙 ${TU.sc[p]}개`, { fs: 30, c: P.ink }); });
+} else {
 g += tx(640, y + 70, TU.score === TU_N ? '열두 개 다 넣었어요!' : `화살 ${TU_N}개 중 ${TU.score}개 쏙!`, { f: 'SM', fs: 40, c: C_SEAL });
 g += tuPotSVG(640, y + 272, 0.75, { arrows: TU.inPot });
-g += tx(640, y + 314, TU.newBest ? '최고 기록!' : `최고 기록 ${tuMem('best') || 0}개`, { fs: 26, c: TU.newBest ? C_SEAL : C_INK2 });
-g += btn(x + 90, y + h - 100, 240, 66, '다시 하기', () => tuStart(), { fs: 30 }) + btn(x + w - 330, y + h - 100, 240, 66, '민속놀이', () => go('nol'), { fs: 28 });
+g += tx(640, y + 314, TU.newBest ? '최고 기록!' : `최고 기록 ${tuMem('best') || 0}개`, { fs: 26, c: TU.newBest ? C_SEAL : C_INK2 }); }
+const two = TU.two;
+g += btn(x + 90, y + h - 100, 240, 66, '다시 하기', () => tuBegin(two), { fs: 30 }) + btn(x + w - 330, y + h - 100, 240, 66, '민속놀이', () => go('nol'), { fs: 28 });
 return g + `</g>`;
+}
+function tuMenu() {
+let g = title('투호', '화살을 항아리에 쏙 · 들어간 수로 겨뤄요', undefined, 40);
+const card = (x, label, sub, art, cb) => { hit(x, 230, 300, 330, cb);
+return `<rect x="${x}" y="236" width="300" height="330" rx="22" fill="#8A5A36" opacity=".35"/><rect x="${x}" y="230" width="300" height="330" rx="22" fill="#FBF5E6" stroke="#8A5A36" stroke-width="3.5"/>` + art
++ tx(x + 150, 490, label, { f: 'SM', fs: 38, c: C_INK }) + tx(x + 150, 528, sub, { fs: 21, c: C_INK2 }); };
+g += card(300, '혼자서', `화살 ${TU_N}개`, tuPotSVG(390, 430, 0.62) + gatGom(510, 440, { c: 'white', s: 0.8, T, arms: 'point' }), () => tuBegin(false));
+g += card(680, '둘이서', `${TU_TWO_N}개씩 번갈아`, chimaGom(760, 440, { k: 0, s: 0.8, T, arms: 'up' }) + tuPotSVG(830, 430, 0.5) + gatGom(900, 440, { c: 'blue', s: 0.8, T, arms: 'up' }), () => tuBegin(true));
+return g;
 }
 if (typeof window !== 'undefined' && window.addEventListener) {
 window.addEventListener('pointermove', e => { if (S === 'tuho' && TU && TU.drag) { const p = svgXY(e); if (p) tuMove(...p); } });
@@ -10840,7 +10868,7 @@ if (holdStart(x, y)) return;
 tapAt(x, y);
 });
 ['pointerup', 'pointercancel', 'pointerleave'].forEach(n => window.addEventListener(n, holdEnd));
-window.__mini = { jmStart, palStart, palPick, JM_PAL, JM_DEUNG, JM_HEON, setSignStyle: v => { RM_SIGN_STYLE = v; }, RHY, rhyInst, jamStart, jamHit, jamAt, jamAll, JAM, pgStart, pgHit, PG_SONGS, pgStoneAt, geoFretAt, GEO_X, dsStart, dsToggle, dsBtn, dsEasy, dsPlay, dsTouch, DS_SONGS, DS_F, DS_HOLE, dsName, rhyMenu, rhyPlay, rhyFree, rhyHit, rhyIns, gkRhyTouch, rhyNotes, rhyBest, rhyClock, GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, get BS() { return BS; }, get YT() { return YT; }, ytStart, ytBegin, ytThrow, ytMove, ytPath, ytOptions, ytTick, YN, YR, bsStart, get TU() { return TU; }, tuStart, tuThrow, tuLaunch, tuAdvance, TU_POT, get JG() { return JG; }, jgStart, jgTap, jgDrop, JG_KY, jgFootX, ckOpen, ckUse, ckTap, ckPage, ckQuizStart, ckQuizMenu, ckAnswer, ckNext, ckMakeQuiz, ckDone, get CK() { return CK; }, CK_BOOKS, bsThrow, bsLaunch, bsAdvance, BS_ST, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, janGo, janPawTap, janPawPick, J_PAW_SEAT, janChopTap, janChopPick, J_CHOP_SEAT, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
+window.__mini = { jmStart, palStart, palPick, JM_PAL, JM_DEUNG, JM_HEON, setSignStyle: v => { RM_SIGN_STYLE = v; }, RHY, rhyInst, jamStart, jamHit, jamAt, jamAll, JAM, pgStart, pgHit, PG_SONGS, pgStoneAt, geoFretAt, GEO_X, dsStart, dsToggle, dsBtn, dsEasy, dsPlay, dsTouch, DS_SONGS, DS_F, DS_HOLE, dsName, rhyMenu, rhyPlay, rhyFree, rhyHit, rhyIns, gkRhyTouch, rhyNotes, rhyBest, rhyClock, GIM, gimItems, gimSave, gimCardsSVG, dalReadStart, sdQuizStart, sdQuizAnswer, sdLineName, sdLineOf, dalReadNext, dalSdStart, dalSdSet, setMaT: v => { MA_TST = v; }, setSky: v => { MA_PH_FORCE = v; }, maSunRS, maPhase, get DL() { return DL; }, dalStart, dalOpenBook, dalPage, dalTap, dalNext, dalToday, dalSeason, dalTodayLine, dalJosa, DAL_PAGES, DAL_J, DAL_M, DAL_SCI, dalKeepSVG, get CREDP() { return CREDP; }, gkKeepStage, holdStart, holdEnd, get HOLD() { return HOLD; }, get GK() { return GK; }, get BS() { return BS; }, get YT() { return YT; }, ytStart, ytBegin, ytThrow, ytMove, ytPath, ytOptions, ytTick, YN, YR, bsStart, get TU() { return TU; }, tuStart, tuBegin, tuThrow, tuLaunch, tuAdvance, TU_POT, get JG() { return JG; }, jgStart, jgTap, jgDrop, JG_KY, jgFootX, ckOpen, ckUse, ckTap, ckPage, ckQuizStart, ckQuizMenu, ckAnswer, ckNext, ckMakeQuiz, ckDone, get CK() { return CK; }, CK_BOOKS, bsThrow, bsLaunch, bsAdvance, BS_ST, gkQuizStart, gkAnswer, gkMakeSjQuiz, gkNext, gkMakeQuiz, gkCount, gkStamp, GK_ALL, GK_FACT, gugakCard, keepSVG, get KEEP() { return KEEP; }, get K() { return K; }, sdkMake, sdkCount, sdkBegin, sdkPut, sdkHint, sdkAnswer, sdkAsk, get STD() { return STD; }, stdBegin, stdStart, stdPress, stdMem, stdOrders, stdFactors, svOrders, svPick, svKey, sdkTap, sdkMem, get J() { return J; }, janGo, janPawTap, janPawPick, J_PAW_SEAT, janChopTap, janChopPick, J_CHOP_SEAT, J_SEATS, janSwap, jRuns, jFindMove, get DECO() { return DECO; }, SND, get CRED() { return CRED; }, cardSVG, keepCard, go: (s, o) => { go(s, o); render(); }, tapAt, get S() { return S; }, get P() { return P; }, setT: t => { T = t; render(); } };
 Object.defineProperties(window.__mini, Object.getOwnPropertyDescriptors(HW_TEST));
 Object.defineProperties(window.__mini, Object.getOwnPropertyDescriptors(SG_TEST));
 const START_JAN = typeof location !== 'undefined' && /[?&]g=jan/.test(location.search || '');
