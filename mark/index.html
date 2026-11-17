@@ -1619,7 +1619,7 @@ const x = 62, y = 42; hit(x - 50, y - 32, 100, 64, cb || (() => { SND.pop(); go(
 return tx(x, y + 12, '마을', { fs: 34, c: C_INK, st: C_PAPER, sw: 7 });
 }
 function footer() {
-hit(1170, 700, 110, 24, () => { SND.pop(); openCredits(); }, 'credits');
+hit(1170, 700 + EX, 110, 24 + EX, () => { SND.pop(); openCredits(); }, 'credits');
 return tx(640, 716 + EX, '© 2026 zdogame · https://zdogame.com/mark', { fs: 13, c: '#FFFDF6', op: 0.75, st: '#3A2414', sw: 3 })
 + tx(1258, 716 + EX, '자료 출처', { fs: 14, a: 'end', c: '#FFFDF6', op: 0.9, st: '#3A2414', sw: 3 }) + triArt(1268, 711 + EX, 0.5, '#FFFDF6');
 }
