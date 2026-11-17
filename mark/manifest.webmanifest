@@ -1,0 +1,31 @@
+{
+ "name": "곰 재주 마을",
+ "short_name": "곰 재주 마을",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "landscape",
+ "background_color": "#6E4A2A",
+ "theme_color": "#6E4A2A",
+ "icons": [
+  {
+   "src": "icon-414786b0-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-414786b0-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-414786b0-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
