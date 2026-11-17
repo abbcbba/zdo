@@ -1,5 +1,5 @@
-const C='mark-r3-4800f7eb7c47', A='mark-assets';
-const FILES=['./','index.html','manifest.webmanifest','icon-414786b0-180.png','icon-414786b0-192.png','icon-414786b0-512.png'];
+const C='mark-r3-aa4eedf6e3ee', A='mark-assets';
+const FILES=['./','index.html','manifest.webmanifest','icon-c337166c-180.png','icon-c337166c-192.png','icon-c337166c-512.png'];
 const ASSETS=[];
 let filling=null;
 function fill(){ if(filling) return filling; filling=caches.open(A).then(async c=>{
