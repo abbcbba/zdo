@@ -13,7 +13,7 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="천하통일 333 - 삼국지 인물 · 고사성어 · 한자를 배우는 게임">
 <meta property="og:description" content="도원결의부터 천하통일까지! 삼국지 8장 모험 · 보스 스테이지 8개 · 인물 카드 71장 · 고사성어 22개 · 장수 대결 · 적토마 퀴즈쇼 · 삼국지 월드컵 · 족보 그리기 · 연대표">
-<meta property="og:image" content="https://zdogame.com/333/og.png?v=6ce6b3f0">
+<meta property="og:image" content="https://zdogame.com/333/og.png?v=a36e01d4">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:url" content="https://zdogame.com/333/">
@@ -899,6 +899,12 @@ if (L.cloud) for (const [cx, cy] of [[-30, -30], [26, -40], [-6, -22]]) g += `<p
 if (L.pads) for (const sx of [-1, 1]) g += `<path d="M${sx * 18},-122 Q${sx * 44},-126 ${sx * 46},-100 Q${sx * 34},-96 ${sx * 20},-104Z" ${st(L.pads, 2.2)}/><path d="M${sx * 26},-114 Q${sx * 38},-116 ${sx * 42},-104" ${ln(1.5)}/>`;
 if (F) g += `<path d="M-4,-66 Q-8,-40 -12,-24 M4,-66 Q8,-40 12,-24" ${ln(4, N)}/>`;
 if (L.bells) for (const x of [-20, -4, 12]) g += `<circle cx="${x}" cy="-56" r="5" ${st('#E3B53C', 2)}/><path d="M${x - 2},-55 L${x + 2},-55" ${ln(1.4)}/>`;
+if (hp.l[0] > -ax + 6) {
+const sx = -ax + 6, sy = -114, [hx2, hy2] = hp.l, dx2 = hx2 - sx, dy2 = hy2 - sy, LL = Math.hypot(dx2, dy2) || 1, ux = dx2 / LL, uy = dy2 / LL, nx = -uy, ny = ux, cx = hx2 - ux * 13, cy = hy2 - uy * 13, wv = 12.6;
+g += one([limb(sx, sy, hx2, hy2, SL), [ell(hx2, hy2, 8, 8), S]], H_SW * 0.8);
+g += `<path d="M${(cx + nx * wv).toFixed(1)},${(cy + ny * wv).toFixed(1)} L${(cx - nx * wv).toFixed(1)},${(cy - ny * wv).toFixed(1)}" ${ln(7, H_OUT)}/><path d="M${(cx + nx * (wv - 1)).toFixed(1)},${(cy + ny * (wv - 1)).toFixed(1)} L${(cx - nx * (wv - 1)).toFixed(1)},${(cy - ny * (wv - 1)).toFixed(1)}" ${ln(4.2, L.cuff || T)}/>`;
+g += `<path d="M${(sx + dx2 * 0.45 + nx * 4).toFixed(1)},${(sy + dy2 * 0.45 + ny * 4).toFixed(1)} q${(ux * 6).toFixed(1)},${(uy * 6).toFixed(1)} ${(ux * 10 - nx * 6).toFixed(1)},${(uy * 10 - ny * 6).toFixed(1)}" ${fold}/>`;
+}
 return g;
 }
 const HX = 47, HY = -70;
