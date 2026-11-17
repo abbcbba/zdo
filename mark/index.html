@@ -1619,9 +1619,11 @@ const x = 62, y = 42; hit(x - 50, y - 32, 100, 64, cb || (() => { SND.pop(); go(
 return tx(x, y + 12, '마을', { fs: 34, c: C_INK, st: C_PAPER, sw: 7 });
 }
 function footer() {
-hit(1170, 700 + EX, 110, 24 + EX, () => { SND.pop(); openCredits(); }, 'credits');
-return tx(640, 716 + EX, '© 2026 zdogame · https://zdogame.com/mark', { fs: 13, c: '#FFFDF6', op: 0.75, st: '#3A2414', sw: 3 })
-+ tx(1258, 716 + EX, '자료 출처', { fs: 14, a: 'end', c: '#FFFDF6', op: 0.9, st: '#3A2414', sw: 3 }) + triArt(1268, 711 + EX, 0.5, '#FFFDF6');
+const fy = 716 + EX - Math.min(EX, 34);
+const ht = EX ? fy - 22 : 700;
+hit(EX ? 1150 : 1170, ht, EX ? 130 : 110, 724 + EX - ht, () => { SND.pop(); openCredits(); }, 'credits');
+return tx(640, fy, '© 2026 zdogame · https://zdogame.com/mark', { fs: 13, c: '#FFFDF6', op: 0.75, st: '#3A2414', sw: 3 })
++ tx(1258, fy, '자료 출처', { fs: 14, a: 'end', c: '#FFFDF6', op: 0.9, st: '#3A2414', sw: 3 }) + triArt(1268, fy - 5, 0.5, '#FFFDF6');
 }
 const CREDITS = [
 '집 짓는 차례(터 다지기, 주춧돌, 짜맞추기, 상량, 지붕 · 흙벽, 구들 · 마루) = 경남신문 「토종의 세계 3부 - 황토기행 ⑦」(2003)',
@@ -1660,10 +1662,10 @@ FLY = FLY.filter(f => T - f.t0 < 0.7);
 FLY.forEach(f => { const u = ease((T - f.t0) / 0.7), tx2 = 400, ty2 = 668, x = f.x + (tx2 - f.x) * u, y = f.y + (ty2 - f.y) * u - Math.sin(u * Math.PI) * 120; g += itemArt(f.k, x, y, 1.1 - u * 0.4); });
 return g;
 }
-let SVG_BG = null, SVG_FG = null, SCALE = 1;
+let SVG_BG = null, SVG_FG = null, SCALE = 1, LAY_WH = '';
 function layout() {
 const v = document.getElementById('v'); if (!v) return;
-const vw = v.clientWidth, vh = v.clientHeight;
+const vw = v.clientWidth, vh = v.clientHeight; LAY_WH = vw + 'x' + vh;
 PORTRAIT = vh > vw * 1.05;
 if (vh / vw > H / W) { SCALE = vw / W; EX = Math.floor((vh / SCALE - H) / 2); } else { SCALE = vh / H; EX = 0; }
 [SVG_BG, SVG_FG].forEach(s => { s.setAttribute('viewBox', `0 ${-EX} ${W} ${H + 2 * EX}`); s.setAttribute('width', W * SCALE); s.setAttribute('height', (H + 2 * EX) * SCALE); });
@@ -1710,6 +1712,7 @@ return `<g transform="rotate(${rot})"><path d="M-7,8 A7,7 0 0 1 7,8 L7,30 Q7,22 
 }
 let LAST = 0, FRAME = 0;
 function frame(now) {
+{ const v = document.getElementById('v'); if (v && SVG_FG && v.clientWidth + 'x' + v.clientHeight !== LAY_WH) layout(); }
 const dt = Math.min(0.1, (now - LAST) / 1000 || 0); LAST = now; T += dt; FRAME++;
 if (HOLD && T - HOLD.t0 >= HOLD.sec) { const h = HOLD; HOLD = null; h.cb(); }
 const sc = SCENES[S];
@@ -1732,7 +1735,7 @@ function startGame() {
 const v = document.getElementById('v');
 v.innerHTML = `<svg id="bg" xmlns="http://www.w3.org/2000/svg"></svg><svg id="fg" xmlns="http://www.w3.org/2000/svg"></svg>`;
 SVG_BG = document.getElementById('bg'); SVG_FG = document.getElementById('fg');
-layout(); window.addEventListener('resize', layout);
+layout(); window.addEventListener('resize', layout); window.addEventListener('orientationchange', () => setTimeout(layout, 300)); if (window.visualViewport) visualViewport.addEventListener('resize', layout);
 svLoad();
 v.addEventListener('pointerdown', e => { e.preventDefault(); const p = toGame(e); try { v.setPointerCapture(e.pointerId); } catch (er) { } down(p.x, p.y); });
 v.addEventListener('pointermove', e => { const p = toGame(e); move(p.x, p.y); });
