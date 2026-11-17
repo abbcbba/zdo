@@ -3351,11 +3351,6 @@ return g;
 },
 };
 const PARTY_C = ['#E84A5F', '#F2C24E', '#5CC26B', '#3FA7E0', '#F27FB5', '#FFF6DC', '#B07AD8'];
-function chorongArt(x, y, s, sw) {
-return `<g transform="translate(${x},${y}) rotate(${sw.toFixed(1)}) scale(${s})"><path d="M0,-40 V-20" stroke="#5E3A1E" stroke-width="2"/><circle cx="0" cy="8" r="34" fill="#FFE2A0" opacity=".35"/><rect x="-16" y="-22" width="32" height="6" rx="2" fill="#5E3A1E"/>`
-+ `<path d="M-18,-16 Q-22,6 -18,24 H18 Q22,6 18,-16Z" fill="#C8323A"/><path d="M-18,-16 Q-21,-4 -20,4 H20 Q21,-4 18,-16Z" fill="#2F62B0"/><path d="M-18,-16 Q-22,6 -18,24 H18 Q22,6 18,-16Z" fill="none" stroke="#3A2414" stroke-width="2"/><ellipse cx="0" cy="6" rx="8" ry="11" fill="#FFE9A8" opacity=".55"/>`
-+ `<rect x="-16" y="24" width="32" height="5" rx="2" fill="#5E3A1E"/><path d="M-6,29 L-8,46 M0,29 V48 M6,29 L8,46" stroke="#C8323A" stroke-width="2.4" stroke-linecap="round"/></g>`;
-}
 function fwBurst(x, y, u, h) {
 if (u <= 0 || u >= 1) return '';
 const r = 24 + 96 * ease(u), op = u < 0.7 ? 1 : (1 - u) / 0.3, c1 = PARTY_C[h % 7], c2 = PARTY_C[(h + 3) % 7];
@@ -3368,7 +3363,7 @@ const FW = [[260, 170, 0.6, 0], [1020, 150, 0.95, 1], [640, 96, 1.3, 2], [380, 2
 function endParty(t) {
 let g = '';
 if (t < 0.3) g += `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#FFFFFF" opacity="${(0.75 * (1 - t / 0.3)).toFixed(2)}"/>`;
-[210, 400, 880, 1070].forEach((x, i) => { g += chorongArt(x, 64, 0.95, Math.sin(T * 2 + i) * 5); });
+[210, 400, 880, 1070].forEach((x, i) => { g += chorong(x, 0, 0.62, { len: 30, swing: Math.sin(T * 2 + i) * 5 }); });
 const lp = t > 3 ? (t - 3) % 4.2 : -1;
 FW.forEach(([x, y, d, h], i) => { const u1 = (t - d) / 0.9, u2 = lp >= 0 ? (lp - d * 0.9) / 0.9 : -1;
 g += fwBurst(x, y, u1, h) + fwBurst(x, y, u2, h + 2);
@@ -6599,6 +6594,8 @@ const nGlowDefs = () => `<defs><radialGradient id="nGlow"><stop offset="0" stop-
 function nightTraces() {
 let g = nGlowDefs();
 { const x = 392, y = 456;
+hit(x - 30, y - 70, 120, 80, () => { SND.pop(); P.tapSaw = T; openSawPick(); }, 'sawBear');
+if (!POP && (T % 9) < 1.2) g += `<g opacity="${(0.9 * Math.sin((T % 9) / 1.2 * Math.PI)).toFixed(2)}">` + twinkle4(x + 60, y - 70, 9, 1) + twinkle4(x + 76, y - 54, 5, 1) + `</g>`;
 g += `<g><path d="M${x + 22},${y} l10,-26 M${x + 74},${y} l-10,-26 M${x + 26},${y - 2} l44,0" stroke="#6E4524" stroke-width="5" stroke-linecap="round"/><rect x="${x + 14}" y="${y - 36}" width="68" height="14" rx="7" fill="#A87A44" stroke="#5E3A1E" stroke-width="2"/><ellipse cx="${x + 82}" cy="${y - 29}" rx="4" ry="7" fill="#E2C08A" stroke="#5E3A1E" stroke-width="1.4"/></g>`
 + `<g transform="translate(${x + 40},${y - 40}) rotate(-8)"><path d="M0,0 L36,0 L36,8 L0,6Z" fill="#CFCBC2" stroke="#5A5650" stroke-width="1.4"/><rect x="-10" y="-2" width="12" height="10" rx="3" fill="#8A5A30"/></g>`
 + `<circle cx="${x + 48}" cy="${y + 2}" r="2" fill="#E8C88E"/><circle cx="${x + 56}" cy="${y + 4}" r="1.6" fill="#E8C88E"/><circle cx="${x + 40}" cy="${y + 5}" r="1.4" fill="#E8C88E"/>`; }
