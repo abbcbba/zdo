@@ -7377,7 +7377,7 @@ QD.hbhat.steps = [
 { t: 'tap', j: 'dye', order: 1, say: '톡톡 밀짚을 빙글빙글 엮어요', pts: HT_WEAVE, snd: 'weave' },
 { t: 'rub', j: 'dye', say: '쓱쓱 챙을 넓게 엮어 펴요', box: [-126, HT.cy - 26, 252, 52] },
 { t: 'rub', j: 'dye', say: '쓱쓱 주황 물을 들여요', box: [-120, HT.top - 4, 240, HT.cy - HT.top + 30] },
-{ t: 'drag', j: 'dye', say: '초록 잎 꼭지를 위에 달아요', pieces: [{ item: 'straw', pa: () => qg(0, 34, 0.9, htLeaf()), tgt: [-44, HT.top - 46, 88, 56] }] },
+{ t: 'drag', j: 'dye', say: '초록 잎 꼭지를 위에 달아요', pieces: [{ item: 'straw', pa: () => qg(0, -(HT.top - 12) * 0.9, 0.9, htLeaf()), tgt: [-44, HT.top - 46, 88, 56] }] },
 { t: 'tap', j: 'dye', order: 1, say: '톡톡 턱끈을 달아요', pts: [[-52, HT.cy + 8], [52, HT.cy + 8], [0, -4]], snd: 'weave' },
 ];
 QD.hbhat.art = function (st, p, col, x, y, s) {
@@ -8406,7 +8406,11 @@ L.forEach((q, i) => { if (i > 0 && (i < 62 || i > 63) && q.z === 'l' && L[i - 1]
 if (Q_ORDER.indexOf('doggi') !== 8 || Q_ORDER[7] !== 'homi' || Q_ORDER.indexOf('sogo') !== 18 || Q_ORDER.indexOf('eo') < 40 || Q_ORDER.slice(61, 64).join() !== 'pgyeong,dancheong,bike' || Q_ORDER.indexOf('jinmyo') < Q_ORDER.indexOf('harubang')) bad.push('261 자리');
 return bad;
 }
-const pawUsed = () => SV.paw === mkDayKey();
+const PAW_MAX = 3;
+const pawN = () => { const v = SV.paw, d = mkDayKey(); if (!v) return 0; if (typeof v === 'string') return v === d ? 1 : 0; return v.d === d ? v.n || 0 : 0; };
+const pawLeft = () => Math.max(0, PAW_MAX - pawN());
+const pawUsed = () => pawLeft() <= 0;
+const pawUse = () => { SV.paw = { d: mkDayKey(), n: pawN() + 1 }; };
 const PAW_AT = [1207, 140];
 function pawArt(x, y, used) {
 return `<g opacity="${used ? 0.45 : 1}"><circle cx="${x}" cy="${y + 4}" r="30" fill="#8A5A36" opacity=".4"/><circle cx="${x}" cy="${y}" r="30" fill="${used ? '#E6DCC8' : '#F5C93A'}" stroke="${used ? '#8A7A62' : '#A87A10'}" stroke-width="3.4"/>`
@@ -8416,8 +8420,8 @@ return `<g opacity="${used ? 0.45 : 1}"><circle cx="${x}" cy="${y + 4}" r="30" f
 function openPaw() {
 POP = { k: 'paw', soft: true, draw() {
 let g = `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#000" opacity=".35"/>` + cardFrame(380, 220, 520, 280); hit(380, 220, 520, 280, () => { });
-g += pawArt(640, 276, false) + tx(640, 350, '황금 발바닥', { fs: 32, c: '#8A2A10' }) + tx(640, 388, '이 걸음을 넘어갈까요? (하루 한 번)', { fs: 22, c: '#5A3A20' });
-g += btn(420, 416, 210, 60, '넘어가기', () => { POP = null; SV.paw = mkDayKey(); svSave(); SND.twinkle(); P.stepT = null; const c = qCur(); if (c && c.steps[P.si]) qwStepDone(); else if (!P.done) { P.done = T; SND.install(); } }, { k: 'pawYes', col: '#FBE7A6', bd: '#B07E10', fs: 26 })
+g += pawArt(640, 276, false) + tx(640, 350, '황금 발바닥', { fs: 32, c: '#8A2A10' }) + tx(640, 388, `이 걸음을 넘어갈까요? (오늘 ${pawLeft()}번 남음)`, { fs: 22, c: '#5A3A20' });
+g += btn(420, 416, 210, 60, '넘어가기', () => { POP = null; pawUse(); svSave(); SND.twinkle(); P.stepT = null; const c = qCur(); if (c && c.steps[P.si]) qwStepDone(); else if (!P.done) { P.done = T; SND.install(); } }, { k: 'pawYes', col: '#FBE7A6', bd: '#B07E10', fs: 26 })
 + btn(650, 416, 210, 60, '아니요', () => { POP = null; SND.pop(); }, { k: 'pawNo', fs: 26 });
 return g; } };
 }
@@ -8427,8 +8431,8 @@ W0.draw = function () {
 const c = qCur(); if (c && !c.steps[P.si] && !P.done) { P.done = T; SND.install(); }
 let g = d0.call(this); if (P.done || POP) return g;
 const [x, y] = PAW_AT, used = pawUsed();
-hit(x - 36, y - 36, 72, 72, () => { SND.pop(); if (pawUsed()) { say('app', 1150, 560, ['황금 발바닥은 하루 한 번!', '내일 또 써요'], 2.6); return; } openPaw(); }, 'pawBtn');
-return g + pawArt(x, y, used); }; }
+hit(x - 36, y - 36, 72, 72, () => { SND.pop(); if (pawUsed()) { say('app', 1150, 560, [`황금 발바닥은 하루 ${PAW_MAX}번!`, '내일 또 써요'], 2.6); return; } openPaw(); }, 'pawBtn');
+const left = pawLeft(); return g + pawArt(x, y, used) + (left > 0 ? `<circle cx="${x + 24}" cy="${y + 24}" r="13" fill="#8A2A10" stroke="#FFF6C8" stroke-width="2.4"/>` + tx(x + 24, y + 30, String(left), { fs: 17, c: '#FFF6C8' }) : ''); }; }
 const MM_DIR = { UP: 1, RIGHT: 2, DOWN: 4, LEFT: 8 }, MM_DIRS = [1, 2, 4, 8], MM_OPP = { 1: 4, 2: 8, 4: 1, 8: 2 };
 const MM_DAY = 10, MM_SEC = 45, MM_HINT = 8;
 const mmRot = (mask, q = 1) => { let r = mask & 15; for (let i = 0; i < ((q % 4) + 4) % 4; i++) r = ((r << 1) & 15) | ((r >> 3) & 1); return r; };
