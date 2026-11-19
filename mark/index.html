@@ -3276,9 +3276,9 @@ FB_POS.forEach(([a, c, h], i) => { if (on ? !on[i] : i >= n) return; g += FB_PLA
 if (n >= 6 && !on) g += wsButterfly(36 + Math.sin(T * 1.3) * 30, -62 + Math.sin(T * 2.1) * 8, 0.32, '#F2C230', Math.sin(T * 9) * 14);
 return g + ring(0.01, 1.01) + `</g>`;
 }
-function yardBG(eve) {
+function yardBG(eve, o = {}) {
 let g = mkScenery(eve ? 'eve' : 'day', { fy: 390 });
-g += mkPine(40, 400, 0.6) + mkPine(1250, 396, 0.6, 1) + mkStones(560, 380, 720, 26) + hutArt(1180, 420, 0.55, eve);
+g += mkPine(40, 400, 0.6) + mkPine(1250, 396, 0.6, 1) + mkStones(560, 380, 720, 26) + (o.noHut ? '' : hutArt(1180, 420, 0.55, eve));
 return g;
 }
 function yardHouse(lit) { return houseAt(330, 470, 0.62, 8, { lit, shadow: lit }); }
@@ -3709,7 +3709,7 @@ card: { t: '허수아비', txt: ['곡식을 쪼아 먹는 새를', '쫓으려고
 ddeokme: { name: '떡메', size: 's', who: 'tokki', whoName: '옥토끼 곰', whoAt: [912, 698, 0.5], spot: [880, 650], r: 34, zoom: [860, 620],
 ask: ['떡메가 닳았어요!', '새 떡메 주세요'], needs: { bakdal: 1, plank: 1 }, reward: { items: { bakdal: 1, plank: 2 } },
 card: { t: '절구와 떡메', txt: ['절구에 넣고 공이로', '내리쳐 찧어요.', '디딜방아 · 물레방아도', '공이로 찧는 방아 무리예요.'], src: '한국민족문화대백과사전 「방아」' } },
-fan: { name: '곰 발바닥 부채', size: 's', who: 'seonbi', whoName: '갓 쓴 선비 곰', whoAt: [970, 694, 0.42], spot: [992, 646], r: 30, zoom: [960, 620],
+fan: { name: '곰 발바닥 부채', size: 's', who: 'seonbi', whoName: '부채 선비 곰', whoAt: [970, 694, 0.42], spot: [992, 646], r: 30, zoom: [960, 620],
 ask: ['송편 잔치 날', '부칠 부채를 줘요!'], needs: { daeori: 2, paper: 1 }, reward: { items: { dak: 2, daeori: 1 } },
 card: { t: '둥근 부채', txt: ['부채살에 종이나 비단을', '붙인 둥근 부채를', '단선이라고 해요.', '둥글부채라고도 불러요.'], src: '한국민족문화대백과사전 「단선」' } },
 sign: { name: '「민속놀이」 팻말', size: 's', who: 'nol', whoName: '민속놀이 곰', whoAt: [480, 700, 0.46], spot: [418, 680], r: 34, zoom: [460, 640],
@@ -7958,6 +7958,7 @@ hit(w.x - 32, w.y - 78, 64, 84, () => { SND.pop(); say('jmok', clamp(w.x, 130, 1
 }
 function hrbGuide() {
 const c = qCur();
+if (!c && typeof qShutSay === 'function' && (qNightClosed() || qDayFull())) return qShutSay();
 if (!c) return SV.q && SV.q.done.length >= Q_ORDER.length ? ['의뢰를 다 했어요!', '의뢰 장부를 봐요'] : ['새 의뢰가 기다려요', '의뢰판으로 가 봐요!'];
 const m = needItems(), k = Object.keys(m)[0];
 if (SV.q.ws > 0 || !k) return ['재료는 다 있어요!', '가운데 [만들기]를 톡!'];
@@ -10284,7 +10285,7 @@ card: { t: '가마솥', txt: ['무쇠를 녹여 찰흙 거푸집에', '부어 �
 tteoksal: { name: '떡살', size: 's', qband: 3, jangs: ['mok', 'pot'], who: 'shop', whoName: '송편 가게 곰', whoAt: [1188, 636, 0.6], spot: [TS_AT.x, TS_AT.y - 10], r: 18, zoom: [1100, 520],
 ask: ['떡에 예쁜 무늬를', '꾹 찍고 싶어요'], needs: { plank: 2, water: 1 }, reward: { items: { plank: 1, bakdal: 1, wood: 2 } },
 card: { t: '떡살', txt: ['떡에 무늬를 찍는', '도장 같은 도구예요.', '단단한 감나무로 만들고,', '단오 떡엔 수레바퀴 무늬!'], src: '한국민족문화대백과사전 「떡살」 · 「수리취떡」' } },
-yugi: { name: '유기 그릇', size: 'm', qband: 3, jangs: ['smith'], who: 'seonbi', whoName: '갓 쓴 선비 곰', whoAt: [970, 694, 0.42], spot: [YG_AT.x, YG_AT.y - 10], r: 22, zoom: [1040, 380],
+yugi: { name: '유기 그릇', size: 'm', qband: 3, jangs: ['smith'], who: 'seonbi', whoName: '부채 선비 곰', whoAt: [970, 694, 0.42], spot: [YG_AT.x, YG_AT.y - 10], r: 22, zoom: [1040, 380],
 ask: ['잔칫상에 올릴', '놋그릇이 필요하오'], needs: { brass: 2, wood: 1 }, reward: { items: { brass: 1, soe: 1, wood: 2 } },
 card: { t: '방짜 유기', txt: ['구리에 주석을 섞은 놋쇠를', '달궈 여럿이 두드려요.', '떨어뜨려도 찌그러질 뿐', '잘 깨지지 않아요.'], src: '국가유산사랑 「쇳물로 빚어낸 멋, 유기장」 · 국가유산진흥원 「방짜유기」' } },
 jeongsu: { name: '정수 필터', size: 'm', qband: 3, jangs: ['pot'], pic: 'home', who: 'tamheom', whoName: '탐험곰', whoAt: [1050, 530, 0.42], spot: [JS_AT.x, JS_AT.y - 36], r: 28, zoom: [1080, 460],
@@ -11464,8 +11465,8 @@ return g + tx(640, 664, '빈 곳 톡 = 닫기', { fs: 19, c: '#7A6A56' });
 const MD_Y0 = 440, MD_Y1 = 606, MD_MAX = 40;
 SCENES.madang = {
 start() { P.pg = 0; P.wig = {}; const n = Object.values(decoBox()).reduce((a, b) => a + b, 0);
-setTimeout(() => say('mom', 250, 430, !hidFound().length ? ['작업대에서 재료를 섞다 보면', '꾸미기 물건이 나와요!'] : n ? ['가방에서', '끌어다 놓아요!'] : ['우리 마당', '참 예뻐요!'], 3.6), 300); },
-bg() { return yardBG(false); }, bgKey: () => 'madang',
+setTimeout(() => say('mom', 720, 470, !hidFound().length ? ['작업대에서 재료를 섞다 보면', '꾸미기 물건이 나와요!'] : n ? ['가방에서', '끌어다 놓아요!'] : ['우리 마당', '참 예뻐요!'], 3.6), 300); },
+bg() { return yardBG(false, { noHut: 1 }); }, bgKey: () => 'madang',
 draw() {
 let g = '';
 const L = madangL();
@@ -11495,7 +11496,7 @@ L.push({ q: d.d.q, x: 380 + rnd(560), y: MD_Y0 + 20 + rnd(MD_Y1 - MD_Y0 - 20) })
 if (d.k === 'dbox' && (box[d.d.k] || 0) > 0) { if (L.length >= MD_MAX) { SND.wrong(); toast('마당이 꽉 찼어요! 하나를 가방으로'); return; }
 box[d.d.k]--; L.push({ k: d.d.k, x: 380 + rnd(560), y: MD_Y0 + 20 + rnd(MD_Y1 - MD_Y0 - 20) }); SND.get(); svSave(); } },
 };
-const MD_PER = 8, MD_PXCM = 0.55;
+const MD_PER = 8;
 const MD_CM = {
 sokuri: 40, onggi: 60, wheel: 250, jaeban: 200, yut: 20, siru: 40, bojagi: 50, homi: 35, doggi: 80, jeolgu: 50, wondu: 300, seoan: 70, dotja: 200, chorong: 60, tuho: 70,
 cheom: 220, soban: 45, honey: 25, sogo: 30, scare: 160, ang: 50, jamot: 60, kite: 60, biseok: 25, fan: 40, byeong: 150, hbhat: 35, ddeokme: 90, jamjari: 120, haemeok: 200,
@@ -11510,9 +11511,12 @@ tap: 80, jang: 150, sot: 200, ssari: 200, pyeong: 180, geune: 200, dok: 120, hwa
 morae: 80, tou: 30, meong: 200, doluija: 50, gitbal: 220, gulreong: 60, paengi: 10, dakjang: 150, tokki: 100, ppallae: 220, doldam: 200, jinggeom: 200, nadgari: 150, yeondeung: 40,
 jeongja: 300, didil: 250, jegi: 12, gulttuk: 200, jukma: 150, mulhwak: 60, sarip: 180, geumjul: 220, bal: 150, doltak: 100, hwaro: 40, xstar: 80,
 };
-const mdPx = cm => clamp(cm * MD_PXCM, 12, 180);
-const mdQBox = q => { if (!QD[q]) return null; const b = qFit(q, QD[q].steps.length), s = mdPx(MD_CM[q] || 80) / Math.max(b.w, b.h); return { w: Math.max(40, b.w * s), h: Math.max(30, b.h * s), s, b }; };
-const mdQArt = (q, x, y) => { const z = mdQBox(q); if (!z) return ''; const { b, s } = z, c = QD[q];
+const mdPx = cm => clamp(50 + cm * 0.3, 56, 130);
+const mdNoTag = f => { const n = QZ_NOTAG; QZ_NOTAG = 1; try { return f(); } finally { QZ_NOTAG = n; } };
+const mdQBox = q => mdNoTag(() => mdQBox0(q));
+const mdQBox0 = q => { if (!QD[q]) return null; const b = qFit(q, QD[q].steps.length), s = mdPx(MD_CM[q] || 80) / Math.max(b.w, b.h); return { w: Math.max(40, b.w * s), h: Math.max(30, b.h * s), s, b }; };
+const mdQArt = (q, x, y) => mdNoTag(() => mdQArt0(q, x, y));
+const mdQArt0 = (q, x, y) => { const z = mdQBox(q); if (!z) return ''; const { b, s } = z, c = QD[q];
 Q_SMALL = 1; const g = c.art(c.steps.length, 0, qCol(q), x - (b.x + b.w / 2) * s, y - (b.y + b.h) * s, s); Q_SMALL = 0;
 return `<ellipse cx="${x}" cy="${y + 2}" rx="${(b.w * s * 0.36).toFixed(1)}" ry="${Math.max(2, b.w * s * 0.07).toFixed(1)}" fill="#000" opacity=".12"/>` + g; };
 const MD_DBOX = {};
@@ -11524,15 +11528,14 @@ return mdPx(MD_DCM[k] || 100) / MD_DBOX[k];
 }
 const mdMade = () => (SV.q && SV.q.done ? Q_ORDER.filter(k => SV.q.done.includes(k) && QD[k]) : []);
 function mdBag(x, y, s) {
-return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-30,-20 Q-30,-46 0,-46 Q30,-46 30,-20" fill="none" stroke="${DL}" stroke-width="6"/><rect x="-40" y="-24" width="80" height="62" rx="14" fill="#B5352D" stroke="${DL}" stroke-width="4"/>`
-+ `<path d="M-40,-4 Q0,14 40,-4 L40,-16 Q0,2 -40,-16Z" fill="#8E2620" stroke="${DL}" stroke-width="3"/><circle cx="0" cy="6" r="7" fill="#E9C46A" stroke="${DL}" stroke-width="3"/><path d="M-24,22 h48" stroke="#E9C46A" stroke-width="3" stroke-dasharray="6 5"/></g>`;
+return `<g transform="translate(${x},${y}) scale(${s})"><rect x="-40" y="-28" width="80" height="56" rx="9" fill="#C99A62" stroke="${DL}" stroke-width="4"/><path d="M-40,-10 h80" stroke="${DL}" stroke-width="4"/><path d="M-30,4 h60 M-30,16 h60" stroke="#A9783E" stroke-width="2" opacity=".7"/><rect x="-9" y="-19" width="18" height="14" rx="3" fill="#E9C46A" stroke="${DL}" stroke-width="3"/></g>`;
 }
 function mdBroom(x, y, s) {
 return `<g transform="translate(${x},${y}) scale(${s}) rotate(-30)"><path d="M0,-30 V8" stroke="#8A5A2E" stroke-width="5" stroke-linecap="round"/><path d="M-12,8 L12,8 L16,30 L-16,30Z" fill="#E2B85A" stroke="${DL}" stroke-width="3"/><path d="M-8,14 L-10,28 M0,14 V28 M8,14 L10,28" stroke="${DL}" stroke-width="2"/></g>`;
 }
 function mdNyamFace(x, y, r) {
-return `<circle cx="${x}" cy="${y}" r="${r}" fill="#FFFDF6" stroke="${DL}" stroke-width="4"/><path d="M${x - r * 0.8},${y + r * 0.6} Q${x},${y + r * 0.2} ${x + r * 0.8},${y + r * 0.6} A${r},${r} 0 0 1 ${x - r * 0.8},${y + r * 0.6}Z" fill="#F2C230" stroke="${DL}" stroke-width="3"/>`
-+ `<g transform="translate(${x},${y + 56 * r / 34}) scale(${0.6 * r / 34})">${gomHead({}) + gomFace({ eyes: 'smile' })}</g>`;
+return `<defs><clipPath id="mdNyC"><circle cx="${x}" cy="${y}" r="${r - 2}"/></clipPath></defs><circle cx="${x}" cy="${y}" r="${r}" fill="#FFFDF6"/>`
++ `<g clip-path="url(#mdNyC)">${TK_STP + dollBear(x, y + r * 1.85, { s: r / 34 * 0.72, stripe: 'pink', arms: 'up', eyes: 'open', shadow: false })}</g><circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="${DL}" stroke-width="4"/>`;
 }
 function mdBar() {
 let g = ''; const tab = P.bagTab || 0, box = decoBox(), placed = madangL();
@@ -11549,7 +11552,7 @@ cell = (k, x) => { const n = box[k] || 0, h = HID[k]; if (n) drag(x - 42, 640, 8
 return `<rect x="${x - 42}" y="640" width="84" height="62" rx="12" fill="#F6EBD2" stroke="${DL}" stroke-width="2.5" opacity="${n ? 1 : 0.5}"/><g opacity="${n ? 1 : 0.4}">${decoArt(k, x, 694, h.bs * 0.56)}</g>`
 + `<circle cx="${x + 32}" cy="692" r="12" fill="${n ? DL : '#9A8E7A'}"/>` + tx(x + 32, 698, String(n), { fs: 15, c: '#FFF' }); }; }
 else { ks = mdMade(); cell = (q, x) => { const on = placed.some(o => o.q === q); if (!on) drag(x - 42, 640, 84, 62, 'qbox', { q });
-return `<rect x="${x - 42}" y="640" width="84" height="62" rx="12" fill="#F6EBD2" stroke="${DL}" stroke-width="2.5" opacity="${on ? 0.5 : 1}"/><g opacity="${on ? 0.35 : 1}">${qArtFit(q, x, 671, 74, 54, 0.4)}</g>`
+return `<rect x="${x - 42}" y="640" width="84" height="62" rx="12" fill="#F6EBD2" stroke="${DL}" stroke-width="2.5" opacity="${on ? 0.5 : 1}"/><g opacity="${on ? 0.35 : 1}">${mdNoTag(() => qArtFit(q, x, 671, 74, 54, 0.4))}</g>`
 + (on ? tx(x, 698, '마당에', { fs: 13, c: '#5A3A22' }) : ''); }; }
 const pages = Math.max(1, Math.ceil(ks.length / MD_PER)); P.pg = Math.min(P.pg || 0, pages - 1);
 if (!ks.length) g += tx(576, 680, tab ? '의뢰를 끝내면 만든 물건이 여기에!' : '작업대에서 숨은 조합을 찾으면 여기에 쏙!', { fs: 22, c: '#FBF0D6' });
@@ -11581,14 +11584,14 @@ return bad;
 }
 { const d0 = SCENES.village.draw;
 SCENES.village.draw = function () { let g = d0.call(this); if (SV.ph !== 'done' || POP) return g;
-const n = Object.values(decoBox()).reduce((a, b) => a + b, 0); if (!n) return g;
+const L0 = madangL(), n = Object.values(decoBox()).reduce((a, b) => a + b, 0) + mdMade().filter(q => !L0.some(o => o.q === q)).length; if (!n) return g;
 const hx = (typeof qOn === 'function' && qOn() ? QHOUSE.x : 640) + 84, hy = (typeof qOn === 'function' && qOn() ? QHOUSE.y : 418) - 12 + Math.sin(T * 3) * 5;
-g += `<g transform="translate(${hx},${hy.toFixed(1)})"><rect x="-26" y="-18" width="52" height="36" rx="6" fill="#C99A62" stroke="${DL}" stroke-width="3"/><path d="M-26,-6 h52" stroke="${DL}" stroke-width="3"/><rect x="-6" y="-12" width="12" height="9" rx="2" fill="#E9C46A" stroke="${DL}" stroke-width="2"/>`
+g += `<g transform="translate(${hx},${hy.toFixed(1)})">${mdBag(0, 0, 0.65)}`
 + `<circle cx="24" cy="-18" r="12" fill="#E2483C"/>${tx(24, -12, String(Math.min(n, 99)), { fs: 15, c: '#FFF' })}</g>`;
 hit(hx - 34, hy - 30, 70, 56, () => { SND.pop(); go('madang'); }, 'mdBoxV');
 return g; }; }
-const MD_FIX = { tree: [1190, 560], flower: [1010, 606], well: [150, 650], dad: [150, 556], kid: [220, 566], mom: [290, 560] };
-const MD_FIX_BOX = { tree: [-62, -150, 124, 160], flower: [-110, -60, 220, 80], well: [-56, -128, 112, 138], dad: [-40, -112, 80, 116], kid: [-26, -76, 52, 80], mom: [-38, -112, 76, 116] };
+const MD_FIX = { house: [0, 470], tree: [1190, 560], flower: [1010, 606], well: [150, 650], dad: [150, 556], kid: [220, 566], mom: [290, 560] };
+const MD_FIX_BOX = { house: [-150, -150, 360, 190], tree: [-62, -150, 124, 160], flower: [-110, -60, 220, 80], well: [-56, -128, 112, 138], dad: [-40, -112, 80, 116], kid: [-26, -76, 52, 80], mom: [-38, -112, 76, 116] };
 const mdPos = k => { const p = (SV.mdPos || {})[k]; return p ? [p[0], k === 'house' ? MD_FIX.house[1] : p[1]] : MD_FIX[k].slice(); };
 function mdBaby(x, y, s) {
 return `<g transform="translate(${x},${y}) scale(${s})"><ellipse cx="0" cy="34" rx="34" ry="26" fill="#F7F1E2" stroke="#3A2414" stroke-width="3"/><path d="M-30,30 q30,14 60,0" fill="none" stroke="#E2A6B8" stroke-width="4"/><g transform="translate(0,78) scale(.72)">${gomHead({}) + gomFace({ eyes: 'smile' })}</g></g>`;
@@ -11597,6 +11600,7 @@ function mdDadArms(x, y, s) {
 return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-40,-6 Q-30,40 6,40 Q30,40 40,20" fill="none" stroke="#3A2414" stroke-width="20" stroke-linecap="round"/><path d="M-40,-6 Q-30,40 6,40 Q30,40 40,20" fill="none" stroke="#3F6FB8" stroke-width="15" stroke-linecap="round"/><circle cx="44" cy="16" r="10" fill="#C9A27A" stroke="#3A2414" stroke-width="3"/></g>`;
 }
 const MD_FIX_ART = {
+house: (x) => `<g transform="translate(${x},0)">${yardHouse(false)}</g>`,
 tree: (x, y) => sakuraTree(x, y, 0.5, true), flower: (x, y) => flowerBed(x, y, 1.15, 6), well: (x, y) => wellArt(x, y, 0.7, 1),
 dad: (x, y) => dadGom(x, y, 0.72) + mdBaby(x + 2, y - 46, 0.5) + mdDadArms(x + 2, y - 32, 0.36),
 kid: (x, y) => kidGom(x, y, 0.5, { stick: false }), mom: (x, y) => momGom(x, y, 0.7),
@@ -11616,7 +11620,7 @@ E.sort((a, b) => a.y - b.y);
 let g = ''; E.forEach(e => { const w = e.k && P.wigF && P.wigF[e.k] && T - P.wigF[e.k] < 0.6 ? Math.sin((T - P.wigF[e.k]) * 30) * 4 : 0;
 g += e.k && w ? `<g transform="rotate(${w.toFixed(1)} ${e.x} ${e.y})">${e.art}</g>` : e.art; });
 if (o.reg) {
-Object.keys(MD_FIX).sort((a, b) => mdPos(a)[1] - mdPos(b)[1]).forEach(k => { const [x, y] = mdPos(k), [bx, by, bw, bh] = MD_FIX_BOX[k], cx = k === 'house' ? 330 + x : x;
+['house', ...Object.keys(MD_FIX).filter(k => k !== 'house').sort((a, b) => mdPos(a)[1] - mdPos(b)[1])].forEach(k => { const [x, y] = mdPos(k), [bx, by, bw, bh] = MD_FIX_BOX[k], cx = k === 'house' ? 330 + x : x;
 drag(cx + bx, y + by, bw, bh, 'mdfix', { k }); });
 E.filter(e => e.i != null).forEach(e => e.o.q ? drag(e.o.x - e.h.w / 2, e.o.y - e.h.h - 10, e.h.w, e.h.h + 20, 'mdeco', { i: e.i }) : drag(e.o.x - Math.max(30, MD_DBOX[e.o.k] * mdDecoSc(e.o.k) / 2), e.o.y - Math.max(40, MD_DBOX[e.o.k] * mdDecoSc(e.o.k)) - 10, Math.max(60, MD_DBOX[e.o.k] * mdDecoSc(e.o.k)), Math.max(40, MD_DBOX[e.o.k] * mdDecoSc(e.o.k)) + 20, 'mdeco', { i: e.i }));
 if (typeof jmYardReg === 'function') jmYardReg(E); }
@@ -12709,9 +12713,8 @@ P.back = { k, t0: T }; SND.get(); SND.twinkle(); toast(`${h.name} → 재료로 
 { const M = SCENES.madang, d0 = M.draw, dr0 = M.drop, t0 = M.tapDrag;
 M.draw = function () { let g = d0.call(this), pnl = '';
 const [bx, by, bw, bh] = MD_BACK, cx = bx + bw / 2, dragging = DRAG && (DRAG.k === 'mdeco' || DRAG.k === 'dbox'), over = dragging && DRAG.x > bx - 30 && DRAG.y < by + bh + 30 && DRAG.y > by - 30;
-g = g.replace('끌어다 놓아요 · 가방으로 끌면 되돌려요', '끌어다 놓아요 · 바구니에 넣으면 재료로');
-pnl += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="18" fill="#FFFDF6" opacity="${over ? 0.95 : 0.78}" stroke="${over ? '#E8A800' : '#8A5A36'}" stroke-width="${over ? 5 : 3}"/>` + backBasket(cx, by + 76, dragging) + tx(cx, by + bh - 6, '되돌리기 바구니', { fs: 17, c: '#3A2414' });
-drop(bx, by, bw, bh, 'mdback', 0); hit(bx, by, bw, bh, () => { SND.pop(); say('mom', 250, 430, ['꾸미기 물건을 바구니에 넣으면', '재료로 돌아와요!'], 3); }, 'mdBack');
+pnl += `<rect x="${bx}" y="${by}" width="${bw}" height="${bh}" rx="18" fill="#FFFDF6" opacity="${over ? 0.95 : 0.78}" stroke="${over ? '#E8A800' : '#8A5A36'}" stroke-width="${over ? 5 : 3}"/>` + backBasket(cx, by + 76, dragging) + tx(cx, by + bh - 6, '되돌리기 바구니', { fs: 17, c: '#3A2414' }) + tx(cx, by + bh + 24, '꾸미기 물건 → 재료로', { fs: 16, c: '#3A2414', st: '#FFFDF6', sw: 5 });
+drop(bx, by, bw, bh, 'mdback', 0); hit(bx, by, bw, bh, () => { SND.pop(); say('mom', 720, 470, ['꾸미기 물건을 바구니에 넣으면', '재료로 돌아와요!'], 3); }, 'mdBack');
 const z = P.back; if (z && T - z.t0 < 1.6) { const h = HID[z.k], ins = []; for (const k in h.in) for (let j = 0; j < h.in[k]; j++) ins.push(k); const u = (T - z.t0) / 1.6;
 ins.forEach((k, j) => { pnl += itemArt(k, cx + (j - (ins.length - 1) / 2) * 44, by + 60 - u * 70, 0.7); }); pnl += sparkle(cx, by + 50, u, 8); }
 return pnl + g; };
@@ -12859,13 +12862,13 @@ const KID_SLIP = { jang: { jeo: '#FBFBF8', pants: '#5E8E4E', baeja: '#E2783C', g
 const JM_TTI = { ja: '쥐띠 곰', chuk: '소띠 곰', in: '범띠 곰', myo: '옥토끼 곰', jin: '용띠 곰', sa: '뱀띠 곰', o: '말띠 곰', mi: '양띠 곰', sin: '원숭이띠 곰', yu: '닭띠 곰', sul: '개띠 곰', hae: '돼지띠 곰' };
 const JM_GAK = [['jang', '장구 곰'], ['gaya', '가야금 곰'], ['dae', '대금 곰'], ['hae', '해금 곰'], ['buk', '북 곰'], ['kkw', '꽹과리 곰']];
 const JUMIN = [
-{ k: 'nyam', n: '냠냠곰', d: (x, y, s, a) => hanbokGom(x, y, { c: 'yel', s, T, arms: a || 'up' }) },
+{ k: 'nyam', n: '냠냠곰', d: (x, y, s, a) => TK_STP + dollBear(x, y, { s: s * 1.05, stripe: 'pink', arms: a || 'up' }) },
 { k: 'jangnan', n: '장난곰', d: (x, y, s, a) => kid240(x, y, s * 1.1, { ...KID_SLIP.jang, arms: a || 'up', T }) },
 { k: 'kkureogi', n: '꾸러기곰', d: (x, y, s, a) => kid240(x, y, s * 1.1, { ...KID_SLIP.kku, arms: a || 'up', T }) },
 { k: 'tamheom', n: '탐험곰', d: (x, y, s) => tamheomGom(x, y, s) },
-{ k: 'ijangKid', n: '이장 꼬마곰', d: (x, y, s, a) => folkGom(4, x, y, { s: s * 0.7, arms: a || 'up', T }) },
+{ k: 'ijangKid', n: '이장 꼬마곰', d: (x, y, s, a) => folkGom(4, x, y, { s: s * 0.95, arms: a || 'up', T }) },
 { k: 'janchi', n: '잔치 곰', d: (x, y, s, a) => folkGom(14, x, y, { s, arms: a || 'up', T }) },
-{ k: 'biseok', n: '비석 곰', d: (x, y, s, a) => dollBear(x, y, { s: s * 0.66, stripe: 'blue', arms: a || 'up' }) },
+{ k: 'biseok', n: '비석 곰', d: (x, y, s, a) => dollBear(x, y, { s: s * 1.05, stripe: 'blue', arms: a || 'up' }) },
 { k: 'kim', n: '김정호 곰', d: (x, y, s, a) => qWho('kim', x, y, s, { arms: a }) },
 { k: 'king', n: '임금님곰', d: (x, y, s, a) => qWho('king', x, y, s, { arms: a }) },
 { k: 'bday', n: '생일 곰', d: (x, y, s, a) => qWho('bday', x, y, s, { arms: a }) },
@@ -12891,6 +12894,7 @@ const JUMIN = [
 { k: 'shop', n: '송편 가게 곰', d: (x, y, s, a) => qWho('shop', x, y, s, { arms: a }) },
 { k: 'minsok', n: '민속놀이 곰', d: (x, y, s, a) => qWho('nol', x, y, s, { arms: a }) },
 { k: 'seonbi', n: '선비 곰', d: (x, y, s, a) => qWho('tuho', x, y, s, { arms: a }) },
+{ k: 'buchae', n: '부채 선비 곰', d: (x, y, s, a) => qWho('seonbi', x, y, s, { arms: a }) },
 { k: 'basket', n: '바구니 곰', d: (x, y, s, a) => qWho('palum', x, y, s, { arms: a }) },
 { k: 'hakdang', n: '학당 곰', d: (x, y, s, a) => folkGom(7, x, y, { s, arms: a || 'up', T }) },
 { k: 'sudoku', n: '스도쿠 곰', d: (x, y, s, a) => folkGom(5, x, y, { s, arms: a || 'up', T }) },
@@ -12958,14 +12962,14 @@ return g; } };
 }
 function q283Bad() {
 const bad = [];
-if (JUMIN.length !== 52) bad.push('283 주민 52 = ' + JUMIN.length);
+if (JUMIN.length !== 53) bad.push('284 주민 53 = ' + JUMIN.length);
 const ks = new Set(), ns = new Set();
 JUMIN.forEach(j => { if (ks.has(j.k)) bad.push('283 주민 저장 이름 겹침 ' + j.k); ks.add(j.k); if (ns.has(j.n)) bad.push('283 주민 이름 겹침 ' + j.n); ns.add(j.n);
 let s = ''; try { s = j.d(0, 0, 0.4); } catch (e) { bad.push('283 주민 그림 오류 ' + j.n + ' ' + e.message); } if (!s || s.length < 200) bad.push('283 주민 그림 ' + j.n); });
 if (JUMIN[0].n !== '냠냠곰' || JUMIN[4].n !== '이장 꼬마곰' || JUMIN[7].n !== '김정호 곰' || JUMIN[JUMIN.length - 1].n !== '십중팔구 곰') bad.push('283 명부 차례');
 if (JUMIN.some(j => /갑|을|병|정곰|천간/.test(j.n))) bad.push('283 천간 곰은 뺌');
 if (!JM_ART || ['sogo', 'helmet', ...JM_GAK.map(a => a[0])].some(k => !JM_ART[k])) bad.push('283 jumin_art.js 그림');
-if (MD_FIX.house) bad.push('283 마당 옛날집');
+if (!MD_FIX.house || /hutArt/.test(String(SCENES.madang.bg))) bad.push('284 마당 = 새 집 있음 · 옛날집(움막) 없음');
 Q_ORDER.forEach(k => { if (!MD_CM[k]) bad.push('283 만든 물건 크기(cm) ' + k); }); Object.keys(HID).forEach(k => { if (!MD_DCM[k]) bad.push('283 꾸미기 물건 크기(cm) ' + k); });
 return bad;
 }
