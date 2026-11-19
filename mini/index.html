@@ -2958,7 +2958,7 @@ g += tx(x + w / 2, y + 150, B.name, { f: 'SM', fs: B.name.length > 8 ? 23 : 26, 
 if (done) g += `<g transform="translate(${x + w - 32},${y + 30}) rotate(-12)"><circle r="23" fill="none" stroke="${C_SEAL}" stroke-width="3"/>` + tx(0, 8, '끝', { f: 'SM', fs: 21, c: C_SEAL }) + `</g>`;
 });
 [70, 1210].forEach((x, i) => { g += folkGom(i * 3 + 1, x, 668, { s: 0.5, T, arms: Math.sin(T * 0.8 + i * 1.7) > 0.7 ? 'up' : 'down' }); });
-g += `<g transform="translate(300,682)">${sngGirl(0, 0, { s: 0.42, arms: Math.sin(T * 3) > 0 ? 'up' : 'down' })}</g>` + tx(330, 650, '그림은 생물을 좋아하는 아기 곰이 화가 곰 캔버스를 빌려 그렸어요', { fs: 20, c: C_INK2, a: 'start' });
+g += `<g transform="translate(300,682)">${sngGirl(0, 0, { s: 0.42, arms: Math.sin(T * 3) > 0 ? 'up' : 'down' })}</g>` + tx(330, 650, '그림은 생물을 좋아하는 탐험곰이 화가 곰 캔버스를 빌려 그렸어요', { fs: 20, c: C_INK2, a: 'start' });
 if (Object.keys(sgMem('done') || {}).length) g += pill(1000, 622, 160, '도장 지우기', () => { SG.rst = 1; SND.pop(); }, { fs: 21, h: 46 });
 if (SG.rst) {
 hit(0, -EX, W, H + 2 * EX, () => { });
@@ -10266,13 +10266,13 @@ if (job === 'summer') return wom(616, 379, MA_FARM.weed(T), 10) + man(664, 379, 
 return wom(616, 377, MA_FARM.sheaf()) + man(664, 380, MA_FARM.sickle(T), 8);
 }
 const MA_MOVE = [
-{ k: 'hak', n: '곰 학당', i: 7, x: 142, y: 702, s: 0.4 , do: 'card' },
-{ k: 'rhy', n: '장단놀이', i: 4, x: 704, y: 708, s: 0.3 , do: 'dance' },
-{ k: 'sdk', n: '스도쿠', i: 5, x: 1022, y: 378, s: 0.4 , do: 'board', suit: 'y' },
-{ k: 'hwk', n: '십중팔구', i: 12, x: 862, y: 384, s: 0.36 , do: 'coin' },
-{ k: 'dal', n: '곰 달력', x: 300, y: 378, s: 0.44, own: 1 },
-{ k: 'jan', n: '송편 잔치', i: 14, x: 1166, y: 692, s: 0.4 , do: 'eat' },
-{ k: 'bsk', n: '비석치기', x: 432, y: 674, s: 0.3, own: 1 },
+{ k: 'hak', n: '곰 학당', jm: '학당 곰', i: 7, x: 142, y: 702, s: 0.4 , do: 'card' },
+{ k: 'rhy', n: '장단놀이', jm: '이장 꼬마곰', i: 4, x: 704, y: 708, s: 0.3 , do: 'dance' },
+{ k: 'sdk', n: '스도쿠', jm: '스도쿠 곰', i: 5, x: 1022, y: 378, s: 0.4 , do: 'board', suit: 'y' },
+{ k: 'hwk', n: '십중팔구', jm: '십중팔구 곰', i: 12, x: 862, y: 384, s: 0.36 , do: 'coin' },
+{ k: 'dal', n: '곰 달력', jm: '절기 곰', x: 300, y: 378, s: 0.44, own: 1 },
+{ k: 'jan', n: '송편 잔치', jm: '잔치 곰', i: 14, x: 1166, y: 692, s: 0.4 , do: 'eat' },
+{ k: 'bsk', n: '비석치기', jm: '비석 곰', x: 432, y: 674, s: 0.3, own: 1 },
 ];
 function maNbHop(k) { const t = typeof maNbOn === 'function' ? maNbOn(k) : -1; return t >= 0 && t < 0.5 ? (-Math.sin(t / 0.5 * Math.PI) * 30).toFixed(1) : 0; }
 function maMoveMem() { try { const r = JSON.parse(localStorage.getItem('mini_maeul') || '{}'); r.mv = r.mv || {}; r.seen = r.seen || {}; return r; } catch (e) { return { mv: {}, seen: {} }; } }
@@ -10283,7 +10283,7 @@ if (!MA_TOAST || S === 'maeul') return ''; const t = T - MA_TOAST.t0; if (t > 5)
 const m = MA_MOVE.find(x => x.k === MA_TOAST.k), dy = Math.min(0, (t - 0.35) * 200) + Math.min(0, (4.65 - t) * 200), w = 560, x = W / 2, y = 46 + dy;
 return `<g><rect x="${x - w / 2 + 4}" y="${y - 25}" width="${w}" height="72" rx="36" fill="#3A2414" opacity=".25"/><rect x="${x - w / 2}" y="${y - 30}" width="${w}" height="72" rx="36" fill="#FFF6DC" stroke="#B5352D" stroke-width="4"/>`
 + `<g transform="translate(${x - w / 2 + 50},${y + 34}) scale(.42)">${m.own ? dollBear(0, 0, { s: 1.3, stripe: 'blue', arms: 'up' }) : folkGom(m.i, 0, 0, { s: 1 })}</g>`
-+ tx(x + 30, y + 4, '새 이웃 곰이 마을로 이사 갔어요!', { fs: 25, c: '#7A1E1E' }) + tx(x + 30, y + 31, `${m.n} 곰 · 마을에 가면 만나요`, { fs: 18, c: '#7A5A44' }) + `</g>`;
++ tx(x + 30, y + 4, '새 이웃 곰이 마을로 이사 갔어요!', { fs: 25, c: '#7A1E1E' }) + tx(x + 30, y + 31, `${m.jm} · 마을에 가면 만나요`, { fs: 18, c: '#7A5A44' }) + `</g>`;
 }
 let MA_SYNCED = false, MA_NB_HITS = [], MA_NB = null, MA_NB_TOP = '', MA_TOAST = null;
 const MA_NB_DAY = 864e5;
@@ -10477,12 +10477,12 @@ hit(0, -EX, W, H + 2 * EX, () => { MA_IJ_LIST = null; });
 g += `<rect ${FULLR()} fill="#1E120A" opacity="${(0.55 * a).toFixed(2)}"/><g opacity="${a.toFixed(2)}">`;
 g += `<rect x="120" y="120" width="1040" height="520" rx="18" fill="#8A5A2E" stroke="#5A3A1E" stroke-width="5"/><rect x="138" y="138" width="1004" height="484" rx="10" fill="#F6E9C8"/>`
 + `<path d="M170,110 L140,70 M1110,110 L1140,70" stroke="#5A3A1E" stroke-width="5"/><rect x="430" y="96" width="420" height="64" rx="10" fill="#3A2414" stroke="#E9B21C" stroke-width="3"/>` + tx(640, 140, '이사 올 이웃 곰', { f: 'SM', fs: 34, c: '#F5D77A' })
-+ tx(640, 196, `이장님 부부: "${n} / ${N} 곰이 이사 왔어요! 놀이를 하면 이웃이 늘어요"`, { fs: 22, c: C_INK2 });
++ tx(640, 196, `이장 가족: "${n} / ${N} 곰이 이사 왔어요! 놀이를 하면 이웃이 늘어요"`, { fs: 22, c: C_INK2 });
 MA_MOVE.forEach((m, i) => { const cx = 210 + i * 143, cy = 470, here = !!r.mv[m.k], H2 = MA_IJ_HOW[m.k] || ['', ''];
 hit(cx - 66, 220, 132, 390, () => { SND.pop(); MA_IJ_LIST = null; MA_IJ = null; (MA_IJ_GO[m.k] || (() => {}))(); });
 g += `<rect x="${cx - 66}" y="226" width="132" height="380" rx="14" fill="${here ? '#FFFDF6' : '#EFE3C6'}" stroke="${here ? '#B5352D' : '#B9A27A'}" stroke-width="3" ${here ? '' : 'stroke-dasharray="8 6"'}/>`
 + `<ellipse cx="${cx}" cy="${cy + 2}" rx="46" ry="8" fill="#000" opacity=".08"/><g transform="translate(${cx},${cy})">${here ? maIjPic(m, 0.62) : maIjSil(maIjPic(m, 0.62))}</g>`
-+ tx(cx, 270, m.n, { f: 'SM', fs: m.n.length > 4 ? 19 : 22, c: C_INK }) + tx(cx, 296, '곰', { fs: 17, c: C_INK2 })
++ tx(cx, 270, m.jm, { f: 'SM', fs: m.jm.length > 5 ? 17 : m.jm.length > 4 ? 19 : 22, c: C_INK }) + tx(cx, 296, m.n + '에서', { fs: 15, c: C_INK2 })
 + tx(cx, 512, H2[0], { fs: 15, c: C_INK2 }) + tx(cx, 534, H2[1], { fs: 15, c: C_INK2 })
 + (here ? `<g transform="translate(${cx},578) rotate(-6)"><rect x="-46" y="-17" width="92" height="34" rx="6" fill="none" stroke="#B5352D" stroke-width="3"/>${tx(0, 8, '왔어요!', { f: 'SM', fs: 20, c: '#B5352D' })}</g>`
 : `<rect x="${cx - 44}" y="560" width="88" height="36" rx="18" fill="#B5352D"/>` + tx(cx, 585, '갈래', { fs: 20, c: '#FFF6DC' })); });
@@ -10494,7 +10494,7 @@ if (MA_IJ && T - MA_IJ.t0 > MA_IJ_SEC) MA_IJ = null;
 if (!MA_IJ) { hit(x - 50, y - 80, 100, 84, () => { if (P.pick) return; MA_IJ = { t0: T }; MA_IJ_HI = null; SND.pop(); });
 const h = maIjHiT(); if (h > MA_IJ_HI_SEC) MA_IJ_HI = null; if (h < 0 || h > MA_IJ_HI_SEC) return '';
 const m = MA_MOVE.find(q => q.k === MA_IJ_HI.k) || { n: '' }, a = Math.min(1, h / 0.2, (MA_IJ_HI_SEC - h) / 0.3);
-return `<g opacity="${a.toFixed(2)}">${maIjBub(`${m.n} 곰, 어서 와요!`)}</g>`; }
+return `<g opacity="${a.toFixed(2)}">${maIjBub(`${m.jm || m.n + ' 곰'}, 어서 와요!`)}</g>`; }
 const t = T - MA_IJ.t0, a = Math.min(1, t / 0.2, (MA_IJ_SEC - t) / 0.3), msg = n < N ? `이웃 곰 ${n} / ${N}` : '이웃 곰이 다 왔어요!', link = '명단 보기';
 g += `<g opacity="${a.toFixed(2)}">${maIjBub(msg, link)}</g>`;
 const bb = maIjBubBox(msg, link); hit(bb[0], bb[1], bb[2], bb[3], () => { SND.pop(); MA_IJ_LIST = T; });
