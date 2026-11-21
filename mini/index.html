@@ -1237,7 +1237,7 @@ if (J.ph === 'idle' && J.pawP && J.pawQ) janPawDo(J.pawA, janPosOf(J.pawQ));
 }
 function janPawDo(a, at) {
 const [r, c] = a, [r2, c2] = at;
-const G = J.G; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]];
+const G = J.G; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]]; G[r][c].fy = r; G[r2][c2].fy = r2;
 J.sw = { a, b: at, t0: T, d: 0.35 }; J.ph = 'pswap'; J.paw = 0; J.pawOn = false; J.pawA = null; J.pawP = J.pawQ = null; J.pick = null; J.lastAct = T; J.pawUsed = T; J.combo = 0;
 J.pawMark = [[r, c], [r2, c2]]; SND.stamp(); seatPose(J_PAW_SEAT, 'card', 1.8, '얼쑤!');
 return true;
@@ -1310,7 +1310,7 @@ return g;
 function janSwap(a, b) {
 if (J.ph !== 'idle' || J.left <= 0) return false;
 const [r, c] = a, [r2, c2] = b; if (Math.abs(r - r2) + Math.abs(c - c2) !== 1 || r2 < 0 || c2 < 0 || r2 >= JN || c2 >= JN) return false;
-const G = J.G; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]];
+const G = J.G; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]]; G[r][c].fy = r; G[r2][c2].fy = r2;
 J.sw = { a, b, t0: T }; J.ph = 'swap'; J.pick = null; J.lastAct = T; SND.click();
 return true;
 }
@@ -1532,7 +1532,7 @@ if (ja || jb) { J.sw = null; J.combo = 0; J.lastSw = null; ja ? janJarBoom(ar, a
 else if (jItem(G[ar][ac]) && jItem(G[br][bc]) && (J.combo = 0, janMerge([ar, ac], [br, bc]))) { J.sw = null; J.lastSw = null; }
 else if (jItem(G[ar][ac]) || jItem(G[br][bc])) { J.sw = null; J.combo = 0; J.lastSw = null; const st = jRuns(G); [[ar, ac], [br, bc]].forEach(([r, c]) => { if (jItem(G[r][c])) st.add(r * JN + c); }); janPop(st, true); }
 else if (set.size) { J.lastSw = [J.sw.a, J.sw.b]; J.sw = null; J.combo = 0; janPop(set); }
-else { const { a: [r, c], b: [r2, c2] } = J.sw; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]]; J.sw = { a: J.sw.b, b: J.sw.a, t0: T }; J.ph = 'back'; SND.wrong(); } }
+else { const { a: [r, c], b: [r2, c2] } = J.sw; [G[r][c], G[r2][c2]] = [G[r2][c2], G[r][c]]; G[r][c].fy = r; G[r2][c2].fy = r2; J.sw = { a: J.sw.b, b: J.sw.a, t0: T }; J.ph = 'back'; SND.wrong(); } }
 }
 if (J.ph === 'pswap' && T - J.sw.t0 > J.sw.d) { J.lastSw = [J.sw.a, J.sw.b]; J.sw = null; const set = jRuns(G); if (set.size) janPop(set); else { J.lastSw = null; janEndTurn(); } }
 if (J.ph === 'pop' && T - J.pop.t0 > 0.3) { J.pop.set.forEach(i => { G[Math.floor(i / JN)][i % JN] = null; });
