@@ -10450,7 +10450,7 @@ if (!o.pic && !nt) g += maPainterSay();
 g += maJanBanner();
 if (typeof maNyBanner === 'function') g += maNyBanner();
 if (nt) g += nGlowDefs() + nLantern(296, 650, 0.9) + nLantern(930, 640, 0.9);
-if (!o.pic) g += maPathArrow();
+if (!o.pic) g += maPathArrow() + maAirPlane(ph);
 MA_NIGHT_HITS.forEach(h => hit(...h));
 g += chTop(o); CH_HITS.forEach(h => hit(...h));
 g += maJidoTop(o); MA_JIDO_HITS.forEach(h => hit(...h));
@@ -11141,6 +11141,27 @@ return g;
 function maSlideTo(rel, abs, dir) {
 const el = document.body; el.style.transition = 'transform .6s ease-in, opacity .6s ease-in'; el.style.transform = `translateX(${dir * 100}%)`; el.style.opacity = '.6';
 setTimeout(() => { location.href = /^https?:$/.test(location.protocol) ? rel : abs; }, 620);
+}
+const MA_AIR_TEST = typeof location !== 'undefined' && /[?&]airgo\b/.test(location.search || ''), MA_AIR_OPEN = false || MA_AIR_TEST;
+let MA_AIR_ASK = -99;
+function maAirPlane(ph) {
+if (!MA_AIR_OPEN || ph === 'night') return '';
+const per = MA_AIR_TEST ? 20 : 150, t = (((T - 40) % per) + per) % per, u = t / 16, ask = T - MA_AIR_ASK < 7;
+let g = '';
+if (u < 1) {
+const x = -80 + u * 1440, y = 124 - u * 34 + Math.sin(T * 0.8) * 5, pr = 2 + Math.abs(Math.sin(T * 30)) * 10, st = 'stroke="#6B4A1E" stroke-width="2" stroke-linejoin="round"';
+g += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(-5)"><path d="M-26,-3 L-40,-18 L-30,-18 L-16,-6Z" fill="#E8843C" ${st}/><ellipse cx="0" cy="0" rx="30" ry="9.5" fill="#F4C64A" ${st}/><path d="M-22,4 Q0,11 24,4" fill="none" stroke="#FFF6DC" stroke-width="3" stroke-linecap="round"/>`
++ [-10, 1, 12].map(a => `<circle cx="${a}" cy="-2" r="3" fill="#BFE3F2" stroke="#6B4A1E" stroke-width="1.2"/>`).join('')
++ `<rect x="-14" y="-15" width="34" height="6" rx="3" fill="#FFFDF4" ${st}/><ellipse cx="32" cy="0" rx="2" ry="${pr.toFixed(1)}" fill="#8A6A44" opacity=".7"/><circle cx="30" cy="0" r="3" fill="#6B4A1E"/></g>`;
+if (!ask) hit(x - 46, y - 30, 92, 60, () => { if (P.pick) return; SND.twinkle(); MA_AIR_ASK = T; });
+}
+if (ask) {
+const btn = (bx, tx, fill, cb) => { hit(bx - 80, 262, 160, 56, cb); return `<rect x="${bx - 80}" y="262" width="160" height="56" rx="16" fill="${fill}" stroke="#6B4A1E" stroke-width="3"/><text x="${bx}" y="300" font-family="Jua" font-size="28" text-anchor="middle" fill="#3E2A12">${tx}</text>`; };
+hit(420, 168, 440, 170, () => { });
+g += `<rect x="420" y="168" width="440" height="170" rx="22" fill="#FFF8E4" stroke="#6B4A1E" stroke-width="4"/><text x="640" y="224" font-family="Jua" font-size="30" text-anchor="middle" fill="#3E2A12">곰곰 국제 공항으로 갈까요?</text>`
++ btn(545, '가요!', '#F4C64A', () => { MA_AIR_ASK = -99; maSlideTo('../air/', 'https://zdogame.com/air/', -1); }) + btn(735, '다음에', '#EFE6D0', () => { MA_AIR_ASK = -99; });
+}
+return g;
 }
 const D10_MAX = 10;
 const D10_NAME = { yut: '윷놀이', nym: '냠냠곰', tuh: '투호', bsk: '비석치기', jeg: '제기차기', okt: '옥토끼 방앗간' };

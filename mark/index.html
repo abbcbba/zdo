@@ -3008,7 +3008,7 @@ g += signs; signsFirst();
 g += mkTitle('곰 재주 마을') + (T < BAR_UNTIL ? '' : needBanner()) + stepBar() + hintArrow();
 g += invBar();
 g += (qOn() ? '' : scrollBtn()) + (qOn() ? bookBtn(1132, 666, 'ledger') : '') + bookBtn(1218, 666, 'cards');
-g += mkPathArrow() + footer();
+g += mkPathArrow() + mkAirPlane(ph) + footer();
 return g;
 }
 const PATH_XY = [1212, 290];
@@ -3024,6 +3024,27 @@ return g;
 function mkSlideTo(rel, abs, dir) {
 const el = document.body; el.style.transition = 'transform .6s ease-in, opacity .6s ease-in'; el.style.transform = `translateX(${dir * 100}%)`; el.style.opacity = '.6';
 setTimeout(() => { location.href = /^https?:$/.test(location.protocol) ? rel : abs; }, 620);
+}
+const MK_AIR_TEST = typeof location !== 'undefined' && /[?&]airgo\b/.test(location.search || ''), MK_AIR_OPEN = false || MK_AIR_TEST;
+let MK_AIR_ASK = -99;
+function mkAirPlane(ph) {
+if (!MK_AIR_OPEN || ph === 'night') return '';
+const per = MK_AIR_TEST ? 20 : 150, t = (((T - 40) % per) + per) % per, u = t / 16, ask = T - MK_AIR_ASK < 7;
+let g = '';
+if (u < 1) {
+const x = -80 + u * 1440, y = 124 - u * 34 + Math.sin(T * 0.8) * 5, pr = 2 + Math.abs(Math.sin(T * 30)) * 10, st = 'stroke="#6B4A1E" stroke-width="2" stroke-linejoin="round"';
+g += `<g transform="translate(${x.toFixed(1)},${y.toFixed(1)}) rotate(-5)"><path d="M-26,-3 L-40,-18 L-30,-18 L-16,-6Z" fill="#E8843C" ${st}/><ellipse cx="0" cy="0" rx="30" ry="9.5" fill="#F4C64A" ${st}/><path d="M-22,4 Q0,11 24,4" fill="none" stroke="#FFF6DC" stroke-width="3" stroke-linecap="round"/>`
++ [-10, 1, 12].map(a => `<circle cx="${a}" cy="-2" r="3" fill="#BFE3F2" stroke="#6B4A1E" stroke-width="1.2"/>`).join('')
++ `<rect x="-14" y="-15" width="34" height="6" rx="3" fill="#FFFDF4" ${st}/><ellipse cx="32" cy="0" rx="2" ry="${pr.toFixed(1)}" fill="#8A6A44" opacity=".7"/><circle cx="30" cy="0" r="3" fill="#6B4A1E"/></g>`;
+if (!ask) hit(x - 46, y - 30, 92, 60, () => { if (POP) return; SND.twinkle(); MK_AIR_ASK = T; });
+}
+if (ask) {
+const btn = (bx, tx, fill, cb) => { hit(bx - 80, 262, 160, 56, cb); return `<rect x="${bx - 80}" y="262" width="160" height="56" rx="16" fill="${fill}" stroke="#6B4A1E" stroke-width="3"/><text x="${bx}" y="300" font-family="Jua" font-size="28" text-anchor="middle" fill="#3E2A12">${tx}</text>`; };
+hit(420, 168, 440, 170, () => { });
+g += `<rect x="420" y="168" width="440" height="170" rx="22" fill="#FFF8E4" stroke="#6B4A1E" stroke-width="4"/><text x="640" y="224" font-family="Jua" font-size="30" text-anchor="middle" fill="#3E2A12">곰곰 국제 공항으로 갈까요?</text>`
++ btn(545, '가요!', '#F4C64A', () => { MK_AIR_ASK = -99; mkSlideTo('../air/', 'https://zdogame.com/air/', -1); }) + btn(735, '다음에', '#EFE6D0', () => { MK_AIR_ASK = -99; });
+}
+return g;
 }
 function houseGlow(ph) {
 const { XS, TOP, ST } = HS, s = HOUSE_XY.s;
@@ -5168,7 +5189,7 @@ let g = '';
 if (jMoved('smith')) g += forgeArt(960, 312, 0.66);
 if (jMoved('dye')) g += dyeShopArt(1078, 556, 0.6);
 const nk = jNew();
-const jTalk = k => { if (mkPhase() === 'night') { SND.pop(); say('lead', 505, 536, ['장인들은 퇴근했어요', '해 뜨면 다시 와요!'], 2.8); return; } const J = JANGIN[k], [x, y] = J.at, st = palSt('j' + k); SND.pop(); st.hopT = T; st.n = (st.n || 0) + 1; say('j' + k, x, y - 70, J.say[(st.n - 1) % J.say.length], 2.8); if (nk === k) { SV.q.jseen = { ...(SV.q.jseen || {}), [k]: 1 }; svSave(); } };
+const jTalk = k => { if (mkPhase() === 'night') { SND.pop(); say('lead', 505, 536, ['장인들은 퇴근했어요', '해 뜨면 다시 와요!'], 2.8); return; } const J = JANGIN[k], [x, y] = J.at, st = palSt('j' + k); SND.pop(); st.hopT = T; if (!st.jt) { st.jt = 1; st.n = 0; } st.n = (st.n || 0) + 1; say('j' + k, x, y - 70, J.say[(st.n - 1) % J.say.length], 2.8); if (nk === k) { SV.q.jseen = { ...(SV.q.jseen || {}), [k]: 1 }; svSave(); } };
 hit(8, 372, 84, 124, () => { SND.pop(); go('daesup'); }, 'grove');
 if (jMoved('smith')) hit(906, 248, 110, 70, () => jTalk('smith'), 'forge');
 if (jMoved('dye')) hit(1026, 500, 104, 60, () => jTalk('dye'), 'dyeline');
@@ -12144,7 +12165,7 @@ ori: ['오리 한 쌍이 귀여워요!', '고마워요!'], dalryeok: ['새해 �
 const pa88 = {
 dbPost: () => '<rect x="-10" y="-30" width="20" height="56" rx="5" fill="' + W88.f + '" stroke="' + L88 + '" stroke-width="4"/>',
 ha: () => '<g transform="translate(0,22) scale(.5)">' + sdHa() + '</g>', gan: () => '<g transform="translate(0,42) scale(.5)">' + sdGan() + '</g>', sang: () => '<g transform="translate(0,66) scale(.5)">' + sdSang() + '</g>',
-hwa: () => '<g transform="translate(0,86) scale(.5)">' + sdHwa(0) + '</g>', ok: () => '<g transform="translate(0,112) scale(.5)">' + sdOk() + '</g>', bo: () => '<g transform="translate(0,127) scale(.8)">' + sdBo() + '</g>',
+hwa: () => '<g transform="translate(0,86) scale(.5)">' + sdHwa(0) + '</g>', ok: () => '<g transform="translate(0,112) scale(.5)">' + sdOk() + '</g>', bo: () => '<g transform="translate(0,356) scale(1.4)">' + sdBo() + '</g>',
 spPost: () => '<g transform="translate(0,26) scale(.5)">' + spPost(0) + '</g>', pine: () => '<g transform="translate(0,56) scale(.24)">' + spPine() + '</g>',
 disk: () => '<circle r="26" fill="#C8B89A" stroke="' + L88 + '" stroke-width="3"/>',
 stand: () => '<path d="M-14,14 L-18,-12 H18 L14,14Z" fill="#7A7C80" stroke="' + L88 + '" stroke-width="3"/>',
@@ -13154,13 +13175,13 @@ QD.tteokguk.steps = [
 { t: 'beat', j: 'pot', say: '떡메로 쿵떡쿵떡 쳐요', n: 6, at: [0, -80] },
 { t: 'rub', j: 'pot', say: '쓱쓱 길게 밀어요 · 가래떡!', box: [-200, -110, 400, 90] },
 { t: 'tap', j: 'pot', order: 1, say: '엽전처럼 동글게 썰어요', pts: TG_CUT, snd: 'pick' },
-{ t: 'drag', j: 'pot', say: '꿩이 없으면? 꿩 대신 닭! 국물을 부어요', pieces: [{ item: 'water', pa: () => '<g transform="translate(0,30)">' + gmPot(false).replace(/scale\([^)]*\)/, 'scale(.5)') + '</g>', tgt: [-110, -170, 220, 140] }] },
+{ t: 'drag', j: 'pot', say: '꿩이 없으면? 꿩 대신 닭! 국물을 부어요', pieces: [{ item: 'water', pa: () => '<g transform="translate(0,16) scale(.25)"><g transform="translate(0,30)">' + gmPot(false).replace(/scale\([^)]*\)/, 'scale(.5)') + '</g></g>', tgt: [-110, -170, 220, 140] }] },
 ];
 QD.bokjori.steps = [
 { t: 'beat', j: 'pot', say: '땅땅 대나무를 가늘게 쪼개요', n: 6, at: [0, -60] },
 { t: 'sew', j: 'pot', say: '대오리를 촘촘히 엮어요', pts: BJ_SEW, thread: '#C8A040' },
 { t: 'tap', j: 'pot', order: 1, say: '섣달 그믐밤 「복조리 사시오!」 대문을 톡톡', pts: BJ_DOOR.map(([x, y]) => [x, y + 40]), snd: 'pop' },
-{ t: 'drag', j: 'pot', say: '복조리를 벽에 걸어요 · 복이 쏙!', pieces: [{ item: 'daeori', pa: () => '<g transform="scale(.6) translate(0,200)">' + bjPair() + '</g>', tgt: [-110, -280, 220, 240] }] },
+{ t: 'drag', j: 'pot', say: '복조리를 벽에 걸어요 · 복이 쏙!', pieces: [{ item: 'daeori', pa: () => '<g transform="translate(2,-28) scale(.6)"><g transform="scale(.6) translate(0,200)">' + bjPair() + '</g></g>', tgt: [-110, -280, 220, 240] }] },
 ];
 const SEOL_ART = { tteokguk: [TG_ART, tteokgukDone], bokjori: [BJ_ART, bokjoriDone] };
 for (const k of SEOL_Q) QD[k].art = function (st, p, col, x, y, s) {
@@ -15350,16 +15371,16 @@ hwaro() { return dSh(36) + `<path d="M-36,0 Q-44,-40 -32,-54 H32 Q44,-40 36,0Z" 
 });
 HIDDEN.push(
 { k: 'gulreong', name: '굴렁쇠', in: { soe: 1, wood: 1 }, sc: 0.7, bs: 0.5, say: '데굴데굴 굴렁쇠!' },
-{ k: 'paengi', name: '팽이', in: { bakdal: 1, chik: 1 }, sc: 0.8, bs: 0.7, say: '뱅글뱅글 팽이!' },
+{ k: 'paengi', name: '꼬마 팽이', in: { bakdal: 1, chik: 1 }, sc: 0.8, bs: 0.7, say: '뱅글뱅글 팽이!' },
 { k: 'dakjang', name: '닭장', in: { plank: 1, daeori: 2 }, sc: 0.62, bs: 0.42, say: '꼬끼오 닭장!' },
 { k: 'tokki', name: '토끼집', in: { plank: 1, straw: 2 }, sc: 0.66, bs: 0.5, say: '깡충깡충 토끼집!' },
 { k: 'ppallae', name: '빨랫줄', in: { chik: 1, bamboo: 2 }, sc: 0.62, bs: 0.36, say: '보송보송 빨랫줄!' },
 { k: 'doldam', name: '돌담', in: { stone: 2, mud: 1 }, sc: 0.62, bs: 0.36, say: '도란도란 돌담!' },
 { k: 'jinggeom', name: '징검다리', in: { dolpan: 2, water: 1 }, sc: 0.66, bs: 0.34, say: '폴짝폴짝 징검다리!' },
 { k: 'nadgari', name: '볏짚 낟가리', in: { ieong: 1, straw: 1 }, sc: 0.66, bs: 0.48, say: '수북수북 낟가리!' },
-{ k: 'yeondeung', name: '연등', in: { paper: 1, mulR: 1, daeori: 1 }, sc: 0.62, bs: 0.34, say: '환하게 연등!' },
+{ k: 'yeondeung', name: '꼬마 연등', in: { paper: 1, mulR: 1, daeori: 1 }, sc: 0.62, bs: 0.34, say: '환하게 연등!' },
 { k: 'jeongja', name: '작은 정자', in: { beam: 1, giwa: 2 }, sc: 0.62, bs: 0.27, say: '쉬어 가요, 작은 정자!' },
-{ k: 'didil', name: '디딜방아', in: { beam: 1, hwak: 1 }, sc: 0.66, bs: 0.32, say: '쿵덕쿵덕 디딜방아!' },
+{ k: 'didil', name: '꼬마 디딜방아', in: { beam: 1, hwak: 1 }, sc: 0.66, bs: 0.32, say: '쿵덕쿵덕 디딜방아!' },
 { k: 'jegi', name: '제기', in: { paper: 1, soe: 1 }, sc: 0.9, bs: 0.8, say: '하나 둘 제기!' },
 { k: 'gulttuk', name: '굴뚝', in: { gudeul: 2, mud: 1 }, sc: 0.62, bs: 0.38, say: '모락모락 굴뚝!' },
 { k: 'jukma', name: '죽마', in: { bamboo: 2, plank: 1 }, sc: 0.62, bs: 0.32, say: '껑충껑충 죽마!' },
@@ -15428,6 +15449,7 @@ const bad = [];
 if (HIDDEN.length !== 40) bad.push('280 숨은 조합 40');
 if (Math.ceil(HIDDEN.length / HID_PER) !== 2) bad.push('280 숨은 조합 쪽 둘');
 HIDDEN.slice(20).forEach(h => { if (!h.name || !h.say || !(h.sc > 0) || !(h.bs > 0)) bad.push('280 숨은 조합 ' + h.k); });
+HIDDEN.slice(20).forEach(h => { if (Object.values(QD).some(q => q.name === h.name)) bad.push('280 숨은 조합 이름이 의뢰 이름과 겹침 ' + h.name); });
 return bad;
 }
 const xsOpenDay = () => typeof mkTkIs === 'function' && mkTkIs('xmas', 'xm');
