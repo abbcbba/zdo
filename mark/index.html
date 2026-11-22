@@ -14082,14 +14082,14 @@ for (let i = 0; i < 9; i++) { const u = (i + 0.5) / 9, x = -70 + 140 * u, y = -1
 };
 const HIDDEN = [
 { k: 'tap', name: '돌탑', in: { stone: 2, gudeul: 1 }, sc: 0.7, bs: 0.62, say: '차곡차곡 돌탑!' },
-{ k: 'jang', name: '곰 장승', in: { plank: 1, meok: 1 }, sc: 0.62, bs: 0.36, say: '마을 지킴이 곰 장승!' },
+{ k: 'jang', name: '꼬마 곰 장승', in: { plank: 1, meok: 1 }, sc: 0.62, bs: 0.36, say: '마을 지킴이 곰 장승!' },
 { k: 'sot', name: '솟대', in: { bamboo: 1, wood: 1 }, sc: 0.6, bs: 0.3, say: '나무 새가 훨훨 솟대!' },
 { k: 'ssari', name: '싸리 울타리', in: { daeori: 2, chik: 1 }, sc: 0.75, bs: 0.62, say: '촘촘 싸리 울타리!' },
 { k: 'pyeong', name: '평상', in: { plank: 2, wanggol: 1 }, sc: 0.7, bs: 0.36, say: '쉬어 가요, 평상!' },
-{ k: 'geune', name: '그네', in: { wood: 1, kkeun: 1, plank: 1 }, sc: 0.6, bs: 0.36, say: '휘익 그네!' },
+{ k: 'geune', name: '꼬마 그네', in: { wood: 1, kkeun: 1, plank: 1 }, sc: 0.6, bs: 0.36, say: '휘익 그네!' },
 { k: 'dok', name: '장독대', in: { dolpan: 1, clay: 2 }, sc: 0.6, bs: 0.4, say: '옹기종기 장독대!' },
 { k: 'hwabun', name: '꽃 화분', in: { clay: 1, sapling: 1 }, sc: 0.7, bs: 0.52, say: '알록달록 꽃 화분!' },
-{ k: 'seokdeung', name: '석등', in: { stone: 2, paper: 1 }, sc: 0.62, bs: 0.36, say: '은은한 석등!' },
+{ k: 'seokdeung', name: '꼬마 석등', in: { stone: 2, paper: 1 }, sc: 0.62, bs: 0.36, say: '은은한 석등!' },
 { k: 'saejip', name: '나무 새집', in: { plank: 2, straw: 1 }, sc: 0.58, bs: 0.3, say: '짹짹 새집!' },
 { k: 'yeonmot', name: '작은 연못', in: { stone: 1, water: 2 }, sc: 0.75, bs: 0.46, say: '퐁당 작은 연못!' },
 { k: 'achi', name: '덩굴 아치', in: { chik: 2, bamboo: 1 }, sc: 0.65, bs: 0.36, say: '꽃 덩굴 아치!' },
@@ -15449,7 +15449,7 @@ const bad = [];
 if (HIDDEN.length !== 40) bad.push('280 숨은 조합 40');
 if (Math.ceil(HIDDEN.length / HID_PER) !== 2) bad.push('280 숨은 조합 쪽 둘');
 HIDDEN.slice(20).forEach(h => { if (!h.name || !h.say || !(h.sc > 0) || !(h.bs > 0)) bad.push('280 숨은 조합 ' + h.k); });
-HIDDEN.slice(20).forEach(h => { if (Object.values(QD).some(q => q.name === h.name)) bad.push('280 숨은 조합 이름이 의뢰 이름과 겹침 ' + h.name); });
+HIDDEN.forEach(h => { if (Object.values(QD).some(q => q.name === h.name)) bad.push('280 숨은 조합 이름이 의뢰 이름과 겹침 ' + h.name); });
 return bad;
 }
 const xsOpenDay = () => typeof mkTkIs === 'function' && mkTkIs('xmas', 'xm');
