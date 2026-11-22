@@ -1,4 +1,4 @@
-const C='mark-r3-71a68c9cca72', A='mark-assets';
+const C='mark-r3-a2a2f9f7a455', A='mark-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-c337166c-180.png','icon-c337166c-192.png','icon-c337166c-512.png'];
 const ASSETS=[];
 let filling=null;
