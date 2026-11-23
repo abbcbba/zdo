@@ -18860,6 +18860,67 @@ if (!['bearpad', 'nwhoe', 'nwpick'].every(k => LG_SP.includes(k)) || !SP_Q.every
 if (typeof PD_BASIC !== 'function' || PD_BASIC().some(k => ['meok', 'brass', 'silk', 'gajuk', 'rubber'].includes(k) || RECIPES.some(r => r.out === k))) bad.push('333 베어패드 = 기본 재료만');
 return bad;
 }
+{ const L0 = SCENES.ledger, d0 = L0.draw;
+L0.draw = function () { let g = d0.call(this); if (P.spPg) return g;
+const PER = 16, pg = clamp(P.pg || 0, 0, lgNP() - 1), CW = 106, CH = 136;
+SP_Q.forEach(k => { const i = Q_ORDER.indexOf(k); if (i < 0 || Math.floor(i / PER) !== pg) return; const j = i % PER, x = 772 + (j % 4) * 114, y = 62 + Math.floor(j / 4) * 142;
+HITS = HITS.filter(h => !(h.x >= x - 2 && h.x < x + CW && h.y >= y - 2 && h.y < y + CH));
+g += `<rect x="${x - 3}" y="${y - 3}" width="${CW + 6}" height="${CH + 8}" rx="13" fill="#F4E8CE"/><rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="12" fill="#F7EEDC" stroke="#C8A47E" stroke-width="2.4" stroke-dasharray="7 5"/>`
++ tx(x + CW / 2, y + 44, '특별 의뢰', { fs: 17, c: '#8A2A10' }) + tx(x + CW / 2, y + 68, '쪽에 있어요', { fs: 15, c: '#7A6A56' })
++ `<circle cx="${x + CW / 2}" cy="${y + 102}" r="17" fill="#FFFDF6" stroke="#8A5A36" stroke-width="2.4"/>` + triArt(x + CW / 2 + 2, y + 102, 0.9, '#8A5A36', 1);
+hit(x, y, CW, CH, () => { SND.pop(); P.spPg = 1; }, 'lgToSp_' + k); });
+return g; }; }
+const TIP_VERB = { bench: '만들어요', kiln: '구워요', forge: '두드려요', dyepot: '물들여요', gift: '의뢰 상으로 모아요' };
+function tipPlace(k) { const f = ITEM_FROM[k]; return f === 'gift' ? '' : (PL_BACK[f] || '마을') + '에서 '; }
+function tipNeedLines(need) {
+return Object.keys(need).slice(0, 3).map(k => [`${ITEM_NAME[k]} ${need[k]}개 더!`, `${tipPlace(k)}${TIP_VERB[ITEM_FROM[k]] || '구해 와요'}!`]);
+}
+function tipQuest() {
+if (!qOn() || !SV.q) return [['곰 가족 집을 다 지으면', '의뢰판이 열려요!']];
+const q = SV.q;
+if (q.cur && QD[q.cur]) { const c = QD[q.cur], m = needItems(), L = [[`지금 「${c.name}」${nwJ(c.name, '을', '를').slice(c.name.length)}`, '만들고 있죠?']];
+if (q.ws > 0) return [...L, ['재료는 벌써 넣었어요!', '일터에서 「이어서 만들기!」를 톡!']];
+if (!Object.keys(m).length) return [...L, ['재료는 다 모였어요!', '일터에서 「만들기 시작!」을 톡!']];
+return [...L, ...tipNeedLines(m), ['다 모으면 일터에서', '「만들기 시작!」을 톡!']]; }
+if (qRegN() >= Q_ORDER.length) return [['의뢰를 다 했어요!', '정말 대단해요.']];
+const k = qBoard().find(x => !qLocked(x)); if (!k) return [['지금 열린 의뢰가 없어요.', '조금 뒤에 또 물어봐요!']];
+const c = QD[k], m = {}; for (const it in c.needs) if (inv(it) < c.needs[it]) m[it] = c.needs[it] - inv(it);
+return [['의뢰판 맨 앞은', `「${c.name}」예요.`], ...(Object.keys(m).length ? tipNeedLines(m) : [['재료는 벌써 다 있어요!', '의뢰판에서 맡아 봐요.']])];
+}
+function tipHidden() {
+const s = pdSv(), today = mkDayKey();
+if (s.tipK === today) return [['숨은 조합은 하루에 하나만!', '내일 또 물어봐요.']];
+const left = HIDDEN.filter(h => !hidFound().includes(h.k)); if (!left.length) return [['숨은 조합을 모두 찾았어요!', '숨은 조합 명장이에요!']];
+const h = left[pdDayN() % left.length], ins = []; for (const k in h.in) for (let j = 0; j < h.in[k]; j++) ins.push(k);
+const first = ITEM_NAME[ins[0]], o = ins.find(k => k !== ins[0]); s.tipK = today; svSave();
+return [[`숨은 조합 「${h.name}」,`, '아직 못 찾았죠?'],
+o ? [`책에 있는 ${first} 말고`, `${ITEM_NAME[o]}도 들어가요! (작업대에서)`, 'ok'] : [`${nwJ(first, '이', '가')} ${ins.length}개 들어가요!`, '(작업대에서)', 'ok'],
+['숨은 조합은 하루에 하나만', '살짝! 내일 또 물어봐요.']];
+}
+const TIP_X = () => PD_S.x + PD_S.w - 196, TIP_Y = () => PD_S.y + 8;
+{ const C = SCENES.bpchat, d0 = C.draw, t0 = C.tick;
+C.draw = function () { let g = d0.call(this); if (P.ph !== 'chat' || !P.msgs) return g;
+const x = TIP_X(), y = TIP_Y(), busy = !!P.tipBusy;
+g += `<rect x="${x - 4}" y="${y - 2}" width="200" height="40" fill="#FFFFFF"/><rect x="${x}" y="${y}" width="180" height="36" rx="18" fill="${busy ? '#F2EEE2' : '#FFF6C8'}" stroke="#E2B44A" stroke-width="2.4"/>` + pdCloud(x + 24, y + 19, 0.4) + tx(x + 104, y + 25, '살짝 알려 줘!', { fs: 18, c: busy ? '#B8A888' : '#8A5A10' });
+if (!busy) hit(x - 6, y - 8, 192, 52, () => { SND.pop(); P.tipBusy = 1; P.opt = null; P.L.splice(P.i, 0, ['tipme'], ['c', ['좋아요! 무엇을 알려 줄까요?']], ['tipask']); P.next = Math.min(P.next || T, T + 0.2); }, 'pdTip');
+return g; };
+C.tick = function () {
+if (P.ph === 'chat' && !P.opt && T >= P.next) { const a = P.L && P.L[P.i];
+if (a && a[0] === 'tipme') { const last = P.msgs[P.msgs.length - 1]; if (last && last.k === 'dots') P.msgs.pop(); P.msgs.push({ k: 'me', lines: ['살짝 알려 줘!'] }); P.i++; P.next = T + 0.4; return; }
+if (a && a[0] === 'tipask') { P.opt = { kind: 'ask', key: 'tip', opts: [['다음 의뢰', 'q'], ['숨은 조합', 'h']], star: 0 }; return; } }
+return t0.call(this); }; }
+{ const p0 = pdPick;
+pdPick = function (o, i) {
+if (o.kind !== 'ask' || o.key !== 'tip') return p0(o, i);
+const [t, v] = o.opts[i]; P.msgs.push({ k: 'me', lines: [`${i + 1}. ${t}`] }); SND.pop(); P.opt = null; P.i++;
+const L = v === 'q' ? tipQuest() : tipHidden();
+P.L.splice(P.i, 0, ...L.map(l => l[l.length - 1] === 'ok' ? ['c', l.slice(0, -1), 'ok'] : ['c', l])); P.next = T + 0.5; P.tipBusy = 0; }; }
+function q334Bad() {
+const bad = [];
+if (!SP_Q.every(k => Q_ORDER.includes(k))) bad.push('334 장부 128~130');
+if (typeof tipQuest !== 'function' || !Array.isArray(tipNeedLines({ stone: 1 }))) bad.push('334 살짝 알려 줘');
+return bad;
+}
 const GAL_ON = /[?&]gallery(=|&|$)/.test(QS);
 SCENES.gallery = {
 start(o) { qInit(); P.k = o.k || null; P.st = P.k ? QD[P.k].steps.length : 0; },
@@ -18902,7 +18963,7 @@ if (saEls().length !== 8) bad.push('서안 조각 수 ' + saEls().length);
 if (MK_HB.length !== 25) bad.push('한반도 시·도 수 ' + MK_HB.length);
 { const NQ = 150 + Q328_NEW.length; if (Q_ORDER.length !== NQ || Object.keys(QD).filter(k => !QD[k].outside).length !== NQ || new Set([...Q_FIRST, ...Q_NEXT]).size !== NQ || [...Q_FIRST, ...Q_NEXT].length !== NQ) bad.push('의뢰 수'); }
 if (Object.keys(QSAY).length !== 153 + Q328_NEW.length || Object.keys(THANKS).length !== 153 + Q328_NEW.length) bad.push('257 · 258 · 259 · 261 · 262 장인 말 · 고마운 말');
-q328Bad().forEach(b => bad.push(b)); q330Bad().forEach(b => bad.push(b)); q331Bad().forEach(b => bad.push(b)); q328QBad().forEach(b => bad.push(b)); q327Bad().forEach(b => bad.push(b)); q332Bad().forEach(b => bad.push(b)); q332bBad().forEach(b => bad.push(b)); q333Bad().forEach(b => bad.push(b)); q324Bad().forEach(b => bad.push(b)); q309Bad().forEach(b => bad.push(b)); q292Bad().forEach(b => bad.push(b)); q290Bad().forEach(b => bad.push(b)); q290bBad().forEach(b => bad.push(b)); q289Bad().forEach(b => bad.push(b)); q288Bad().forEach(b => bad.push(b)); q281Bad().forEach(b => bad.push(b)); q283Bad().forEach(b => bad.push(b)); q281bBad().forEach(b => bad.push(b)); q262OrderBad().forEach(b => bad.push(b)); q263OrderBad().forEach(b => bad.push(b)); q262bBad().forEach(b => bad.push(b)); q262cBad().forEach(b => bad.push(b)); q263cBad().forEach(b => bad.push(b)); q271QzBad().forEach(b => bad.push(b)); q272Bad().forEach(b => bad.push(b)); madangBad().forEach(b => bad.push(b)); q275Bad().forEach(b => bad.push(b)); q276Bad().forEach(b => bad.push(b)); q277Bad().forEach(b => bad.push(b)); q280Bad().forEach(b => bad.push(b)); q282Bad().forEach(b => bad.push(b)); q285Bad().forEach(b => bad.push(b));
+q328Bad().forEach(b => bad.push(b)); q330Bad().forEach(b => bad.push(b)); q331Bad().forEach(b => bad.push(b)); q328QBad().forEach(b => bad.push(b)); q327Bad().forEach(b => bad.push(b)); q332Bad().forEach(b => bad.push(b)); q332bBad().forEach(b => bad.push(b)); q333Bad().forEach(b => bad.push(b)); q334Bad().forEach(b => bad.push(b)); q324Bad().forEach(b => bad.push(b)); q309Bad().forEach(b => bad.push(b)); q292Bad().forEach(b => bad.push(b)); q290Bad().forEach(b => bad.push(b)); q290bBad().forEach(b => bad.push(b)); q289Bad().forEach(b => bad.push(b)); q288Bad().forEach(b => bad.push(b)); q281Bad().forEach(b => bad.push(b)); q283Bad().forEach(b => bad.push(b)); q281bBad().forEach(b => bad.push(b)); q262OrderBad().forEach(b => bad.push(b)); q263OrderBad().forEach(b => bad.push(b)); q262bBad().forEach(b => bad.push(b)); q262cBad().forEach(b => bad.push(b)); q263cBad().forEach(b => bad.push(b)); q271QzBad().forEach(b => bad.push(b)); q272Bad().forEach(b => bad.push(b)); madangBad().forEach(b => bad.push(b)); q275Bad().forEach(b => bad.push(b)); q276Bad().forEach(b => bad.push(b)); q277Bad().forEach(b => bad.push(b)); q280Bad().forEach(b => bad.push(b)); q282Bad().forEach(b => bad.push(b)); q285Bad().forEach(b => bad.push(b));
 if (!eoboArt({ face: 1, paper: 1, knob: 0.5, dye: 0.5 }).length || !jamjariArt().length || !dotbogiArt({ glass: 0.5, gOn: 0 }).length || !garodeungArt({ cap: 0.5, capOn: 0, lamp: 0.5, lampOn: 0 }).length || !anjeonmoArt({ brim: 1 }).length || !helmetOn(0, 0, 1).length || !juryeongArt({ cut: 6 }).length || !ppeongArt({ pop: 0.5, fire: 1 }).length || !tamheomGom(0, 0, 0.3, { net: 1, lens: 1 }).length) bad.push('262 새 그림');
 if (!mulleArt({ base: 0.5, baseOn: 0, lift: 0, spin: 1 }).length || !sinhoArt({ heat: 0.5, glass: 0.5, stone: 0.5, lit: 'g' }).length || !byeokboArt({ board: 0.5, glue: 0.5, up: 1 }).length || !yumoArt({ baby: 1, red: '#D7342E' }).length || !Q14_PIC.nolyard({ focus: 'byeokbo' }).includes('후보')) bad.push('263 새 그림');
 q261OrderBad().forEach(b => bad.push(b));
