@@ -4238,6 +4238,7 @@ saw: { name: '좋은 톱', txt: ['쓱싹! 잘 드는 톱이에요.', '대패질 
 function qInit() { if (!SV.q) { SV.q = { done: [], cur: null, ws: 0, board: Q_FIRST.slice(), tools: {}, col: {}, hanbok: 0 }; } return SV.q; }
 const qOn = () => SV.ph === 'done';
 const qDone = k => !!(SV.q && SV.q.done.includes(k));
+const qRegN = () => SV.q ? SV.q.done.filter(k => Q_ORDER.includes(k)).length : 0;
 const qCur = () => SV.q && SV.q.cur ? QD[SV.q.cur] : null;
 const qTool = k => !!(SV.q && SV.q.tools[k]);
 const qCol = k => (SV.q && SV.q.col[k]) || {};
@@ -4304,7 +4305,7 @@ let g = '';
 const [bx, by] = BOARD_XY;
 hit(bx - 50, by - 46, 100, 124, () => { SND.pop(); go('qboard'); }, 'board');
 g += qBoardArt(bx, by);
-const bdTw = !SV.q.seenBoard || (!SV.q.cur && SV.q.done.length >= 3 && SV.q.done.length < Q_ORDER.length);
+const bdTw = !SV.q.seenBoard || (!SV.q.cur && SV.q.done.length >= 3 && qRegN() < Q_ORDER.length);
 if (bdTw && !POP && (T % 3) < 1.6) g += twinkle4(bx + 40, by - 40, 10 * Math.sin((T % 3) / 1.6 * Math.PI), 0.9);
 const [wx, wy] = WORK_XY, c = qCur();
 g += `<g transform="translate(${wx},${wy})"><ellipse cx="0" cy="10" rx="128" ry="22" fill="#000" opacity=".12"/><path d="M-120,14 L-104,-16 H104 L120,14Z" fill="#D9B96E" stroke="#8A6A2A" stroke-width="2.4"/>${[0, 1, 2, 3].map(i => `<path d="M${-116 + i * 4},${8 - i * 6} H${116 - i * 4}" stroke="#B8963E" stroke-width="1.4"/>`).join('')}</g>`;
@@ -4313,7 +4314,7 @@ g += c.art(SV.q.ws, 0, qCol(k), wx, wy, c.vk || (c.size === 'l' ? 0.5 : 0.62));
 hit(wx - 120, wy - 130, 240, 150, () => qWorkTap(), 'work');
 if (ready || SV.q.ws > 0) { const b = Math.abs(Math.sin(T * 3.5)) * -10;
 g += sparkle(wx, Q_GO_Y + 70, (T % 1.2) / 1.2, 8) + `<g transform="translate(0,${b.toFixed(1)})">` + btn(wx - 120, Q_GO_Y, 240, 62, SV.q.ws > 0 ? '이어서 만들기!' : '만들기 시작!', () => qWorkTap(), { col: '#FBE7A6', bd: '#B07E10', ink: '#8A2A10', fs: 30, k: 'qGo' }) + `</g>`; } }
-else { g += tx(wx, wy - 2, (SV.q.done.length >= Q_ORDER.length || !qBoard().length) ? '의뢰 다 했어요!' : qDayFull() ? '내일 또 와요!' : qNightClosed() ? '내일 해 뜨면 또 와요!' : '의뢰판을 봐요!', { fs: 22, c: '#5A3A20', st: '#FFFDF6', sw: 5 }); hit(wx - 120, wy - 40, 240, 60, () => { SND.pop(); go('qboard'); }, 'work'); }
+else { g += tx(wx, wy - 2, (qRegN() >= Q_ORDER.length || !qBoard().length) ? '의뢰 다 했어요!' : qDayFull() ? '내일 또 와요!' : qNightClosed() ? '내일 해 뜨면 또 와요!' : '의뢰판을 봐요!', { fs: 22, c: '#5A3A20', st: '#FFFDF6', sw: 5 }); hit(wx - 120, wy - 40, 240, 60, () => { SND.pop(); go('qboard'); }, 'work'); }
 return janginVillage() + g;
 }
 function qWorkTap() {
@@ -4326,7 +4327,7 @@ say('lead', 505, 536, [`${ITEM_NAME[k]} ${m[k]}개 더!`, '재료가 모자라�
 }
 function qAsk() {
 const c = qCur(), lx = 505, ly = 536;
-if (!c) { say('lead', lx, ly, SV.q && SV.q.done.length >= Q_ORDER.length ? ['곰 놀이 마을이', '다 우리 손길이에요!'] : ['의뢰판에', '새 의뢰가 왔어요!']); return; }
+if (!c) { say('lead', lx, ly, SV.q && qRegN() >= Q_ORDER.length ? ['곰 놀이 마을이', '다 우리 손길이에요!'] : ['의뢰판에', '새 의뢰가 왔어요!']); return; }
 Q_ASK_T = T;
 if (SV.q.ws > 0 || !Object.keys(needItems()).length) { say('lead', lx, ly, ['재료 다 모았어요!', '가운데를 톡!']); return; }
 const m = needItems(), k = Object.keys(m)[0], pl = nextPlace();
@@ -4352,7 +4353,7 @@ return g; },
 bgKey: () => 'qboard', ex: () => [MA_SKY.day[0], '#93C06C'],
 draw() {
 const b = qBoard(), cur = SV.q.cur;
-let g = tx(640, 148, '곰 놀이 마을 의뢰판', { f: 'SM', fs: 40, c: '#FBF0D6', st: '#3A2414', sw: 6 });
+let g = tx(640, 148, '곰 재주 마을 의뢰판', { f: 'SM', fs: 40, c: '#FBF0D6', st: '#3A2414', sw: 6 });
 if (!b.length) g += qBoardDoneNote();
 b.forEach((k, i) => { g += qPaperArt(k, i, cur); hit(210 + i * 300, 190, 260, 390, () => { SND.pop(); go('qreq', { k }); }, 'paper_' + k); });
 return g + homeBtn() + bookBtn(1132, 666, 'cards') + bookBtn(1218, 666, 'ledger');
@@ -4478,7 +4479,7 @@ return `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#4A2E1A
 bgKey: () => 'ledger' + (SV.q ? SV.q.done.join('') : '') + (P.stamp && T - P.t0 < 1.4 ? 'st' : ''), ex: () => ['#4A2E1A', '#4A2E1A'],
 draw() {
 const q = qInit();
-let g = tx(390, 96, '의뢰 장부', { f: 'SM', fs: 46, c: '#8A2A10' }) + tx(390, 530, `곰 놀이 마을 의뢰 ${q.done.length} / ${Q_ORDER.length}`, { fs: 24, c: '#7A6A56' });
+let g = tx(390, 96, '의뢰 장부', { f: 'SM', fs: 46, c: '#8A2A10' }) + tx(390, 530, `의뢰 ${qRegN()} / ${Q_ORDER.length}`, { fs: 24, c: '#7A6A56' });
 if (P.stamp && !QD[P.stamp].pic) { const u = clamp((T - P.t0 - 0.4) / 0.35, 0, 1), [sx, sy] = QD[P.stamp].spot, X = 70 + sx * 0.5, Y = 132 + (sy - (QD[P.stamp].r || 40) * 0.4) * 0.5;
 if (u < 1) g += `<g opacity="${u.toFixed(2)}">${qStamp(X, Y, 0.5 * (2.2 - 1.2 * ease(u)))}</g>`;
 if (u >= 1 && !P.thud) { P.thud = 1; SND.thump(); } }
@@ -8466,7 +8467,7 @@ hit(w.x - 32, w.y - 78, 64, 84, () => { SND.pop(); say('jmok', clamp(w.x, 130, 1
 function hrbGuide() {
 const c = qCur();
 if (!c && typeof qShutSay === 'function' && (qNightClosed() || qDayFull())) return qShutSay();
-if (!c) return SV.q && SV.q.done.length >= Q_ORDER.length ? ['의뢰를 다 했어요!', '의뢰 장부를 봐요'] : ['새 의뢰가 기다려요', '의뢰판으로 가 봐요!'];
+if (!c) return SV.q && qRegN() >= Q_ORDER.length ? ['의뢰를 다 했어요!', '의뢰 장부를 봐요'] : ['새 의뢰가 기다려요', '의뢰판으로 가 봐요!'];
 const m = needItems(), k = Object.keys(m)[0];
 if (SV.q.ws > 0 || !k) return ['재료는 다 있어요!', '가운데 [만들기]를 톡!'];
 const pl = nextPlace(), nm = PL_BACK[pl] || PL_BACK[PL_ALIAS[pl]] || '';
@@ -9875,10 +9876,10 @@ let g = m0(); if (!qOn()) return g;
 const rep = (k) => SV.q && SV.q.cur === k && REPLAY, vil = S === 'village';
 if (qDone('mulle') && !rep('mulle')) { const sp = T - (P.mlT ?? -9) < 2 ? 9 : 2.4;
 g += qg(ML_AT.x, ML_AT.y, ML_AT.s, mulleArt({ spin: T * sp }));
-if (vil) hit(ML_AT.x - 26, ML_AT.y - 36, 52, 40, () => { P.mlT = T; SND.pop(); say('ml', ML_AT.x, ML_AT.y - 40, ['빙글빙글~'], 1.6); }, 'mulle'); }
+if (vil) hit(ML_AT.x - 34, ML_AT.y - 52, 68, 64, () => { P.mlT = T; SND.pop(); say('ml', ML_AT.x, ML_AT.y - 40, ['빙글빙글~'], 1.6); }, 'mulle'); }
 if (qDone('yumo') && !rep('yumo')) { const fx = QHOUSE.x + 128, fy = QHOUSE.y + 58, roll = Math.sin(T * 0.8) * 6, x = fx + YM_DX + roll;
 g += qg(x, fy + 2, 0.1, yumoArt({ baby: 1, rock: 1, sleep: (T % 14) < 9, ang: roll * 12 }));
-if (vil) hit(x - 22, fy - 46, 44, 48, () => { P.ymT = T; SND.peek(); say('ym', x, fy - 50, rndPick([['쉿, 아기가', '자고 있어요'], ['까꿍!'], ['동생이 웃었어요!']]), 2); }, 'yumo'); }
+if (vil) hit(x - 32, fy - 56, 64, 64, () => { P.ymT = T; SND.peek(); say('ym', x, fy - 50, rndPick([['쉿, 아기가', '자고 있어요'], ['까꿍!'], ['동생이 웃었어요!']]), 2); }, 'yumo'); }
 return g; }; }
 { const I0 = SCENES.qinstall, d0 = I0.draw;
 I0.draw = function () {
@@ -13887,7 +13888,7 @@ acart: [['math', '카트 하나에 가방 3개씩, 카트 12대면 가방은 몇
 };
 for (const k of Q309_NEW) { qzAddStep(k); qzAddTag(k); }
 const QFROM_GAME = { air: ['곰곰 국제 공항', '#24406E'], mini: ['곰 놀이 마을', '#3F8F4A'], jido: ['新 대동여지도', '#8A2A10'] };
-const JAEJU_WHO = ['fam', 'mom', 'lead', 'soe', 'seokgong', 'heuk', 'dye'];
+const JAEJU_WHO = ['fam', 'mom', 'lead', 'soe', 'seokgong', 'heuk', 'dye', 'app'];
 const qFrom = k => { const c = QD[k]; if (!c) return null; if (c.from) return c.from; if (c.pic === 'bang') return 'jido'; if (JAEJU_WHO.includes(c.who)) return null; return 'mini'; };
 function qFromTag(k, x, y) {
 const f = qFrom(k), G = f && QFROM_GAME[f]; if (!G) return '';
@@ -18042,7 +18043,7 @@ g += tx(SX, oy + 16, one(oh, 13), { fs: 18, c: NW_INK, a: 'start' }) + tx(SX, oy
 + `<path d="M${SX},${oy + 76} H${R0}" stroke="#D8CEB8" stroke-width="1.2" stroke-dasharray="4 3"/>`;
 hit(SX - 6, oy - 4, SW + 12, 80, () => { SND.pop(); P.pg = i; P.turn = { t0: T, dir: i > pg ? 1 : -1 }; nwSeen(i); }, 'nwOther'); });
 { const NB = SB - 92, q = SV.q, hn = typeof hidFound === 'function' ? hidFound().length : 0;
-const R = qOn() && q ? [['끝낸 의뢰', `${q.done.length} / ${Q_ORDER.length}`], ['숨은 조합', `${hn} / ${typeof HIDDEN !== 'undefined' ? HIDDEN.length : 60}`], ['도립신문', `${N}호까지`]] : [['집 짓기', `${Math.min(SV.st, 8)} / 8 단계`], ['간직한 카드', `${SV.cards.length}장`], ['도립신문', `${N}호까지`]];
+const R = qOn() && q ? [['끝낸 의뢰', `${qRegN()} / ${Q_ORDER.length}`], ['숨은 조합', `${hn} / ${typeof HIDDEN !== 'undefined' ? HIDDEN.length : 60}`], ['도립신문', `${N}호까지`]] : [['집 짓기', `${Math.min(SV.st, 8)} / 8 단계`], ['간직한 카드', `${SV.cards.length}장`], ['도립신문', `${N}호까지`]];
 g += `<rect x="${SX}" y="${NB}" width="${SW}" height="88" rx="6" fill="#F3EBD6" stroke="#B8AE96" stroke-width="1.6"/>` + tx(SX + SW / 2, NB + 20, '지금 우리 마을', { fs: 15, c: '#5E3A1E' })
 + R.map(([k2, v], i) => tx(SX + 12, NB + 44 + i * 19, k2, { fs: 15, c: '#6A6258', a: 'start' }) + tx(SX + SW - 12, NB + 44 + i * 19, v, { fs: 16, c: NW_INK, a: 'end' })).join(''); }
 g += nwAdBanner(a.d, L0, y + 552, R0 - L0, 62, pg);
@@ -18210,7 +18211,7 @@ const pdBunItems = i => { const L = pdIn(); return L.filter((_, j) => j % 5 === 
 Object.assign(QD, {
 bearpad: { name: '베어패드 세트', size: 'l', outside: 1, who: 'mom', whoName: '엄마 곰', pic: 'home', whoAt: [700, 568, 0.42], spot: [560, 560], r: 40, zoom: [640, 470], jang: 'mok',
 ask: ['꼬마 곰을 위해', '게임을 만들어 주고 싶어요'], needs: {}, reward: { items: { plank: 2, stone: 2, water: 2 } },
-card: { t: '베어패드', txt: ['가진 재료를 하나씩 전부', '가마솥에 넣고 펑!', '구름 도우미 클라우드가', '같이 게임을 만들어 줘요.'], fun: 1 } },
+card: { t: '베어패드', txt: ['주운 재료를 하나씩', '가마솥에 넣고 펑!', '구름 도우미 클라우드가', '같이 게임을 만들어 줘요.'], fun: 1 } },
 });
 QD.bearpad.steps = [
 { t: 'tap', j: 'mok', order: 1, say: '보따리 재료를 톡톡 가마솥에 다 넣어요', pts: PD_BUN, snd: 'pop' },
@@ -18220,7 +18221,11 @@ QD.bearpad.steps = [
 ];
 QD.bearpad.art = function (st, p, col, x, y, s) {
 let g = '';
-if (st === 0) { const n = Math.round((p || 0) * 5); g += pdPot(0, Q_SMALL ? 0 : T); PD_BUN.forEach(([bx, by], i) => { if (i >= n) g += pdBundle(bx, by, pdBunItems(i)); }); }
+if (st === 0) { const n = Math.round((p || 0) * 5); g += pdPot(0, Q_SMALL ? 0 : T); PD_BUN.forEach(([bx, by], i) => { if (i >= n) g += pdBundle(bx, by, pdBunItems(i)); });
+if (!Q_SMALL) { if (P.pdN == null || n < P.pdN) P.pdN = n; if (n > P.pdN) { P.pdFly = { i: n - 1, t0: T }; P.pdN = n; }
+const F = P.pdFly; if (F && T - F.t0 < 1.6) { const its = pdBunItems(F.i), [bx, by] = PD_BUN[F.i];
+its.slice(0, 3).forEach((it, j) => { const u = clamp((T - F.t0 - j * 0.12) / 0.55, 0, 1); if (u <= 0 || u >= 1) return; const x = bx + (0 - bx) * u + (j - 1) * 20 * (1 - u), y = by + (-150 - by) * u - Math.sin(u * Math.PI) * 90; g += itemArt(it, x, y, 0.7 * (1 - u * 0.4)); });
+if (its.length) { const a = Math.min(1, (1.6 - (T - F.t0)) / 0.4); g += `<g opacity="${a.toFixed(2)}">` + tx(0, -235, its.slice(0, 3).map(k => ITEM_NAME[k]).join(' · ') + ' 퐁!', { fs: 34, c: '#8A2A10', st: '#FFFDF6', sw: 7 }) + `</g>`; } } } }
 else if (st === 1) g += pdPot(p || 0, Q_SMALL ? 0 : T * (1 + (p || 0) * 3));
 else if (st === 2) g += pdPot(1, 0) + (Q_SMALL ? '' : `<circle cx="0" cy="-170" r="${60 + 6 * Math.sin(T * 8)}" fill="#FFF6C8" opacity=".35"/>`);
 else if (st === 3) g += pdPadStand(true, (p || 0) >= 1);
@@ -18229,7 +18234,7 @@ return qg(x, y, s, g);
 };
 QD.bearpad.fit = { x: -200, y: -310, w: 400, h: 320 };
 Object.assign(QW_SK, { bearpad: 1.0 });
-Object.assign(QSAY, { bearpad: [['베어패드?', '가마솥부터 데워요!'], ['재료를 하나씩', '전부라고요?!']] });
+Object.assign(QSAY, { bearpad: [['베어패드?', '가마솥부터 데워요!'], ['주운 재료를', '하나씩 다요?!']] });
 Object.assign(THANKS, { bearpad: ['꼬마 곰이', '좋아하겠어요!'] });
 const pdRegN = () => SV.q ? SV.q.done.filter(k => Q_ORDER.includes(k)).length : 0;
 const pdDone = () => qDone(PD_K);
@@ -18260,21 +18265,25 @@ hit(x, y, w, h, () => { SND.pop(); go('qreq', { k: PD_K }); }, 'paper_' + PD_K +
 return g + PD_RIB(x + 100, y + 30, 112); }; }
 { const d0 = SCENES.qreq.draw;
 SCENES.qreq.draw = function () { let g = d0.call(this); if (P.k !== PD_K) return g;
-g += PD_RIB(964, 116, 112) + tx(1037, 330, '가진 재료를 종류마다', { fs: 21, c: '#3A2414' }) + tx(1037, 360, '하나씩 전부!', { fs: 24, c: '#C8413D' });
-['wood', 'stone', 'water', 'paper'].forEach((it, j) => { g += itemArt(it, 950 + j * 58, 410, 0.6); });
-g += tx(1037, 456, '(견습 곰은 말리지만요)', { fs: 16, c: '#7A6A56' });
+g = g.replace('>필요한 재료<', '>가마솥에 넣을 재료<') + PD_RIB(964, 116, 112) + tx(1037, 318, '(종류마다 하나씩!)', { fs: 18, c: '#C8413D' });
+const L = SV.q && SV.q.cur === PD_K && SV.q.pdIn ? SV.q.pdIn : pdWill(), SH = L.slice(0, 12);
+SH.forEach((it, j) => { g += itemArt(it, 907 + (j % 6) * 52, 368 + Math.floor(j / 6) * 50, 0.5); });
+if (L.length > 12) g += tx(1037, 452, `+ ${L.length - 12}가지 더`, { fs: 16, c: '#7A6A56' });
+if (!L.length) g += tx(1037, 380, '주운 재료가 없어도', { fs: 17, c: '#7A6A56' }) + tx(1037, 404, '괜찮아요!', { fs: 17, c: '#7A6A56' });
 if (typeof qShut === 'function' && qShut() && !qDone(PD_K) && !SV.q.cur && !HITS.some(h => h.k === 'qTake'))
 g += `<rect x="286" y="544" width="308" height="94" rx="20" fill="#F4E8CE"/>` + btn(300, 556, 280, 70, '맡을게요!', () => { qAccept(PD_K); setTimeout(() => { if (S === 'qreq') go('village'); }, 600); }, { col: '#FBE7A6', bd: '#B07E10', ink: '#8A2A10', fs: 34, k: 'qTake' });
 return g; }; }
 { const j0 = jFaces; jFaces = function (k, x, y, r) { return k === PD_K ? '' : j0(k, x, y, r); }; }
+const PD_BASIC = () => ITEM_ORDER.filter(k => ['forest', 'stream', 'field', 'dak', 'daesup'].includes(ITEM_FROM[k]) && !RECIPES.some(r => r.out === k) && k !== 'sapling');
+const pdWill = () => PD_BASIC().filter(k => inv(k) > 0);
 { const w0 = qWorkTap;
 qWorkTap = function () {
 const q = SV.q;
-if (q && q.cur === PD_K && !q.ws) { const L = ITEM_ORDER.filter(k => inv(k) > 0 && k !== 'sapling'); L.forEach(k => invAdd(k, -1)); q.pdIn = L; svSave(); }
+if (q && q.cur === PD_K && !q.ws) { const L = pdWill(); L.forEach(k => invAdd(k, -1)); q.pdIn = L; svSave(); }
 return w0(); }; }
 { const i0 = qwIntroSay;
 qwIntroSay = function (c, j0) { if (SV.q && SV.q.cur === PD_K && !REPLAY) { const n = pdIn().length;
-say('app', 1150, 560, ['대장님, 정말', '다 넣어요?!'], 2.6); setTimeout(() => { if (S === 'qwork') say('jw', ...jwXY(), [`재료 ${n}가지,`, '하나씩 전부요!'], 2.6); }, 2400); return; }
+say('app', 1150, 560, ['대장님, 정말', '다 넣어요?!'], 2.6); setTimeout(() => { if (S === 'qwork') say('jw', ...jwXY(), [`재료 ${n}가지,`, '하나씩이에요!'], 2.6); }, 2400); return; }
 return i0(c, j0); }; }
 { const h0 = Q14_PIC.home;
 Q14_PIC.home = function (o = {}) { const g = h0(o); if (!q14In(PD_K, o)) return g; const [sx, sy] = QD.bearpad.spot;
@@ -18530,15 +18539,9 @@ HITS = HITS.filter(h => h.k === 'home'); hit(S.x, S.y, S.w, S.h, () => { SND.pop
 return g + homeBtn();
 },
 };
-{ const d0 = SCENES.news.draw;
-SCENES.news.draw = function () { let g = d0.call(this); const q = SV.q;
-if (q && pdDone()) g = g.replace(`>${q.done.length} / ${Q_ORDER.length}<`, `>${pdRegN()} / ${Q_ORDER.length}<`);
-return g; }; }
 { const m0 = nwMilestones; nwMilestones = function () { const L = m0(); if (pdDone()) L.push('sp_' + PD_K); return L; }; }
-{ const t0 = nwText; nwText = function (a) { if (a.k === 'sp_' + PD_K) return ['엄마 곰, 베어패드 만들었다', ['엄마 곰이 꼬마 곰을 위해 베어패드를 만들었어요. 가진 재료를 하나씩 전부 넣고 펑! 패드 속 구름 도우미 클라우드와 곰이 나오는 게임을 만든대요.'], 1]; return t0(a); }; }
+{ const t0 = nwText; nwText = function (a) { if (a.k === 'sp_' + PD_K) return ['엄마 곰, 베어패드 만들었다', ['엄마 곰이 꼬마 곰을 위해 베어패드를 만들었어요. 주운 재료를 하나씩 넣고 펑! 패드 속 구름 도우미 클라우드와 곰이 나오는 게임을 만든대요.'], 1]; return t0(a); }; }
 { const a0 = nwArt; nwArt = function (a) { if (a.k === 'sp_' + PD_K) return `<g transform="translate(-70,120) scale(.55)">${pdPadStand(false)}</g>` + momGom(140, 120, 0.62, { arms: 'point' }); return a0(a); }; }
-{ const d0 = SCENES.ledger.draw;
-SCENES.ledger.draw = function () { const g = d0.call(this), q = SV.q; return q && pdDone() ? g.replace(`의뢰 ${q.done.length} / ${Q_ORDER.length}`, `의뢰 ${pdRegN()} / ${Q_ORDER.length}`) : g; }; }
 { const s0 = startGame;
 startGame = function () { s0(); if (!PD_URL[0]) return;
 if (PD_URL[1] === 'board') return; if (PD_URL[1] === 'pad') { if (SV.q && !pdDone()) SV.q.done.push(PD_K); go('bpad'); } else go('bpchat', { first: 1 }); }; }
@@ -18784,10 +18787,10 @@ if (v4Has('kick')) { const o = V4_AT.kick, on = N && N.k === 'kick';
 if (on) { const v = N.u / N.d, dx = Math.sin(v * Math.PI) * 90, dir = v < 0.5 ? 1 : -1;
 g += `<g transform="translate(${(o.x + dx).toFixed(1)},0) scale(${dir},1) translate(${-o.x},0)">${v4Put('kick', o)}</g>` + v4Bear(N.who, o.x + dx - 2 * dir, o.y - o.h * 0.3, 0.24, { arms: 'up' }); }
 else g += v4Put('kick', o);
-if (vil && !on) hit(o.x - 40, o.y - 50, 80, 56, () => { SND.pop(); say('v4kick', o.x, o.y - 60, ['쌩쌩~!'], 1.6); }, 'v4kick'); }
+if (vil && !on) hit(o.x - 42, o.y - 58, 84, 66, () => { SND.pop(); say('v4kick', o.x, o.y - 60, ['쌩쌩~!'], 1.6); }, 'v4kick'); }
 if (v4Has('duck')) { const o = V4_AT.duck, tq = T - (P.v4dT ?? -9), j = tq < 0.5 ? -Math.sin(tq / 0.5 * Math.PI) * 8 : 0, bob = Math.sin(T * 1.6) * 2 + j;
 g += v4Put('duck', o, Math.sin(T * 0.4) * 6, bob);
-if (vil) hit(o.x - 34, o.y - 38, 68, 46, () => { P.v4dT = T; SND.quack(); say('v4duck', o.x, o.y - 40, ['꽥꽥!'], 1.4); }, 'v4duck'); }
+if (vil) hit(o.x - 36, o.y - 46, 72, 64, () => { P.v4dT = T; SND.quack(); say('v4duck', o.x, o.y - 40, ['꽥꽥!'], 1.4); }, 'v4duck'); }
 return g;
 }
 { const m0 = mkHatSpot; mkHatSpot = function () { return m0() + (qOn() ? v4Draw() : ''); }; }
@@ -18808,6 +18811,53 @@ const bad = [];
 if (JM_VIL) bad.push('332 진묘수 = 첫 화면에서 뺌');
 for (const k in V4_AT) if (!QD[k] || !Q_ORDER.includes(k)) bad.push('332 첫 화면 ' + k);
 if (typeof SND.quack !== 'function') bad.push('332 꽥꽥 소리');
+return bad;
+}
+const LG_SP = ['xmstar', 'tteokguk', 'bokjori', 'bearpad', 'nwhoe', 'nwpick'].filter(k => QD[k]);
+const lgNP = () => Math.max(1, Math.ceil(Q_ORDER.length / 16));
+{ const L0 = SCENES.ledger, s0 = L0.start, d0 = L0.draw;
+L0.start = function (o = {}) { s0.call(this, o); P.spPg = o.sp ? 1 : 0; };
+L0.draw = function () {
+const NP = lgNP();
+if (!P.spPg) {
+let g = d0.call(this);
+if (clamp(P.pg || 0, 0, NP - 1) === NP - 1) g += btn(1092, 640, 110, 52, '', () => { SND.pop(); P.spPg = 1; }, { k: 'lgNext' }) + triArt(1147, 666, 1.6, C_INK, 1);
+return g; }
+P.pg = NP - 1; let g = d0.call(this);
+HITS = HITS.filter(h => h.x < 750);
+const q = qInit(), CW = 106, CH = 136;
+g += `<rect x="752" y="40" width="478" height="648" fill="#F4E8CE"/><path d="M752,690 H1212" stroke="#3A2414" stroke-width="5"/>` + tx(996, 54, '특별 의뢰', { fs: 20, c: '#8A2A10' });
+LG_SP.forEach((k, j) => { const x = 772 + (j % 4) * (CW + 8), y = 62 + Math.floor(j / 4) * (CH + 6), d = q.done.includes(k), c = QD[k], L = qLines(c.card.t);
+if (d) { g += `<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="12" fill="#FBF5E6" stroke="${Q_SIZE_C[c.size]}" stroke-width="3"/><defs><clipPath id="lsp${j}"><rect x="${x + 2}" y="${y + 2}" width="${CW - 4}" height="${CH - 30}" rx="10"/></clipPath></defs>`
++ `<g clip-path="url(#lsp${j})">` + qArtFit(k, x + CW / 2, y + (L.length > 1 ? 48 : 54), CW - 16, L.length > 1 ? 76 : 90, 0.3) + `</g>`
++ L.map((l, jj) => tx(x + CW / 2, y + (L.length > 1 ? 110 + jj * 17 : 124), l, { fs: L.length > 1 ? 15 : 18, c: '#8A2A10' })).join('') + qStamp(x + CW - 16, y + 16, 0.38);
+hit(x, y, CW, CH, () => { SND.pop(); openQCard(k, { view: true, replay: true }); }, 'lsp_' + k); }
+else { const m = qLocked(k) ? qLockMsg(k) : ['의뢰판에', '열려 있어요!'];
+g += `<rect x="${x}" y="${y}" width="${CW}" height="${CH}" rx="12" fill="#F3E6D6" stroke="#C8A47E" stroke-width="2.4" stroke-dasharray="7 5"/>` + tx(x + CW / 2, y + 58, '?', { fs: 40, c: '#B8A888' })
++ L.map((l, jj) => tx(x + CW / 2, y + 86 + jj * 16, l, { fs: 14, c: '#8A6A44' })).join('') + m.map((l, jj) => tx(x + CW / 2, y + 112 + jj * 13 - (L.length > 1 ? 0 : 6), l, { fs: 11, c: '#7A6A56' })).join(''); } });
+g += tx(996, 620, `${NP + 1} / ${NP + 1} 쪽`, { fs: 16, c: '#7A6A56' });
+g += btn(790, 640, 110, 52, '', () => { SND.pop(); P.spPg = 0; P.pg = NP - 1; }, { k: 'lgPrev' }) + triArt(845, 666, 1.6, C_INK, -1);
+return g;
+}; }
+{ const e0 = qReplayEnd; qReplayEnd = function (fin) { const k = REPLAY && REPLAY.k; e0(fin); if (k && LG_SP.includes(k) && !Q_ORDER.includes(k)) P.spPg = 1; }; }
+{ const r0 = qReward;
+qReward = function (k) {
+if (k !== PD_K) return r0(k);
+const c = QD[k], it = Object.keys(c.reward.items || {});
+POP = { k: 'qreward', soft: false, t0: T, draw() {
+const u = clamp((T - POP.t0) / 0.5, 0, 1);
+let g = `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#000" opacity=".4"/>` + cardFrame(330, 90, 620, 540, { special: true });
+g += tx(640, 156, '베어패드를 받았어요!', { fs: 36, c: '#8A2A10' });
+g += `<g transform="translate(640,${(372 + (1 - ease(u)) * 30).toFixed(1)}) scale(.62)">${pdPadStand(false)}</g>` + (u >= 1 ? sparkle(640, 250, (T % 1.2) / 1.2, 9) : '');
+g += tx(640, 418, '첫 화면 도립신문 옆에 놓아 둘게요', { fs: 22, c: '#3A2414' }) + tx(640, 448, '톡 = 클라우드와 이야기 · 약어 퀴즈', { fs: 18, c: '#7A6A56' });
+g += tx(500, 492, '덤', { fs: 18, c: '#7A6A56' }) + it.map((x, i) => itemArt(x, 560 + i * 80, 500, 0.62) + tx(560 + i * 80, 540, `${ITEM_NAME[x]} ×${c.reward.items[x]}`, { fs: 15, c: '#3A2414' })).join('');
+g += btn(800, 560, 130, 56, '다음', () => { SND.pop(); POP = null; go('ledger', { sp: 1 }); }, { col: '#FBE7A6', bd: '#B07E10', fs: 24, k: 'next', ico: 'tri' });
+return g; } };
+SND.jjan(); }; }
+function q333Bad() {
+const bad = [];
+if (!['bearpad', 'nwhoe', 'nwpick'].every(k => LG_SP.includes(k)) || !SP_Q.every(k => LG_SP.includes(k))) bad.push('333 장부 특별 의뢰 쪽');
+if (typeof PD_BASIC !== 'function' || PD_BASIC().some(k => ['meok', 'brass', 'silk', 'gajuk', 'rubber'].includes(k) || RECIPES.some(r => r.out === k))) bad.push('333 베어패드 = 기본 재료만');
 return bad;
 }
 const GAL_ON = /[?&]gallery(=|&|$)/.test(QS);
@@ -18852,7 +18902,7 @@ if (saEls().length !== 8) bad.push('서안 조각 수 ' + saEls().length);
 if (MK_HB.length !== 25) bad.push('한반도 시·도 수 ' + MK_HB.length);
 { const NQ = 150 + Q328_NEW.length; if (Q_ORDER.length !== NQ || Object.keys(QD).filter(k => !QD[k].outside).length !== NQ || new Set([...Q_FIRST, ...Q_NEXT]).size !== NQ || [...Q_FIRST, ...Q_NEXT].length !== NQ) bad.push('의뢰 수'); }
 if (Object.keys(QSAY).length !== 153 + Q328_NEW.length || Object.keys(THANKS).length !== 153 + Q328_NEW.length) bad.push('257 · 258 · 259 · 261 · 262 장인 말 · 고마운 말');
-q328Bad().forEach(b => bad.push(b)); q330Bad().forEach(b => bad.push(b)); q331Bad().forEach(b => bad.push(b)); q328QBad().forEach(b => bad.push(b)); q327Bad().forEach(b => bad.push(b)); q332Bad().forEach(b => bad.push(b)); q332bBad().forEach(b => bad.push(b)); q324Bad().forEach(b => bad.push(b)); q309Bad().forEach(b => bad.push(b)); q292Bad().forEach(b => bad.push(b)); q290Bad().forEach(b => bad.push(b)); q290bBad().forEach(b => bad.push(b)); q289Bad().forEach(b => bad.push(b)); q288Bad().forEach(b => bad.push(b)); q281Bad().forEach(b => bad.push(b)); q283Bad().forEach(b => bad.push(b)); q281bBad().forEach(b => bad.push(b)); q262OrderBad().forEach(b => bad.push(b)); q263OrderBad().forEach(b => bad.push(b)); q262bBad().forEach(b => bad.push(b)); q262cBad().forEach(b => bad.push(b)); q263cBad().forEach(b => bad.push(b)); q271QzBad().forEach(b => bad.push(b)); q272Bad().forEach(b => bad.push(b)); madangBad().forEach(b => bad.push(b)); q275Bad().forEach(b => bad.push(b)); q276Bad().forEach(b => bad.push(b)); q277Bad().forEach(b => bad.push(b)); q280Bad().forEach(b => bad.push(b)); q282Bad().forEach(b => bad.push(b)); q285Bad().forEach(b => bad.push(b));
+q328Bad().forEach(b => bad.push(b)); q330Bad().forEach(b => bad.push(b)); q331Bad().forEach(b => bad.push(b)); q328QBad().forEach(b => bad.push(b)); q327Bad().forEach(b => bad.push(b)); q332Bad().forEach(b => bad.push(b)); q332bBad().forEach(b => bad.push(b)); q333Bad().forEach(b => bad.push(b)); q324Bad().forEach(b => bad.push(b)); q309Bad().forEach(b => bad.push(b)); q292Bad().forEach(b => bad.push(b)); q290Bad().forEach(b => bad.push(b)); q290bBad().forEach(b => bad.push(b)); q289Bad().forEach(b => bad.push(b)); q288Bad().forEach(b => bad.push(b)); q281Bad().forEach(b => bad.push(b)); q283Bad().forEach(b => bad.push(b)); q281bBad().forEach(b => bad.push(b)); q262OrderBad().forEach(b => bad.push(b)); q263OrderBad().forEach(b => bad.push(b)); q262bBad().forEach(b => bad.push(b)); q262cBad().forEach(b => bad.push(b)); q263cBad().forEach(b => bad.push(b)); q271QzBad().forEach(b => bad.push(b)); q272Bad().forEach(b => bad.push(b)); madangBad().forEach(b => bad.push(b)); q275Bad().forEach(b => bad.push(b)); q276Bad().forEach(b => bad.push(b)); q277Bad().forEach(b => bad.push(b)); q280Bad().forEach(b => bad.push(b)); q282Bad().forEach(b => bad.push(b)); q285Bad().forEach(b => bad.push(b));
 if (!eoboArt({ face: 1, paper: 1, knob: 0.5, dye: 0.5 }).length || !jamjariArt().length || !dotbogiArt({ glass: 0.5, gOn: 0 }).length || !garodeungArt({ cap: 0.5, capOn: 0, lamp: 0.5, lampOn: 0 }).length || !anjeonmoArt({ brim: 1 }).length || !helmetOn(0, 0, 1).length || !juryeongArt({ cut: 6 }).length || !ppeongArt({ pop: 0.5, fire: 1 }).length || !tamheomGom(0, 0, 0.3, { net: 1, lens: 1 }).length) bad.push('262 새 그림');
 if (!mulleArt({ base: 0.5, baseOn: 0, lift: 0, spin: 1 }).length || !sinhoArt({ heat: 0.5, glass: 0.5, stone: 0.5, lit: 'g' }).length || !byeokboArt({ board: 0.5, glue: 0.5, up: 1 }).length || !yumoArt({ baby: 1, red: '#D7342E' }).length || !Q14_PIC.nolyard({ focus: 'byeokbo' }).includes('후보')) bad.push('263 새 그림');
 q261OrderBad().forEach(b => bad.push(b));
