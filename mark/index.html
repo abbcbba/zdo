@@ -3409,7 +3409,7 @@ if (G.k === 'make') g += `<rect x="492" y="428" width="296" height="92" rx="46" 
 if (h) g += hintCard(h, 640, 116, () => benchFill(h)) + tx(640, 184, '힌트를 톡 = 재료가 한 번에 올라가요', { fs: 19, c: '#5A3A20', st: '#FFFDF6', sw: 4 });
 g += palApp(1156, 650, 0.78, { arms: G.k ? 'point' : 'down' }) + mokGom(84, 650, 0.78, true, { hammer: true, ha: Math.sin(T * 4) * 8 });
 const w = 120; g += `<rect x="${640 - w}" y="16" width="${w * 2}" height="54" rx="12" fill="#4A2E1A" stroke="${C_GOLD}" stroke-width="3"/>` + tx(640, 54, '작업대', { fs: 32, c: '#FBF0D6' });
-g += homeBtn(() => { SCENES.bench.leave(); SND.pop(); go('village'); }) + invBar({ drag: true, big: true, glow: G.glow }) + bookBtn(1222, 668, 'recipes');
+g += homeBtn(() => { SCENES.bench.leave(); SND.pop(); go('village'); }) + invBar({ drag: true, big: true, glow: G.glow }) + (typeof benchBooks === 'function' ? benchBooks() : bookBtn(1222, 668, 'recipes'));
 if (G.k === 'put' && INV_POS[G.item]) g += finger(INV_POS[G.item][0], INV_POS[G.item][1] - 10, SX2[G.slot], 300);
 if (G.k === 'make') g += finger(640, 600, 640, 490, 1.1);
 return g;
@@ -4592,7 +4592,7 @@ function openGotgan() {
 POP = { k: 'gotgan', soft: true, draw() {
 let g = `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#000" opacity=".35"/>` + cardFrame(200, 90, 880, 540);
 g += tx(640, 150, '곳간 (가진 재료 다 보기)', { f: 'SM', fs: 36, c: '#5E3A1E' });
-const ks = ITEM_ORDER.filter(k => inv(k) > 0);
+const ks = (typeof ggOrder === 'function' ? ggOrder() : ITEM_ORDER).filter(k => inv(k) > 0);
 if (!ks.length) g += tx(640, 360, '아직 재료가 없어요', { fs: 28, c: '#9A8A70' });
 const put = S === 'bench' || S === 'kiln';
 let NC = 7, K = 0; for (let c = 7; c <= 16; c++) { const r = Math.max(1, Math.ceil(ks.length / c)), k = Math.min(1, 860 / (c * 116), (S === 'bench' ? 340 : 384) / (r * 100)); if (k > K + 1e-6) { K = k; NC = c; } }
@@ -15816,8 +15816,12 @@ while (q.board.length > 3) q.board.splice(q.board.map(k => k !== q.cur).lastInde
 return q.board; }; }
 { const j0 = jFaces; jFaces = function (k, x, y, r) { return SEOL_Q.includes(k) ? '' : j0(k, x, y, r); }; }
 function seolIcon(x, y, s = 1) {
-return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-22,-20 Q-34,6 -24,20 Q0,30 24,20 Q34,6 22,-20Z" fill="#D8343C" stroke="#7A1E1E" stroke-width="2.6"/><path d="M-22,-20 Q0,-12 22,-20 L14,-30 Q0,-24 -14,-30Z" fill="#E85A5A" stroke="#7A1E1E" stroke-width="2.4"/>`
-+ `<path d="M-14,-22 Q0,-16 14,-22" stroke="#F7C840" stroke-width="3" fill="none"/><circle cx="0" cy="4" r="8" fill="#F7C840" stroke="#B07E10" stroke-width="2"/><path d="M-4,4 h8 M0,0 v8" stroke="#B07E10" stroke-width="1.8"/></g>`;
+const L = '#7A1E1E';
+return `<g transform="translate(${x},${y}) scale(${s})"><path d="M-13,-21 Q-30,-14 -31,6 Q-31,24 -18,28 Q0,33 18,28 Q31,24 31,6 Q30,-14 13,-21 Q0,-16 -13,-21Z" fill="#D8343C" stroke="${L}" stroke-width="2.6" stroke-linejoin="round"/>`
++ `<path d="M14,-20 Q30,-13 31,6 Q31,24 18,28 Q12,30 6,30 Q22,22 22,4 Q22,-10 14,-20Z" fill="#A8242C" opacity=".55"/><path d="M-22,-6 Q-25,6 -21,16" stroke="#F58A8A" stroke-width="3" fill="none" stroke-linecap="round"/>`
++ `<path d="M-15,-21 Q-21,-33 -11,-33 Q-7,-27 -4,-33 Q0,-28 4,-33 Q7,-27 11,-33 Q21,-33 15,-21 Q0,-16 -15,-21Z" fill="#E85A5A" stroke="${L}" stroke-width="2.4" stroke-linejoin="round"/>`
++ `<path d="M-14,-21 Q0,-15 14,-21" stroke="#F7C840" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M-15,-20 q-9,4 -10,14 M15,-20 q9,4 10,14" stroke="#F7C840" stroke-width="2.6" fill="none" stroke-linecap="round"/>`
++ `<path d="M-25,-6 v9 M-28,-5 v8 M-22,-5 v8 M25,-6 v9 M28,-5 v8 M22,-5 v8" stroke="#F7C840" stroke-width="2" stroke-linecap="round"/><circle cx="0" cy="7" r="13.5" fill="#FFF3C0" stroke="#E9B21C" stroke-width="2.2"/>` + tx(0, 14.5, '福', { f: 'SM', fs: 20, c: '#8A1A12', noJ: 1 }) + `</g>`;
 }
 const SEOL_RIB = (x, y, w) => `<rect x="${x}" y="${y}" width="${w}" height="30" rx="15" fill="#2F62B0" stroke="#1E3E7A" stroke-width="2"/>` + tx(x + w / 2, y + 22, '설날 의뢰', { fs: 18, c: '#FFFDF6' });
 { const d0 = SCENES.qboard.draw;
@@ -16346,12 +16350,18 @@ return DECO_BB[k];
 }
 function decoFit(k, cx, by, w, h, mx = 3) { const b = decoBB(k), s = Math.min(w / b.w, h / b.h, mx); return decoArt(k, cx - (b.x + b.w / 2) * s, by - (b.y + b.h) * s, s); }
 const hidIns = h => Object.keys(h.in).map(k => [k, h.in[k]]);
-function hidBookArt(x, y, s = 1) {
-return `<g transform="translate(${x},${y}) rotate(-7) scale(${s})"><rect x="-34" y="-24" width="68" height="52" rx="4" fill="#000" opacity=".3" transform="translate(2,4)"/><rect x="24" y="-24" width="8" height="52" fill="#F3E6C8" stroke="#8A6A44" stroke-width="1.6"/>`
-+ `<rect x="-34" y="-26" width="60" height="54" rx="3" fill="#6A4A9A" stroke="#3E2A62" stroke-width="2.4"/><rect x="-34" y="-26" width="9" height="54" fill="#4E3478"/>`
-+ `<path d="M0,-16 L4.6,-5.6 L16,-4.6 L7.4,2.8 L10,14 L0,8 L-10,14 L-7.4,2.8 L-16,-4.6 L-4.6,-5.6Z" fill="#F7C840" stroke="#3E2A62" stroke-width="1.8" stroke-linejoin="round" transform="translate(2,1) scale(.9)"/></g>`;
+function slimBook(x, y, s, cv, title, mark) {
+return `<g transform="translate(${x},${y}) rotate(-5) scale(${s})"><rect x="-24" y="-28" width="50" height="60" rx="4" fill="#000" opacity=".28" transform="translate(2,4)"/><rect x="20" y="-28" width="7" height="60" fill="#F3E6C8" stroke="#8A6A44" stroke-width="1.4"/>`
++ `<rect x="-24" y="-30" width="46" height="62" rx="3" fill="${cv[0]}" stroke="${cv[1]}" stroke-width="2.4"/><rect x="-20" y="-26" width="13" height="54" fill="#F6EBD3" stroke="#8A6A44" stroke-width="1.2"/>`
++ [...title].map((c, i) => tx(-13.5, -13 + i * 12.4, c, { f: 'SM', fs: 10.5, c: '#2A1A10', noJ: 1 })).join('') + `<g transform="translate(7,2)">${mark}</g></g>`;
 }
-function hidBookBtn(x, y) { hit(x - 42, y - 38, 84, 76, () => { SND.pop(); hidBookOpen(); }, 'book_hid'); return hidBookArt(x, y + Math.sin(T * 2 + 3) * 1.5, 1.08); }
+const SLIM_Q = `<circle cx="0" cy="0" r="12" fill="none" stroke="#5E8A5E" stroke-width="1.8" opacity=".8"/><text x="0" y="8" font-family="Jua" font-size="21" text-anchor="middle" fill="#B8D6A8">?</text>`;
+const SLIM_PAW = `<ellipse cx="0" cy="4" rx="8" ry="6.2" fill="#FFF3D6"/><ellipse cx="-8" cy="-4" rx="3" ry="3.8" fill="#FFF3D6"/><ellipse cx="-3" cy="-8" rx="3" ry="3.8" fill="#FFF3D6"/><ellipse cx="3" cy="-8" rx="3" ry="3.8" fill="#FFF3D6"/><ellipse cx="8" cy="-4" rx="3" ry="3.8" fill="#FFF3D6"/>`;
+function hidBookArt(x, y, s = 1) { return slimBook(x, y, s, ['#C8722E', '#7A3E12'], '숨은조합', SLIM_PAW); }
+function benchBooks() {
+hit(1152, 618, 62, 96, () => { SND.pop(); openRecipes(); }, 'book_recipes'); hit(1214, 618, 66, 96, () => { SND.pop(); hidBookOpen(); }, 'book_hid');
+return slimBook(1184, 664 + Math.sin(T * 2 + 1) * 1.5, 1.2, ['#2F5A36', '#1A3820'], '조합비밀', SLIM_Q) + hidBookArt(1246, 664 + Math.sin(T * 2 + 3) * 1.5, 1.2);
+}
 let HB_PG = 0;
 function hidPutBench(k) {
 const h = HID[k], lack = Object.keys(h.in).find(i => inv(i) < h.in[i]);
@@ -16367,12 +16377,15 @@ const z = this, NP = Math.ceil(HID_ORDER.length / HB_PER), found = hidFound(), b
 let g = `<rect x="0" y="${-EX}" width="${W}" height="${H + 2 * EX}" fill="#000" opacity=".38"/>`;
 hit(-10, -EX - 10, W + 20, H + 2 * EX + 20, () => { SND.pop(); if (z.big) z.big = null; else POP = null; }, 'hbClose');
 g += `<defs><filter id="hbSil" x="-10%" y="-10%" width="120%" height="120%"><feColorMatrix type="matrix" values="0 0 0 0 .32  0 0 0 0 .24  0 0 0 0 .16  0 0 0 .34 0"/></filter></defs>`;
-g += cardFrame(40, 30, 1200, 660) + hidBookArt(108, 86, 1) + tx(262, 100, '숨은 조합 책', { f: 'SM', fs: 40, c: '#2F5A36' }) + tx(540, 98, `찾은 것 ${found.length} / ${HIDDEN.length}`, { fs: 22, c: '#7A6A56' });
+g += cardFrame(40, 30, 1200, 660) + hidBookArt(104, 84, 0.8) + tx(262, 100, '숨은 조합 책', { f: 'SM', fs: 40, c: '#2F5A36' }) + tx(540, 98, `찾은 것 ${found.length} / ${HIDDEN.length}`, { fs: 22, c: '#7A6A56' });
 if (hid40()) g += hidSeal(700, 86, 0.5, -8); if (hidAll()) g += hidSeal2(760, 86, 0.5, 8);
 const list = HID_ORDER.slice(HB_PG * HB_PER, HB_PG * HB_PER + HB_PER), cats = [...new Set(list.map(hidCatOf))].join(' + ');
-g += `<rect x="${896 - cats.length * 10}" y="70" width="${cats.length * 20 + 24}" height="34" rx="17" fill="#2F5A36"/>` + tx(908, 95, cats, { fs: 20, c: '#FFF3B0' });
-g += `<circle cx="1042" cy="88" r="26" fill="#FFFDF6" stroke="${DL}" stroke-width="3"/>` + triArt(1040, 88, 1.3, DL, -1) + tx(1104, 96, `${HB_PG + 1} / ${NP}`, { fs: 22, c: '#7A6A56' }) + `<circle cx="1166" cy="88" r="26" fill="#FFFDF6" stroke="${DL}" stroke-width="3"/>` + triArt(1168, 88, 1.3, DL, 1);
-if (!z.big) { hit(1010, 56, 64, 64, () => { SND.pop(); HB_PG = (HB_PG + NP - 1) % NP; }, 'hbPrev'); hit(1134, 56, 64, 64, () => { SND.pop(); HB_PG = (HB_PG + 1) % NP; }, 'hbNext'); }
+g += `<rect x="${946 - cats.length * 10}" y="70" width="${cats.length * 20 + 24}" height="34" rx="17" fill="#2F5A36"/>` + tx(958, 95, cats, { fs: 20, c: '#FFF3B0' });
+g += tx(1150, 96, `${HB_PG + 1} / ${NP} 쪽`, { fs: 22, c: '#7A6A56' });
+[[-1, 40, 'hbPrev'], [1, 1240, 'hbNext']].forEach(([d, x, k]) => {
+g += `<circle cx="${x}" cy="364" r="36" fill="#7A3E12" opacity=".4"/><circle cx="${x}" cy="360" r="36" fill="#C8722E" stroke="#7A3E12" stroke-width="4"/>`
++ `<path d="M${x + d * 2 - 9 * d},342 L${x + d * 2 + 9 * d},360 L${x + d * 2 - 9 * d},378" fill="none" stroke="#FFF3D6" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>`;
+if (!z.big) hit(x - 44, 310, 88, 100, () => { SND.pop(); HB_PG = (HB_PG + d + NP) % NP; }, k); });
 list.forEach((k, i) => { const h = HID[k], x = 70 + (i % 4) * 288, y = 134 + Math.floor(i / 4) * 178, on = found.includes(k), known = !on && typeof hidKnown === 'function' && hidKnown(k), ins = hidIns(h), n = ins.length;
 g += `<rect x="${x}" y="${y}" width="276" height="166" rx="16" fill="${on ? '#FFFDF6' : known ? '#F4F8EC' : '#EDE4CF'}" stroke="${on ? '#B8A27A' : known ? '#2F5A36' : '#C8BCA0'}" stroke-width="3"/>`;
 g += on ? decoFit(k, x + 66, y + 150, 104, 120) : `<g filter="url(#hbSil)">${decoFit(k, x + 66, y + 150, 104, 120)}</g>`;
@@ -16403,7 +16416,7 @@ g += `<g transform="translate(962,138)"><circle r="24" fill="#FFFDF6" stroke="${
 return g;
 }
 { const d0 = SCENES.bench.draw;
-SCENES.bench.draw = function () { let g = d0.call(this) + hidBookBtn(1222, 584); const z = P.hid;
+SCENES.bench.draw = function () { let g = d0.call(this); const z = P.hid;
 if (z && z.first && hidAll() && T - z.t0 <= 3.2) g += hidSeal2(980, 200, 0.7, 8) + tx(640, 172, '숨은 조합 명장이 되었어요!', { fs: 30, c: '#8A5A10', st: '#FFFDF6', sw: 6 });
 return g; }; }
 const MD_YB = 700;
@@ -16424,7 +16437,7 @@ mdFixClamp = function (k, x, y) { return k === 'house' ? [clamp(x, -130, 700), M
 const mdZFix = k => (SV.mdZ && SV.mdZ[k]) || 0;
 const MD_GLOW = { seokdeung: [0, -96, 30], yeondeung: [38, -86, 38], hwaro: [0, -92, 18] };
 function mdUiRects() {
-const R = [[1184, 88, 96, 366]];
+const R = [[960, 80, 320, 100]];
 if (S === 'madang') { if (P.dock) R.push([20, 556, 800, 60], [0, 604, 1280, 160]); else R.push([12, 662, 540, 80]); }
 return R;
 }
@@ -16517,18 +16530,18 @@ hit(30, 626, 66, 70, () => { P.pg = (P.pg + pages - 1) % pages; SND.pop(); }, 'm
 return g;
 }
 function mdSide() {
-const X = 1222, rb = (y, lab, ico) => `<circle cx="${X}" cy="${y + 4}" r="28" fill="${DL}" opacity=".3"/><circle cx="${X}" cy="${y}" r="28" fill="#FFFDF6" stroke="${DL}" stroke-width="3.5"/>${ico}` + tx(X, y + 47, lab, { fs: 15, c: '#FFFDF6', st: DL, sw: 5 });
-let g = rb(122, '숨은 조합 책', hidBookArt(X, 122, 0.6)); hit(X - 36, 90, 72, 84, () => { SND.pop(); hidBookOpen(); }, 'mdBook');
-g += rb(214, '사진 찍기', `<g transform="translate(${X},214)"><rect x="-19" y="-11" width="38" height="26" rx="6" fill="#E2483C" stroke="${DL}" stroke-width="3"/><rect x="-8" y="-17" width="16" height="8" rx="3" fill="#E2483C" stroke="${DL}" stroke-width="3"/><circle cx="0" cy="2" r="8" fill="#FFFDF6" stroke="${DL}" stroke-width="3"/></g>`);
-hit(X - 36, 182, 72, 84, () => { SND.twinkle(); mdKeepOpen(); }, 'mdKeep');
-g += rb(306, '집 완성 장면', `<g transform="translate(${X},308)"><path d="M-22,-2 Q0,-24 22,-2Z" fill="#4A5568" stroke="${DL}" stroke-width="3" stroke-linejoin="round"/><rect x="-15" y="-2" width="30" height="16" fill="#F4E6C6" stroke="${DL}" stroke-width="3"/><rect x="-5" y="2" width="10" height="12" fill="#F7C840" stroke="${DL}" stroke-width="2"/></g>`);
-hit(X - 36, 274, 72, 84, () => { SND.pop(); go('ending'); }, 'mdEnd');
-const hk = holdK('mdAllBack'), r = 28, Lc = 2 * Math.PI * r;
-g += rb(398, '다 치우기(꾹)', mdBroom(X, 402, 0.58)) + (hk ? `<circle cx="${X}" cy="398" r="${r}" fill="none" stroke="#B5352D" stroke-width="5" stroke-dasharray="${(Lc * hk).toFixed(1)} ${Lc.toFixed(1)}" transform="rotate(-90 ${X} 398)"/>` + `<rect x="950" y="378" width="220" height="40" rx="10" fill="#4A2E1A" opacity=".9"/>` + tx(1060, 405, '꾹 누르고 있어요…', { fs: 18, c: '#FBF0D6' }) : '');
-holdHit(X - 36, 366, 72, 86, 'mdAllBack', 1.5, () => { mdAllBack(); P.sel = null; });
+const Y = 118, XS = [1004, 1082, 1160, 1238], rb = (x, lab, ico) => `<circle cx="${x}" cy="${Y + 4}" r="26" fill="${DL}" opacity=".3"/><circle cx="${x}" cy="${Y}" r="26" fill="#FFFDF6" stroke="${DL}" stroke-width="3.5"/>${ico}` + tx(x, Y + 45, lab, { fs: 14, c: '#FFFDF6', st: DL, sw: 5 });
+let g = rb(XS[0], '숨은 조합 책', hidBookArt(XS[0], Y, 0.5)); hit(XS[0] - 38, Y - 30, 76, 84, () => { SND.pop(); hidBookOpen(); }, 'mdBook');
+g += rb(XS[1], '사진 찍기', `<g transform="translate(${XS[1]},${Y})"><rect x="-17" y="-10" width="34" height="24" rx="6" fill="#E2483C" stroke="${DL}" stroke-width="3"/><rect x="-7" y="-16" width="14" height="8" rx="3" fill="#E2483C" stroke="${DL}" stroke-width="3"/><circle cx="0" cy="2" r="7" fill="#FFFDF6" stroke="${DL}" stroke-width="3"/></g>`);
+hit(XS[1] - 38, Y - 30, 76, 84, () => { SND.twinkle(); mdKeepOpen(); }, 'mdKeep');
+g += rb(XS[2], '집 완성 장면', `<g transform="translate(${XS[2]},${Y + 2})"><path d="M-20,-2 Q0,-22 20,-2Z" fill="#4A5568" stroke="${DL}" stroke-width="3" stroke-linejoin="round"/><rect x="-14" y="-2" width="28" height="15" fill="#F4E6C6" stroke="${DL}" stroke-width="3"/><rect x="-5" y="2" width="10" height="11" fill="#F7C840" stroke="${DL}" stroke-width="2"/></g>`);
+hit(XS[2] - 38, Y - 30, 76, 84, () => { SND.pop(); go('ending'); }, 'mdEnd');
+const hk = holdK('mdAllBack'), r = 26, Lc = 2 * Math.PI * r;
+g += rb(XS[3], '다 치우기(꾹)', mdBroom(XS[3], Y + 4, 0.54)) + (hk ? `<circle cx="${XS[3]}" cy="${Y}" r="${r}" fill="none" stroke="#B5352D" stroke-width="5" stroke-dasharray="${(Lc * hk).toFixed(1)} ${Lc.toFixed(1)}" transform="rotate(-90 ${XS[3]} ${Y})"/>` + `<rect x="1040" y="182" width="220" height="40" rx="10" fill="#4A2E1A" opacity=".9"/>` + tx(1150, 209, '꾹 누르고 있어요…', { fs: 18, c: '#FBF0D6' }) : '');
+holdHit(XS[3] - 38, Y - 30, 76, 84, 'mdAllBack', 1.5, () => { mdAllBack(); P.sel = null; });
 return g;
 }
-const MD_ZA = [300, 78, 330, 84], MD_ZB = [650, 78, 330, 84];
+const MD_ZA = [250, 78, 330, 84], MD_ZB = [600, 78, 330, 84];
 { const M = SCENES.madang;
 M.start = function () { P.pg = 0; P.wig = {}; P.bagTab = 0; P.dock = 1; P.sel = null; const n = Object.values(decoBox()).reduce((a, c) => a + c, 0);
 setTimeout(() => say('mom', 720, 470, !hidFound().length ? ['작업대에서 재료를 섞다 보면', '꾸미기 물건이 나와요!'] : n ? ['아래 칸에서', '톡 하거나 끌어요!'] : ['우리 마당', '참 예뻐요!'], 3.6), 300); };
@@ -16550,6 +16563,7 @@ if (q) g += `<g opacity="${over ? 0.6 : 0.92}">${mdQArt(q, D.x, fy)}</g>`; else 
 const nm = '마당 꾸미기';
 g += `<rect x="470" y="14" width="340" height="52" rx="12" fill="#4A2E1A" stroke="${C_GOLD}" stroke-width="3"/>` + tx(640, 51, nm, { fs: 31, c: '#FBF0D6' });
 if (!zones) g += tx(640, 100, P.dock && P.bagTab === 3 ? '때 하나 · 계절 하나를 골라요' : P.dock ? '아래에서 톡 = 마당에 놓여요 · 끌어서 옮겨요' : '끌어서 옮겨요 · 톡 = 앞으로 · 뒤로', { fs: 23, c: '#FFFDF6', st: DL, sw: 6 });
+if (!zones) g += tx(640, 130, '끌면 위에 가방 · 되돌리기 칸이 나와요', { fs: 18, c: '#FFFDF6', st: DL, sw: 5 });
 g += homeBtn() + mdSide() + mdDock() + mdZBtns();
 return g;
 };
@@ -16583,6 +16597,16 @@ L.push({ q: d.d.q, x: rx(), y: ry() }); SND.get(); svSave(); return; }
 if (d.k === 'dbox' && (box[d.d.k] || 0) > 0) { if (L.length >= MD_MAX) { SND.wrong(); toast('마당이 꽉 찼어요! 하나를 가방으로'); return; }
 box[d.d.k]--; L.push({ k: d.d.k, x: rx(), y: ry() }); SND.get(); svSave(); } };
 }
+const GG_ORDER = ['wood', 'plank', 'beam', 'bakdal', 'bamboo', 'daeori', 'hom',
+'straw', 'ieong', 'wanggol', 'chik', 'kkeun', 'sapling',
+'dak', 'paper', 'tpaper', 'jjokji',
+'dirt', 'sand', 'ash', 'mud', 'clay', 'gdough', 'giwa',
+'water', 'lye',
+'stone', 'gudeul', 'dolpan', 'hwak',
+'sacheol', 'soe', 'brass', 'yeonjang',
+'cloth', 'cheon', 'redcloth', 'silk', 'sil', 'gajuk', 'rubber',
+'jjok', 'honghwa', 'chija', 'mulB', 'mulR', 'mulY', 'meok'];
+const ggOrder = () => [...GG_ORDER.filter(k => ITEM_ORDER.includes(k)), ...ITEM_ORDER.filter(k => !GG_ORDER.includes(k))];
 function q324Bad() {
 const bad = [], seen = new Set();
 if (HIDDEN.length !== 60) bad.push('324 숨은 조합 60');
@@ -16597,6 +16621,8 @@ if (HID_CATS[0][0] !== '곰' || !HID_CATS[0][1].every(k => /곰/.test(HID[k].nam
 if (typeof hid40 !== 'function' || typeof hidSeal2 !== 'function') bad.push('324 도장 둘');
 if (/RB_PAGE = pg/.test(String(openRecipes))) bad.push('324 조합 비밀 책에 숨은 조합 쪽 단추가 남음');
 if (/hutArt/.test(String(SCENES.madang.bg)) || !SCENES.madang.bgKey) bad.push('324 마당 배경');
+ITEM_ORDER.forEach(k => { if (!GG_ORDER.includes(k)) bad.push('325 곳간 차례에 없는 재료 ' + k); }); if (new Set(GG_ORDER).size !== GG_ORDER.length) bad.push('325 곳간 차례 겹침');
+if (typeof benchBooks !== 'function' || !/福/.test(seolIcon(0, 0))) bad.push('325 책 두 권 좌우 · 복주머니 福');
 return bad;
 }
 const GAL_ON = /[?&]gallery(=|&|$)/.test(QS);
