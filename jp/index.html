@@ -827,7 +827,8 @@ for (let i = 0; i < 2; i++) { const s = document.createElementNS('http://www.w3.
 layout(); window.addEventListener('resize', layout); window.addEventListener('orientationchange', () => setTimeout(layout, 300)); if (window.visualViewport) visualViewport.addEventListener('resize', layout);
 v.addEventListener('pointerdown', e => { e.preventDefault(); const p = toGame(e); try { v.setPointerCapture(e.pointerId); } catch (er) { } down(p.x, p.y); });
 v.addEventListener('pointermove', e => { const p = toGame(e); move(p.x, p.y); });
-v.addEventListener('pointerup', () => up());
+v.addEventListener('pointerup', () => { up(); voiceUnlock(); });
+try { document.addEventListener('touchend', () => voiceUnlock(), { passive: true }); } catch (e) { }
 v.addEventListener('pointercancel', () => up());
 document.addEventListener('visibilitychange', () => { if (document.hidden) SND.pause(); else SND.resume(); });
 window.addEventListener('error', e => jpErr(e.error || e.message, 'win')); window.addEventListener('unhandledrejection', e => jpErr(e.reason, 'promise'));
@@ -938,14 +939,29 @@ function voiceWake() {
 if (VOICE.woke) return; VOICE.woke = 1; if (!voiceHas()) return;
 try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; u.lang = 'ja-JP'; speechSynthesis.speak(u); voicePick(); } catch (e) { }
 }
+function voiceUnlock() {
+if (!voiceHas() || VOICE.ok === 1 || !SV.sfx) return;
+try { if (speechSynthesis.speaking || speechSynthesis.pending) return;
+if (!JA_VOICE) voicePick();
+const w = new SpeechSynthesisUtterance('あ'); w.volume = 0; w.lang = 'ja-JP'; if (JA_VOICE) w.voice = JA_VOICE; speechSynthesis.speak(w);
+const p = VOICE.pend; VOICE.pend = null;
+if (p && Date.now() - p.at < 4000) { VOICE.ok = null; sayNow(p.t); }
+} catch (e) { }
+}
 const voiceOff = () => !!SV.sfx && (VOICE.ok === 0 || (!!VOICE.woke && !voiceHas()));
 function say(t, q) {
 if (typeof JP !== 'undefined' && JP.ph[t] && !(SV.ph && SV.ph[t])) { (SV.ph = SV.ph || {})[t] = 1; svSave(); }
 if (!SV.sfx || !t) return;
 if (!voiceHas()) { VOICE.ok = 0; return; }
-try { if (!JA_VOICE) voicePick(); if (!q && (speechSynthesis.speaking || speechSynthesis.pending)) speechSynthesis.cancel();
+if (VOICE.ok !== 1) VOICE.pend = { t, at: Date.now() };
+try { if (!q && (speechSynthesis.speaking || speechSynthesis.pending)) { speechSynthesis.cancel(); setTimeout(() => sayNow(t), 60); return; }
+sayNow(t);
+} catch (e) { VOICE.ok = 0; }
+}
+function sayNow(t) {
+try { if (!JA_VOICE) voicePick();
 const u = new SpeechSynthesisUtterance(t), id = ++VOICE.n; u.lang = 'ja-JP'; u.rate = 0.8; if (JA_VOICE) u.voice = JA_VOICE;
-u.onstart = () => { VOICE.ok = 1; }; u.onerror = e => { if (VOICE.ok !== 1 && e && e.error !== 'interrupted' && e.error !== 'canceled') VOICE.ok = 0; };
+u.onstart = () => { VOICE.ok = 1; VOICE.pend = null; }; u.onerror = e => { if (VOICE.ok !== 1 && e && e.error !== 'interrupted' && e.error !== 'canceled') VOICE.ok = 0; };
 speechSynthesis.speak(u);
 setTimeout(() => { if (VOICE.n === id && VOICE.ok == null && !speechSynthesis.speaking && !speechSynthesis.pending) VOICE.ok = 0; }, 1800);
 } catch (e) { VOICE.ok = 0; }

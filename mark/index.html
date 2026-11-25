@@ -3454,7 +3454,7 @@ if (typeof qOn === 'function' && qOn()) { const ax = 930, ay = 486, sc = P.ash &
 g += `<path d="M${ax - 70},${ay + 20} Q${ax - 50},${ay - 30} ${ax},${ay - 34} Q${ax + 50},${ay - 30} ${ax + 70},${ay + 20}Z" fill="#B8B4AC" stroke="#6E6A64" stroke-width="2.4"/><circle cx="${ax + 14}" cy="${ay - 10}" r="3" fill="#E25A2A" opacity=".7"/>` + (sc ? `<circle cx="${ax}" cy="${ay - 50 - (T - P.ash) * 80}" r="10" fill="#C8C4BC" opacity="${1 - (T - P.ash) * 2}"/>` : '') + tx(ax, ay + 50, '재 긁기 톡', { fs: 20, c: '#3A2414', st: '#FFFDF6' });
 hit(ax - 80, ay - 50, 160, 80, () => { if (P.ash && T - P.ash < 0.3) return; P.ash = T; invAdd('ash', qGN()); flyItem('ash', ax, ay - 30); SND.rub(); funTry('soot', ax, ay); }, 'ash'); }
 g += palApp(1110, 640, 0.9) + palKid(170, 660, 0.8) + funDraw();
-const w = 140; g += `<rect x="${640 - w}" y="16" width="${w * 2}" height="54" rx="12" fill="#4A2E1A" stroke="${C_GOLD}" stroke-width="3"/>` + tx(640, 54, '가마 · 기와 굽기', { fs: 30, c: '#FBF0D6' });
+const w = 140; g += `<rect x="${640 - w}" y="16" width="${w * 2}" height="54" rx="12" fill="#4A2E1A" stroke="${C_GOLD}" stroke-width="3"/>` + tx(640, 54, P.fk === 'yuri' && (P.fire || (P.res && T - P.res.t0 < 2.2)) ? '가마 · 유리 굽기' : '가마 · 기와 굽기', { fs: 30, c: '#FBF0D6' });
 g += homeBtn() + invBar({ drag: true, big: true, glow: inv('gdough') && !P.fire ? { gdough: 1 } : {} }) + bookBtn(1222, 668, 'recipes');
 if (inv('gdough') && !P.fire && INV_POS.gdough) g += finger(INV_POS.gdough[0], INV_POS.gdough[1] - 10, 640, 470);
 return g;

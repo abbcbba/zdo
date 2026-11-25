@@ -1,4 +1,4 @@
-const C='jp-r3-d25c42e7920e', A='jp-assets';
+const C='jp-r3-3d7a355b2fac', A='jp-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-0d538242-180.png','icon-0d538242-192.png','icon-0d538242-512.png'];
 const ASSETS=[];
 let filling=null;
