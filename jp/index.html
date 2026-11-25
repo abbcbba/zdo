@@ -3221,7 +3221,6 @@ const ST_HOME = 'コンビニ';
 const ST_ALL = Object.keys(ST_POS);
 const ST_SPEED = 260;
 function stSV() { const s = SV.st = SV.st || {}; s.v = s.v || {}; if (!ST_POS[s.at]) s.at = ST_HOME; return s; }
-const stSeen = k => TEST || !!stSV().v[k] || k === ST_HOME;
 const stStamps = () => ST_ALL.filter(k => stSV().v[k]).length;
 function stNear(k) { const o = []; ST_LINES.forEach(L => { const i = L[3].indexOf(k); if (i < 0) return; if (i > 0) o.push([L[3][i - 1], L]); if (i < L[3].length - 1) o.push([L[3][i + 1], L]); }); return o; }
 function stPath(a, b) {
@@ -3254,13 +3253,11 @@ ST_LINES.forEach(([nm, c, l], i) => g += `<circle cx="${110}" cy="${158 + i * 38
 return g;
 }
 function stStation(k, here, goal) {
-const [x, y] = ST_POS[k], nums = stNum(k), seen = stSeen(k), w = JP.w[k];
+const [x, y] = ST_POS[k], nums = stNum(k);
 let g = nums.length > 1 ? R(x - 26, y - 20 - (nums.length - 1) * 12, 52, 40 + (nums.length - 1) * 24, '#FFFFFF', { rx: 20, sw: 3 }) : '';
 nums.forEach(([L, n], i) => { const cy = y - (nums.length - 1) * 12 + i * 24; g += `<circle cx="${x}" cy="${cy}" r="17" fill="#fff" stroke="${L[1]}" stroke-width="5"/>` + K(x, cy + 6, L[2] + n, { fs: 13, c: INK }); });
 const ly = y + (nums.length - 1) * 12 + 30;
-g += R(x - 62, ly, 124, 54, here ? '#FFF1C9' : '#FFFFFF', { rx: 14, sw: here ? 3.4 : 2.2, st: here ? HONEY : OUT }) + J(x, ly + 26, k, { fs: k.length > 4 ? 19 : 22, c: BROWN })
-+ (seen ? K(x, ly + 47, w.s, { fs: 14, c: RED }) : K(x, ly + 47, '?', { fs: 14, c: '#C7B28E' }));
-g += seen ? E(x + 54, y - 30, w.pic, 34) : '';
+g += R(x - 62, ly, 124, 54, here ? '#FFF1C9' : '#FFFFFF', { rx: 14, sw: here ? 3.4 : 2.2, st: here ? HONEY : OUT }) + J(x, ly + 34, k, { fs: k.length > 4 ? 19 : 23, c: BROWN });
 if (stSV().v[k]) g += `<circle cx="${x - 56}" cy="${y - 30}" r="11" fill="${RED}" opacity=".85"/>` + K(x - 56, y - 25, '✓', { fs: 13, c: '#fff' });
 return g;
 }
