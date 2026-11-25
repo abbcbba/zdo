@@ -668,7 +668,7 @@ g += ARM.back;
 g += `<rect x="-25" y="-76" width="50" height="48" rx="14" fill="${A.body}" stroke="${L}" stroke-width="${sw}"/>`;
 g += `<ellipse cx="0" cy="-50" rx="15" ry="17" fill="${A.belly}"/>`;
 if (k === 'in') g += `<path d="M-25,-62 l9,3 M-25,-48 l9,2 M25,-62 l-9,3 M25,-48 l-9,2" stroke="#2A1A10" stroke-width="3" stroke-linecap="round"/>`;
-g += `<text x="0" y="-43" font-family="Jua" font-size="19" text-anchor="middle" fill="${L}" opacity=".5">${A.ko}</text>`;
+if (!o.noKo) g += `<text x="0" y="-43" font-family="Jua" font-size="19" text-anchor="middle" fill="${L}" opacity=".5">${A.ko}</text>`;
 if (k === 'mi') g += [[-18, -66], [18, -66], [-20, -44], [20, -44], [-8, -72], [8, -72]].map(([a, b]) => `<circle cx="${a}" cy="${b}" r="6" fill="#FBF8F0" stroke="#C9C0AA" stroke-width="1.4"/>`).join('');
 if (k === 'yu') g += `<path d="M-25,-56 Q-38,-50 -30,-36 Q-24,-42 -22,-50Z M25,-56 Q38,-50 30,-36 Q24,-42 22,-50Z" fill="#FBFBF6" stroke="${L}" stroke-width="2"/>`;
 if (k === 'o') g += `<path d="M-6,-76 Q0,-60 -4,-44" stroke="#3A2214" stroke-width="5" fill="none" stroke-linecap="round" opacity=".0"/>`;
