@@ -661,7 +661,8 @@ const QS = typeof location !== 'undefined' ? location.search || '' : '';
 const TEST = /[?&]test(=|&|$)/.test(QS);
 const NOCARD = /[?&]nocard/.test(QS);
 const NOINTRO = /[?&]nointro/.test(QS);
-const SAVE_KEY = TEST ? 'jp_save_test' : 'jp_save';
+const ALL = /[?&]all(=|&|$)/.test(QS);
+const SAVE_KEY = TEST ? 'jp_save_test' : ALL ? 'jp_save_all' : 'jp_save';
 let SV = { done: {}, plays: {}, cs: {}, read: {}, rq: {}, coin: 0, seen: null, miss: {}, hid: 0, nw: {}, gb: {}, dc: {}, ac: {}, snd: 1, sfx: 1, intro: 0 };
 function svLoad() { try { const o = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); if (o) SV = Object.assign(SV, o); } catch (e) { }
 const qc = /[?&]coin=(\d+)/.exec(QS); if (qc) SV.coin = +qc[1];
@@ -820,7 +821,7 @@ LAY[1].innerHTML = (sc.fg ? sc.fg() : '') + coinFx() + (POP ? POP.draw() : '') +
 } catch (e) { jpErr(e, 'draw'); POP = null; PEN = null; if (S !== 'home') go('home'); else { HITS = []; LAY[1].innerHTML = errNote(); } }
 }
 function boot() {
-svLoad(); if (/[?&]full/.test(QS)) svFull(); SND.setOn(SV.snd, SV.sfx);
+svLoad(); if (/[?&]full/.test(QS) || ALL) svFull(); if (ALL) SV.coin = Math.max(SV.coin || 0, 99999); SND.setOn(SV.snd, SV.sfx);
 const v = document.getElementById('v');
 for (let i = 0; i < 2; i++) { const s = document.createElementNS('http://www.w3.org/2000/svg', 'svg'); s.id = 'l' + i; if (i < 1) s.style.pointerEvents = 'none'; v.appendChild(s); LAY.push(s); }
 layout(); window.addEventListener('resize', layout); window.addEventListener('orientationchange', () => setTimeout(layout, 300)); if (window.visualViewport) visualViewport.addEventListener('resize', layout);
@@ -2441,7 +2442,7 @@ E('crash'); notes.push({ t, lane: 2 });
 return { ev, notes, end: t, st };
 }
 function drStart(i) {
-const S = DR_SONGS[i]; P.S = S; P.B = drBuild(S); P.ph = 'play'; P.s0 = T + 1.4; P.ei = 0; P.hitAt = [-9, -9]; P.fx = []; P.combo = 0; P.top = 0; P.cAt = -9; P.shake = -9; SND.right(); say('がんばって');
+const S = DR_SONGS[i]; P.S = S; P.B = drBuild(S); P.ph = 'play'; P.s0 = T + 2.2; P.ei = 0; P.hitAt = [-9, -9]; P.fx = []; P.combo = 0; P.top = 0; P.cAt = -9; P.shake = -9; SND.right(); say('がんばって');
 }
 function drPop(side, s, col, big) { P.fx.push({ x: side === 2 ? 640 : side ? 1090 : 190, y: side === 2 ? 300 : 430, s, col, t: T, big, en: s.replace('!', '') }); if (P.fx.length > 8) P.fx.shift(); }
 function drComboUp() { P.combo++; P.top = Math.max(P.top, P.combo); P.cAt = T; if (P.combo % 10 === 0) drPop(2, DR_YAY[(P.combo / 10 - 1) % DR_YAY.length] + '!', '#FFE27A', 1); }
@@ -2593,7 +2594,7 @@ function rsServe(o) {
 const r = rsSV(), k = o.k, first = !r.m[k], inFive = r.gn < COIN.restN;
 o.ok = Math.max(T, 0.001); SND.right(); r.m[k] = (r.m[k] || 0) + 1; r.gn++; r.gt++; r.tf[k] = 1;
 const c = first ? COIN.restNew : inFive ? COIN.rest : 0; if (c) coinAdd(c, 790, 520, 0.3);
-if (r.gn === COIN.restN && !r.gb) { r.gb = 1; setTimeout(() => { if (S === 'rest') { coinAdd(COIN.restAll, 1136, 250, 0); SND.cheer(); sayFx('おつかれさま', 1000, 330, 0.2, 1); P.fiveT = T; } }, 2000); }
+if (r.gn === COIN.restN && !r.gb) { r.gb = 1; P.fiveWait = 1; setTimeout(() => { if (S === 'rest') { coinAdd(COIN.restAll, 1136, 250, 0); SND.cheer(); sayFx('おつかれさま', 1000, 330, 0.2, 1); P.fiveT = T; } }, 2000); }
 svSave(); P.mpg = Math.floor(JP.menu.indexOf(k) / RS_MPG); P.mlit = { k, t: T }; KEY = null;
 P.serve = T; P.hi = -9; say('おまたせしました'); setTimeout(() => say('いただきます', 1), 1300);
 }
@@ -2633,7 +2634,7 @@ JP.menu.slice(pg * RS_MPG, pg * RS_MPG + RS_MPG).forEach((k, i) => { const [x, y
 hit(x, y, cw, ch, () => { if (TEST || rsSV().m[k]) { SND.tap(); rsCard(k); } else boxGo(k, ['식당', 'rest']); });
 if (lit && lit.k === k) { const u = T - lit.t, b = 0.5 + 0.5 * Math.sin(u * 10); g += R(x - 5, y - 5, cw + 10, ch + 10, 'none', { rx: 16, sw: 6, st: `rgba(255,217,90,${(0.5 + 0.5 * b).toFixed(2)})` }) + acSpark(x + cw - 6, y + 6, 1.1, u * 8) + acSpark(x + 8, y + ch - 6, 0.8, u * 8 + 2); } });
 if (mp > 1) { hit(396, 124, 70, 54, () => { SND.tap(); P.mpg = (pg + mp - 1) % mp; }); hit(502, 124, 70, 54, () => { SND.tap(); P.mpg = (pg + 1) % mp; }); }
-if (o && T > o.t) { const [sx, sy] = RS_SEAT, b = GB_BY[o.who], gone = o.ok && T - o.ok > 2.4, gk = RS_GK * b[3], bub = (h, inner) => R(sx - 140, 262, 280, h, '#FFFFFF', { rx: 24 }) + `<path d="M${sx - 14},${262 + h - 1} L${sx},${262 + h + 18} L${sx + 14},${262 + h - 1}" fill="#FFFFFF" stroke="${OUT}" stroke-width="3"/><path d="M${sx - 12},${262 + h - 2} H${sx + 12}" stroke="#FFFFFF" stroke-width="5"/>` + inner;
+if (o && T > o.t) { const [sx, sy] = RS_SEAT, b = GB_BY[o.who], gone = o.ok && T - o.ok > 2.4 && !(P.fiveWait && !(P.fiveT && T - P.fiveT >= 1.6)), gk = RS_GK * b[3], bub = (h, inner) => R(sx - 140, 262, 280, h, '#FFFFFF', { rx: 24 }) + `<path d="M${sx - 14},${262 + h - 1} L${sx},${262 + h + 18} L${sx + 14},${262 + h - 1}" fill="#FFFFFF" stroke="${OUT}" stroke-width="3"/><path d="M${sx - 12},${262 + h - 2} H${sx + 12}" stroke="#FFFFFF" stroke-width="5"/>` + inner;
 if (gone && !o.card) { o.card = 1; if (rsSV().m[o.k] === 1) rsCard(o.k); }
 if (o.card && !POP && !o.ask) { if (rsDone() && !(P.fiveT && T - P.fiveT < 1.6)) o.ask = Math.max(T, 0.001); else if (!rsDone()) P.od = rsGuest(); }
 if (o.ask) { g += b[2](sx, sy + Math.sin(T * 2) * 1.5, gk, 'down') + bub(124, K(sx, 314, '오목 한 판 둘까요?', { fs: 30, c: RED }) + K(sx, 354, '잘 먹었어요!', { fs: 18, c: '#8A6A4A' }));
@@ -2912,18 +2913,19 @@ return g + backBtn('거리', () => goHome('hotel')) + sndBtn();
 const HC_PER = 12;
 const hcList = slot => WEAR.filter(w => w[1] === slot);
 const hcPos = i => [690 + (i % 6) * 92, 292 + Math.floor(i / 6) * 200];
+const hcLxOn = () => { const t = wearOn().top; return !!(t && WEAR_BY[t] && WEAR_BY[t][6]); };
 function hcBack() {
 const slot = P.slot || 'top', L = hcList(slot), pages = Math.max(1, Math.ceil(L.length / HC_PER)), pg = Math.min(P.pg || 0, pages - 1), on = wearOn();
 let g = htWall('#FBE6EC', '#F3D2DC', '#D9A877');
-g += R(60, 110, 300, 470, '#C9A45A', { rx: 150, sw: 5 }) + R(80, 130, 260, 430, '#DDF1FA', { rx: 130, sw: 3 }) + `<clipPath id="htcm"><rect x="80" y="130" width="260" height="430" rx="130"/></clipPath>` + htMirror(210, 560, 1.9, 'htcm', 0.72) + `<g clip-path="url(#htcm)" opacity=".6"><path d="M110,170 l60,-30 M130,210 l40,-20" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/></g>`;
+g += R(60, 110, 300, 470, '#C9A45A', { rx: 150, sw: 5 }) + R(80, 130, 260, 430, '#DDF1FA', { rx: 130, sw: 3 }) + `<clipPath id="htcm"><rect x="80" y="130" width="260" height="430" rx="130"/></clipPath>` + (hcLxOn() ? '' : htMirror(210, 560, 1.9, 'htcm', 0.72)) + `<g clip-path="url(#htcm)" opacity=".6"><path d="M110,170 l60,-30 M130,210 l40,-20" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/></g>`;
 g += `<ellipse cx="450" cy="640" rx="110" ry="18" fill="#C89A66"/>` + nyamBase(450, 640, 2.0, 'wave');
 g += R(600, 90, 640, 560, '#B0763E', { rx: 18, sw: 5 }) + R(620, 110, 600, 520, '#FFF6E4', { rx: 10, sw: 3 }) + R(560, 100, 44, 540, '#C98A4A', { rx: 8, sw: 4 }) + R(1236, 100, 34, 540, '#C98A4A', { rx: 8, sw: 4 });
 WEAR_SLOT.forEach(([k, l], i) => { const sel = slot === k, n = hcList(k); g += R(640 + i * 188, 126, 180, 46, sel ? '#FFE9A8' : '#FFFFFF', { rx: 23, sw: sel ? 3.4 : 2, st: sel ? HONEY : '#D8C8AA' }) + K(730 + i * 188, 158, `${['옷', '모자', '손'][i]} ${n.filter(w => wearHas(w[0])).length}/${n.length}`, { fs: 20, c: BROWN }); });
 g += `<defs>${NW_SIL}</defs><path d="M640,200 H1200 M640,404 H1200" stroke="#8A5A34" stroke-width="8" stroke-linecap="round"/>`;
 L.slice(pg * HC_PER, pg * HC_PER + HC_PER).forEach((w, i) => { const [x, y] = hcPos(i), has = wearHas(w[0]), cur = on[slot] === w[0], r = Math.floor(i / 6);
 g += (cur ? R(x - 43, y - 54, 86, 158, '#DDF3E4', { rx: 14, sw: 3.4, st: MINT }) : '') + `<path d="M${x},${r ? 404 : 200} v16 M${x - 26},${y - 54} q26,-24 52,0" stroke="#8A8F98" stroke-width="3" fill="none"/>`;
-g += has ? wearOne(w[0], x, y + 78, 0.72) + K(x, y + 97, w[2], { fs: w[2].length > 7 ? 10 : 12, c: BROWN }) + (cur ? K(x + 30, y - 34, '✔', { fs: 20, c: MINT }) : '')
-: w[6] ? R(x - 43, y - 54, 86, 148, '#FFF6D8', { rx: 14, sw: 2.6, st: HONEY }) + wearOne(w[0], x, y + 62, 0.62) + R(x - 40, y + 67, 80, 23, '#FFFFFF', { rx: 11.5, sw: 2 }) + coinArt(x - 27, y + 78.5, 8.5) + K(x + 9, y + 84, w[6].toLocaleString('en-US'), { fs: 15, c: '#8A5A00' })
+g += has ? (w[6] ? '' : wearOne(w[0], x, y + 78, 0.72)) + K(x, y + 97, w[2], { fs: w[2].length > 7 ? 10 : 12, c: BROWN }) + (cur ? K(x + 30, y - 34, '✔', { fs: 20, c: MINT }) : '')
+: w[6] ? R(x - 43, y - 54, 86, 148, '#FFF6D8', { rx: 14, sw: 2.6, st: HONEY }) + R(x - 40, y + 67, 80, 23, '#FFFFFF', { rx: 11.5, sw: 2 }) + coinArt(x - 27, y + 78.5, 8.5) + K(x + 9, y + 84, w[6].toLocaleString('en-US'), { fs: 15, c: '#8A5A00' })
 : `<g filter="url(#nwsil)" opacity=".35">${wearOne(w[0], x, y + 78, 0.72)}</g>` + K(x, y + 97, '?', { fs: 18, c: '#C7B28E' }); });
 if (pages > 1) g += R(808, 594, 60, 32, CREAM, { rx: 16, sw: 2.4 }) + K(838, 617, '◀', { fs: 18, c: BROWN }) + K(920, 618, `${pg + 1} / ${pages}`, { fs: 20, c: '#8A6A4A' }) + R(972, 594, 60, 32, CREAM, { rx: 16, sw: 2.4 }) + K(1002, 617, '▶', { fs: 18, c: BROWN });
 return g + K(450, 694, '거울 속 모습 = 첫 화면 큰 냠냠곰', { fs: 17, c: '#8A6A4A' });
@@ -2947,6 +2949,8 @@ L.slice(pg * HC_PER, pg * HC_PER + HC_PER).forEach((w, i) => { const [x, y] = hc
 if (!wearHas(w[0])) { SND.tap(); if (w[6]) hcBuy(w); else P.say = { x: 450, y: 386, l: ['아직 없는 옷이에요', '오락실 캡슐 뽑기에서 나와요!'], t: T }; return; }
 SND.pop(); wearPut(w[0]); P.put = T; P.say = { x: 450, y: 386, l: wearOn()[slot] === w[0] ? [w[2] + '!', '거울을 봐요 · 잘 어울려요?'] : ['벗었어요', '한복도 좋지요!'], t: T }; }); });
 if (pages > 1) { hit(796, 586, 84, 50, () => { SND.tap(); P.pg = (pg + pages - 1) % pages; }); hit(960, 586, 84, 50, () => { SND.tap(); P.pg = (pg + 1) % pages; }); }
+if (hcLxOn()) g += `<clipPath id="htcm2"><rect x="80" y="130" width="260" height="430" rx="130"/></clipPath>` + htMirror(210, 560, 1.9, 'htcm2', 0.72) + `<g clip-path="url(#htcm2)" opacity=".6"><path d="M110,170 l60,-30 M130,210 l40,-20" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"/></g>`;
+L.slice(pg * HC_PER, pg * HC_PER + HC_PER).forEach((w, i) => { if (!w[6]) return; const [x, y] = hcPos(i); g += wearHas(w[0]) ? wearOne(w[0], x, y + 78, 0.72) : wearOne(w[0], x, y + 62, 0.62); });
 if (P.put && T - P.put < 0.9) [[120, 200], [300, 240], [210, 150], [150, 420], [290, 470]].forEach(([x, y], i) => g += acSpark(x, y, 1.4 * (1 - (T - P.put) / 0.9), T * 8 + i));
 if (on.top || on.hat || on.hand) g += btn(74, 606, 250, 56, '한복으로 돌아가기', () => { SND.tap(); const w = wearSV(); w.on = {}; svSave(); KEY = null; P.put = T; }, { fs: 22, col: CREAM, sh: '#C7B28E' });
 g += btn(196, 16, 190, 58, '방 구경 ▶', () => { SND.tap(); P.v = 'room'; P.say = null; }, { fs: 24, col: '#DDF3EA', sh: '#9CCBBE' }) + K(800, 62, '옷걸이에 걸린 옷을 누르면 거울 속 냠냠곰이 입어요', { fs: 20, c: BROWN });
@@ -3330,7 +3334,7 @@ if (x < 260 || x > 1020 || y < 120 || y > 600) { POP = null; SND.tap(); } } };
 }
 const trStamp = (x, y, s) => `<g transform="translate(${x},${y}) rotate(-14) scale(${s})"><circle r="40" fill="rgba(255,255,255,.75)" stroke="${RED}" stroke-width="5"/><circle r="32" fill="none" stroke="${RED}" stroke-width="1.8"/>` + K(0, -4, '참', { fs: 20, c: RED }) + K(0, 18, '잘했어요', { fs: 15, c: RED }) + `</g>`;
 function trFg() {
-const L = trList(), r = trDay(), all = L.every(x => x.done), x0 = 826, y0 = 12, w = 334;
+const L = trList(), r = trDay(), all = L.every(x => x.done), x0 = 790, y0 = 12, w = 334;
 if (all && !r.got) { r.got = 1; r.n = (r.n || 0) + 1; svSave(); P.trT = T; SND.stamp(); setTimeout(() => SND.cheer(), 400); coinAdd(COIN.trip, x0 + w / 2, y0 + 150, 0.5); sayFx('よくできました', x0 + w / 2, y0 + 190, 0.2); }
 const pop = P.trT && T - P.trT < 0.5 ? 1 + 0.1 * Math.sin((T - P.trT) / 0.5 * Math.PI) : 1;
 let g = `<g transform="translate(${x0 + w / 2},${y0 + 54}) rotate(-1.5) scale(${pop.toFixed(3)}) translate(${-x0 - w / 2},${-y0 - 54})">` + R(x0 + 3, y0 + 5, w, 108, '#14161A', { rx: 12, st: false, op: 0.18 }) + R(x0, y0, w, 108, '#FFFBEA', { rx: 12, sw: 3 }) + R(x0, y0, w, 30, '#FFE27A', { rx: 12, sw: 3 }) + R(x0 + 1.5, y0 + 18, w - 3, 12, '#FFE27A', { rx: 0, st: false })
