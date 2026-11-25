@@ -1,5 +1,5 @@
-const C='jp-r3-f8b606145ad9', A='jp-assets';
-const FILES=['./','index.html','manifest.webmanifest','icon-5dd2d093-180.png','icon-5dd2d093-192.png','icon-5dd2d093-512.png'];
+const C='jp-r3-404dbdd0748a', A='jp-assets';
+const FILES=['./','index.html','manifest.webmanifest','icon-0d538242-180.png','icon-0d538242-192.png','icon-0d538242-512.png'];
 const ASSETS=[];
 let filling=null;
 function fill(){ if(filling) return filling; filling=caches.open(A).then(async c=>{
