@@ -736,6 +736,7 @@ train: 2, trainAll: 15,
 rest: 1, restNew: 3, restAll: 10,
 trip: 10,
 req: 10, reqAll: 10,
+heart: 10, fav8: 20,
 lab: 3,
 arcade: { capsule: 50, crane: 50, drum: 50 },
 omok: 100,
@@ -3406,16 +3407,20 @@ tap(x, y) { const i = ids.findIndex((_, k) => Math.abs(x - (640 + (k - (ids.leng
 if (RT - r0 < 0.5 + GAP * (ids.length - 1)) return; POP = null; SND.tap(); P.plate = ids; P.mix = []; P.say = { x: 500, y: 520, l: ['누구에게 줄까요?', '먹을 곰을 눌러요!'], t: T }; } };
 }
 function hfDiary(tab = 'ny') {
-const r0 = RT, D = { pg: 0, tab }, PER = 4, fpos = i => [330 + (i % 4) * 206, 250 + Math.floor(i / 4) * 196];
+if (hfF8(640, 360)) SND.cheer();
+const r0 = RT, D = { pg: 0, tab }, PER = 4, fpos = i => [330 + (i % 4) * 206, 252 + Math.floor(i / 4) * 214];
 POP = { note: 1, ny: 1, draw() { const u = Math.min(1, (RT - r0) / 0.18), L = hfNy().slice().reverse(), pages = Math.max(1, Math.ceil(L.length / PER)), fv = htSV().fv || {}, fam = GB.slice(0, 8), nf = fam.filter(b => fv[b[0]]).length; D.pg = Math.min(D.pg, pages - 1);
 let g = pdFrame(200, 70, 880, 580, { m: 16, scr: '#FBF6EA' }) + pdLogo(270, 122, 0.5, '#8ED1C0');
 [['ny', '냠냠 일기', 420], ['fav', `💗 찾기 표 ${nf}/8`, 650]].forEach(([k, l, x]) => { const on = D.tab === k; g += R(x, 100, 216, 48, on ? HONEY : '#FFFFFF', { rx: 24, sw: on ? 3.4 : 2.4, st: on ? OUT : '#C7B28E' }) + K(x + 108, 133, l, { fs: 24, c: on ? BROWN : '#A89880' }); });
 if (D.tab === 'fav') {
-fam.forEach((b, i) => { const [x, y] = fpos(i), id = fv[b[0]], it = id && hfItem(id);
-g += R(x - 94, y - 84, 188, 184, id ? '#FFF0F5' : '#FFFFFF', { rx: 20, sw: 2.6, st: id ? '#F7A8C8' : '#D8C8AA' }) + `<clipPath id="hff${i}"><rect x="${x - 90}" y="${y - 80}" width="100" height="130" rx="14"/></clipPath><g clip-path="url(#hff${i})">${b[2](x - 42, y + 50, 0.74 * b[3])}</g>` + K(x - 40, y + 82, b[1], { fs: 19, c: BROWN })
-+ (id ? E1(x + 46, y - 50, '💗', 30 * (P.favT && RT - r0 < 1.2 ? 1 + 0.2 * Math.sin(RT * 9) : 1)) + E(x + 46, y + 4, it.pic, 46) + J(x + 46, y + 48, hfName(id), { fs: f1(Math.min(15, 84 / hfName(id).length)), c: BROWN }) + K(x + 46, y + 70, it.s, { fs: it.s.length > 5 ? 12 : 15, c: RED })
-: `<circle cx="${x + 46}" cy="${y - 4}" r="32" fill="none" stroke="#E4C8D4" stroke-width="3" stroke-dasharray="6 5"/>` + K(x + 46, y + 8, '?', { fs: 36, c: '#E4C8D4' }) + K(x + 46, y + 62, '무엇을', { fs: 14, c: '#B8A890' }) + K(x + 46, y + 80, '좋아할까?', { fs: 14, c: '#B8A890' })); });
-g += KJ(640, 624, nf >= 8 ? '여덟 식구가 좋아하는 음식을 다 찾았어요! 💗' : '좋아하는 음식을 차려 주면 おいしい! 하고 💗 가 채워져요 · 바깥을 누르면 닫혀요', { fs: 17, c: nf >= 8 ? RED : '#A89880' });
+const tz = hfTz(), hp = htSV().hp || {};
+fam.forEach((b, i) => { const [x, y] = fpos(i), id = fv[b[0]], it = id && hfItem(id), f = tz.f[b[0]], fl = JP.fl[f], ok = tz.ok[b[0]];
+g += R(x - 94, y - 90, 188, 200, id ? '#FFF0F5' : '#FFFFFF', { rx: 20, sw: 2.6, st: id ? '#F7A8C8' : '#D8C8AA' }) + `<clipPath id="hff${i}"><rect x="${x - 90}" y="${y - 86}" width="100" height="140" rx="14"/></clipPath><g clip-path="url(#hff${i})">${b[2](x - 42, y + 50, 0.74 * b[3])}</g>` + K(x - 40, y + 74, b[1], { fs: 18, c: BROWN })
++ hfHearts(x + 46, y - 66, hp[b[0]] || 0, P.favT && RT - r0 < 1.2 ? 1 + 0.15 * Math.sin(RT * 9) : 1)
++ (id ? E(x + 46, y - 10, it.pic, 40) + J(x + 46, y + 26, hfName(id), { fs: f1(Math.min(15, 84 / hfName(id).length)), c: BROWN }) + K(x + 46, y + 46, it.s, { fs: it.s.length > 5 ? 12 : 14, c: RED })
+: `<circle cx="${x + 46}" cy="${y - 10}" r="26" fill="none" stroke="#E4C8D4" stroke-width="3" stroke-dasharray="6 5"/>` + K(x + 46, y, '?', { fs: 30, c: '#E4C8D4' }) + K(x + 46, y + 40, '무엇을 좋아할까?', { fs: 12, c: '#B8A890' }))
++ R(x - 86, y + 84, 172, 22 + 0, ok ? '#DDF3E4' : '#FFF6D0', { rx: 11, sw: 1.8, st: ok ? MINT : '#E8D08A' }) + K(x - 58, y + 100, '오늘', { fs: 13, c: '#8A6A4A' }) + E1(x - 30, y + 95, fl.pic, 16) + J(x - 18, y + 101, f, { fs: f.length > 4 ? 12 : 14, c: BROWN, a: 'start' }) + (ok ? K(x + 72, y + 101, '💗', { fs: 13, c: RED }) : ''); });
+g += KJ(640, 632, nf >= 8 ? `여덟 식구가 좋아하는 음식을 다 찾았어요! · 💗 셋 = 선물 코인 ${COIN.heart}` : `좋아하는 음식 · 오늘의 맛을 차려 주면 💗 · 💗 셋 = 코인 ${COIN.heart} · 여덟 식구 다 찾으면 코인 ${COIN.fav8}`, { fs: 16, c: nf >= 8 ? RED : '#A89880' });
 return `<rect ${FULL()} fill="#3A2A1A" opacity="${(0.45 * u).toFixed(2)}"/><g opacity="${u.toFixed(2)}">${g}</g>`; }
 g += K(1040, 132, `오늘 접시 ${L.length}개`, { fs: 18, c: '#8A6A4A', a: 'end' });
 if (!L.length) g += K(640, 350, '아직 차려 준 접시가 없어요', { fs: 28, c: '#A89880' }) + K(640, 392, '냉장고에서 음식을 골라 「요리 완성」 → 곰에게 주면 여기에 적혀요', { fs: 19, c: '#A89880' }) + K(640, 424, '냠냠 일기는 오늘 것만 적어요 · 내일이면 새로 써요', { fs: 17, c: '#B8A890' });
@@ -3432,6 +3437,28 @@ if (y > 96 && y < 152 && x > 420 && x < 866) { SND.tap(); D.tab = x < 643 ? 'ny'
 if (D.tab === 'ny' && y > 588 && y < 644 && pages > 1 && x > 240 && x < 1040) { if (x < 370) { D.pg = (D.pg + pages - 1) % pages; SND.tap(); } else if (x > 910) { D.pg = (D.pg + 1) % pages; SND.tap(); } return; }
 if (x > 200 && x < 1080 && y > 70 && y < 650 && D.tab === 'fav') return;
 POP = null; SND.tap(); } };
+}
+const HF_HEART = 3;
+const hfTzAll = () => Object.keys(JP.fl).filter(f => f !== 'みず' && JP.fl[f].on.some(k => HT_FOOD.some(c => (JP.corner[c] || []).includes(k))));
+function hfTz() {
+const h = htSV(), t = rsToday(); if (h.tz && h.tz.d === t && GB.slice(0, 8).every(b => JP.fl[h.tz.f[b[0]]])) return h.tz;
+let q = (trDayN() * 7919 + 1237) % 233280; const rn = n => { q = (q * 9301 + 49297) % 233280; return Math.floor(q / 233280 * n); };
+const L = hfTzAll(), f = {}; GB.slice(0, 8).forEach(b => { f[b[0]] = L.splice(rn(L.length), 1)[0] || Object.keys(JP.fl)[0]; });
+h.tz = { d: t, f, fv: {}, ok: {} }; svSave(); return h.tz;
+}
+const hfTzOn = f => JP.fl[f].on.filter(k => HT_FOOD.some(c => (JP.corner[c] || []).includes(k)));
+function hfHeartAdd(w) {
+const h = htSV(), hp = h.hp = h.hp || {}; hp[w] = (hp[w] || 0) + 1;
+if (hp[w] < HF_HEART) { svSave(); return false; }
+hp[w] = 0; const hg = h.hg = h.hg || {}; hg[w] = (hg[w] || 0) + 1; svSave(); return true;
+}
+const hfFavN = () => { const fv = htSV().fv || {}; return GB.slice(0, 8).filter(b => fv[b[0]]).length; };
+function hfF8(x, y) {
+const h = htSV(); if (h.f8 || hfFavN() < 8) return false; h.f8 = 1; svSave(); coinAdd(COIN.fav8, x, y, 0.3); return true;
+}
+function hfHearts(x, y, n, k = 1) {
+let g = ''; for (let i = 0; i < HF_HEART; i++) { const cx = x + (i - (HF_HEART - 1) / 2) * 26 * k; g += i < n ? E1(cx, y, '💗', 20 * k) : `<path d="M${f1(cx)},${f1(y + 7 * k)} C${f1(cx - 14 * k)},${f1(y - 2 * k)} ${f1(cx - 8 * k)},${f1(y - 12 * k)} ${f1(cx)},${f1(y - 5 * k)} C${f1(cx + 8 * k)},${f1(y - 12 * k)} ${f1(cx + 14 * k)},${f1(y - 2 * k)} ${f1(cx)},${f1(y + 7 * k)}Z" fill="#FFFFFF" stroke="#F2B8CC" stroke-width="2"/>`; }
+return g;
 }
 const HQ_CORNER = { 음료: ['🥤', '시원하게 마시는 거'], 과자: ['🍪', '바삭하거나 달콤한 간식'], 도시락: ['🍱', '든든한 밥이나 빵'], 냉동: ['🧊', '꽁꽁 차가운 거'], 과일: ['🍎', '달콤한 과일'] };
 function hqDay() {
@@ -3490,16 +3517,21 @@ if (nf) fv[b[0]] = favId; h.pn = (h.pn || 0) + 1; if (hfGuide()) h.g1 = 1; svSav
 const rq = hqOf(b[0]), rqOk = !!(rq && !rq.ok && hqHits(rq, ids)), D = hqDay();
 if (rqOk) { rq.ok = 1; h.rqn = (h.rqn || 0) + 1; svSave(); }
 const rqAll = rqOk && !D.all && D.L.every(o => o.ok); if (rqAll) { D.all = 1; svSave(); }
-P.eat = { si, ids, fav: !!favId || rqOk, t: T, st: 0, j2: nf || rqOk ? 'すきです' : 'おいしい', j3: ids.length >= 3 ? 'おなかいっぱい' : 'ごちそうさまでした', nf, rq: rqOk, rqAll }; SND.plop(); say('いただきます');
+const tz = hfTz(), w = b[0], tzOk = !tz.ok[w] && ids.includes('v:' + tz.f[w]), fvH = !!favId && !tz.fv[w];
+let gift = 0; if (fvH) { tz.fv[w] = 1; gift += hfHeartAdd(w) ? 1 : 0; } if (tzOk) { tz.ok[w] = 1; gift += hfHeartAdd(w) ? 1 : 0; } svSave();
+P.eat = { si, ids, fav: !!favId || rqOk || tzOk, t: T, st: 0, j2: nf || rqOk || tzOk ? 'すきです' : 'おいしい', j3: ids.length >= 3 ? 'おなかいっぱい' : 'ごちそうさまでした', nf, rq: rqOk, rqAll, tz: tzOk, heart: fvH || tzOk, gift, f8: nf && hfFavN() >= 8 }; SND.plop(); say('いただきます');
 }
 const HF_T1 = 1.6, HF_T2 = 3.8;
 function hfEatStep() {
 const e = P.eat; if (!e) return; const u = T - e.t, t3 = e.fav ? HF_T2 + 1.8 : HF_T2, end = t3 + 2.2;
 if (e.st < 1 && u > HF_T1) { e.st = 1; SND.pop(); }
 if (e.st === 1 && u < HF_T2 && Math.floor((u - HF_T1) / 0.45) > (e.bite || 0)) { e.bite = Math.floor((u - HF_T1) / 0.45); SND.plop(); }
-if (e.fav && e.st < 2 && u > HF_T2) { e.st = 2; say(e.j2); SND.right(); if (e.nf) P.favT = T; if (e.rq) coinAdd(COIN.req, HF_SEAT[e.si][0], HF_SEAT[e.si][1] - 160, 0.3); }
+if (e.fav && e.st < 2 && u > HF_T2) { e.st = 2; say(e.j2); SND.right(); if (e.nf || e.heart) P.favT = T; if (e.rq) coinAdd(COIN.req, HF_SEAT[e.si][0], HF_SEAT[e.si][1] - 160, 0.3); if (e.gift) coinAdd(COIN.heart * e.gift, HF_SEAT[e.si][0] + 40, HF_SEAT[e.si][1] - 190, 0.6); }
 if (e.st < 3 && u > t3) { e.st = 3; say(e.j3); }
-if (u > end) { const b = GB[P.seat[e.si]], L = hfNy(); L.push([rsToday(), b[0], e.ids, e.fav ? 1 : 0]); if (L.length > 40) L.splice(0, L.length - 40); svSave(); P.eat = null; SND.ding(); P.wrote = T; P.say = { x: 500, y: 520, l: e.rq ? [`${b[1]} 곰 부탁을 들어줬어요!`, `코인 ${COIN.req} · 오늘의 부탁 ${hqDay().L.filter(o => o.ok).length} / 3`] : e.nf ? [`${b[1]} 곰이 좋아하는 음식 발견! 💗`, '찾기 표에 적었어요'] : ['냠냠 일기에 적었어요!', e.fav ? `${b[1]} 곰이 아주 좋아했어요` : '또 차려 줄까요?'], t: T }; }
+if (u > end) { const b = GB[P.seat[e.si]], L = hfNy(); L.push([rsToday(), b[0], e.ids, e.fav ? 1 : 0]); if (L.length > 40) L.splice(0, L.length - 40); svSave(); P.eat = null; SND.ding(); P.wrote = T; const hn = (htSV().hp || {})[b[0]] || 0, tf = hfTz().f[b[0]];
+if (e.f8 && hfF8(640, 300)) SND.cheer();
+P.say = { x: 500, y: 520, l: e.f8 ? ['여덟 식구가 좋아하는 음식을 다 찾았어요!', `💗 찾기 표 완성 · 코인 ${COIN.fav8}`] : e.gift ? [`${b[1]} 곰 💗 셋! 고마워요 선물!`, `코인 ${COIN.heart * e.gift} · 💗 다시 처음부터`] : e.rq ? [`${b[1]} 곰 부탁을 들어줬어요!`, `코인 ${COIN.req} · 오늘의 부탁 ${hqDay().L.filter(o => o.ok).length} / 3`] : e.nf ? [`${b[1]} 곰이 좋아하는 음식 발견! 💗`, `찾기 표에 적었어요 · 💗 ${hn} / ${HF_HEART}`]
+: e.tz ? [`오늘 먹고 싶던 ${tf} 맛! 💗`, `${b[1]} 곰 💗 ${hn} / ${HF_HEART}`] : e.heart ? [`${b[1]} 곰이 좋아하는 음식! 💗`, `💗 ${hn} / ${HF_HEART} · 셋이면 선물`] : ['냠냠 일기에 적었어요!', e.fav ? `${b[1]} 곰이 아주 좋아했어요` : '또 차려 줄까요?'], t: T }; }
 if (u > end && e.rqAll) { coinAdd(COIN.reqAll, 640, 300, 0.8); hqAllPop(); }
 }
 function hfEatFx(e) {
@@ -3547,7 +3579,10 @@ if (P.favT && T - P.favT < 2.6) g += E1(1151, 80 - 10 * Math.sin((T - P.favT) * 
 const bear = si => { const [x, fy] = HF_SEAT[si], b = GB[P.seat[si]], me = e && e.si === si, u = me ? T - e.t : 0, munch = me && eating, sq = munch ? 1 + 0.08 * Math.sin(u * 14) : 1;
 const hop = me && (e.st === 2 || (e.st === 3 && e.fav)) ? Math.abs(Math.sin(u * 7)) * 12 : munch ? Math.abs(Math.sin(u * 7)) * 14 : hold ? Math.abs(Math.sin(T * 4 + si)) * 4 : Math.sin(T * 2 + si * 1.3) * 1.2, art = b[2](x, fy - hop, HF_K);
 const rq = hqOf(b[0]);
-hit(x - 38, fy - 136, 76, 140, () => { if (hold) { hfGive(si); return; } if (rq && !rq.ok && !e) { hqCard(si); return; } SND.tap(); if (!e) P.say = { x, y: fy - 138, l: [b[5]], t: T, tag: gbTag(b) }; });
+hit(x - 38, fy - 136, 76, 140, () => { if (hold) { hfGive(si); return; } if (rq && !rq.ok && !e) { hqCard(si); return; } SND.tap(); if (e) return;
+const tz = hfTz(), f = tz.f[b[0]], fl = JP.fl[f], on = hfTzOn(f).slice(0, 2);
+if (!tz.ok[b[0]]) { say(f); P.say = { x, y: fy - 138, l: [`${f}! (${fl.ko} 맛)`, `오늘 먹고 싶은 맛 · ${on.join(' · ')}에 붙어요`], t: T, tag: gbTag(b) }; }
+else P.say = { x, y: fy - 138, l: [b[5]], t: T, tag: gbTag(b) }; });
 if (rq && !(e && e.si === si)) { hit((x > 1150 ? x - 70 : x + 22) - 22, fy - 196, 70, 60, () => { if (hold) { hfGive(si); return; } if (!rq.ok && !e) hqCard(si); }); }
 return (rq && !(e && e.si === si) ? hqBubble(x > 1150 ? x - 70 : x + 22, fy - 168 - hop, rq) : '') + (munch ? `<g transform="translate(${x},${f1(fy - hop)}) scale(${(2 - sq).toFixed(3)},${sq.toFixed(3)}) translate(${-x},${f1(-fy + hop)})">${art}</g>` : art) + (hold ? acSpark(x + 30, fy - 150, 0.9, T * 5 + si) : ''); };
 [0, 1, 2, 3].forEach(si => g += bear(si));
