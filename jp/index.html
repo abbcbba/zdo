@@ -731,7 +731,7 @@ trip: 10,
 lab: 3,
 arcade: { capsule: 50, crane: 50, drum: 50 },
 omok: 100,
-wear: { t_astro: 500, t_wizard: 1000, t_heart: 2000 },
+wear: { t_astro: 500, t_wizard: 1000, t_heart: 2000, t_spbear: 2000, t_spbunny: 2000 },
 restN: 5,
 arcadeBox: 1,
 omokBox: 1, omokFree: 10, omokBox2: 2,
@@ -1524,7 +1524,7 @@ return shuffle(un.slice(0, 8)).slice(0, 5).concat(rd).slice(0, 5);
 }
 function rdStart(c, o = {}) {
 let ws = rdWords(c); if (o.want && JP.w[o.want] && (JP.cw[c] || []).includes(o.want)) ws = [o.want].concat(ws.filter(k => k !== o.want)).slice(0, 5);
-go('round', { ro: rowOf(c), c, st: 'new', i: 0, ws, ret: o.ret, toll: o.toll }); if (o.toll) P.quitSub = '상자를 다 열어야 시작할 수 있어요'; rdEnter();
+go('round', { ro: rowOf(c), c, st: cqTurn(c) ? 'cq' : 'new', i: 0, ws, ret: o.ret, toll: o.toll }); if (o.toll) P.quitSub = '상자를 다 열어야 시작할 수 있어요'; rdEnter();
 }
 const tollChar = () => JP.rows.flatMap(r => r.c).reduce((a, c) => ((SV.cs[c] || 0) < (SV.cs[a] || 0) ? c : a));
 function boxToll(n, then, back, why, i = 0) { rdStart(tollChar(), { toll: { n, i, then, back, why } }); }
@@ -1542,6 +1542,7 @@ if (P.st === 'new') say(rdCanSay(P.c) ? P.c : '');
 if (P.st === 'trace') P.tr = trNew(P.c);
 if (P.st === 'aha') { P.open = 0; P.ahaT = null; }
 if (P.st === 'stamp') { P.n = 0; }
+if (P.st === 'cq') { if (P.i === 0) { P.qs = cqMake(P.c); P.cqMiss = 0; cheer('go', 1090, 190, 1); } P.pick = null; P.bad = {}; P.wrong = 0; cqSay(); }
 if (P.st === 'quiz') { if (P.i === 0) { P.qs = rdQuizMake(); cheer('go', 1090, 190, 1); } P.pick = null; P.bad = {}; rdQuizSay(); }
 }
 function rdQuizMake() {
@@ -1550,19 +1551,51 @@ const every = JP.rows.flatMap(r => r.c), pool = [...new Set(now.concat(got))], m
 return shuffle(now.concat(old)).map(a => { let cand = shuffle(pool.filter(c => c !== a)).concat(more); const opts = [a];
 cand.forEach(c => { if (opts.length < 4 && opts.every(o => rdKo(o) !== rdKo(c))) opts.push(c); }); return { a, opts: shuffle(opts) }; });
 }
+const cqTurn = c => (SV.cs[c] || 0) >= 2 && SV.cs[c] % 2 === 0;
+function cqMake(c) {
+const row = rdRow().c, near = shuffle(row.filter(x => x !== c)).concat(shuffle(JP.rows.flatMap(r => r.c).filter(x => x !== c && !row.includes(x))));
+const pick = (a, cand, same) => { const o = [a]; cand.forEach(x => { if (o.length < 4 && o.every(y => !same(y, x))) o.push(x); }); return shuffle(o); }, sameKo = (y, x) => rdKo(y) === rdKo(x);
+const qs = [{ t: 's', a: c, opts: pick(c, near, sameKo) }, { t: 'k', a: c, opts: pick(c, shuffle(near), sameKo) }];
+const ws = (JP.cw[c] || []).filter(k => JP.w[k]);
+if (ws.length) { const a = shuffle(ws.slice(0, 8))[0], other = shuffle(Object.keys(JP.w).filter(k => k.length <= 7 && ![...k].some(x => toKata(x) === c))); qs.push({ t: 'w', a, opts: pick(a, other, (y, x) => JP.w[y].s === JP.w[x].s) }); }
+return qs;
+}
+function cqSay() { const q = P.qs[P.i]; if (q.t === 's' && rdCanSay(q.a)) say(q.a); else if (q.t === 'w') say(q.a); }
+function rdCq() {
+const q = P.qs[P.i], done = P.pick != null, n = q.opts.length, w = q.t === 'w' ? 250 : 200, gap = 24, x0 = 640 - (n * w + (n - 1) * gap) / 2;
+let g = K(640, 130, { s: '이 소리는 어느 글자일까요?', k: '이 글자는 어떤 소리일까요?', w: `${P.c} 가 들어간 낱말 · 들리는 것은 어느 것일까요?` }[q.t], { fs: 30, c: '#8A6A4A' });
+const spk = `<circle cx="806" cy="200" r="24" fill="${HONEY}" stroke="${OUT}" stroke-width="3"/><path d="M795,195 h6 l8,-7 v24 l-8,-7 h-6Z" fill="${BROWN}"/>`;
+g += R(430, 160, 420, 150, '#FFFFFF', { rx: 34, sw: 4 });
+if (q.t === 's') g += K(640, 262, rdKo(q.a), { fs: rdKo(q.a).length > 5 ? 46 : 84, c: RED }) + spk;
+else if (q.t === 'k') g += J(640, 285, q.a, { fs: 130, c: BROWN });
+else g += (done ? E(560, 236, JP.w[q.a].pic || '💡', 64) + K(700, 226, JP.w[q.a].s, { fs: 34, c: RED }) + K(700, 270, JP.w[q.a].ko, { fs: 22, c: '#8A6A4A' }) : K(620, 262, '🔊 다시 듣기', { fs: 40, c: RED })) + spk;
+if (q.t !== 'k') hit(430, 160, 420, 150, () => { SND.tap(); cqSay(); });
+q.opts.forEach((o, i) => { const x = x0 + i * (w + gap), ok = done && o === q.a, bad = P.bad[o], sh = bad ? Math.sin((T - bad) * 40) * 8 * Math.max(0, 1 - (T - bad) / 0.35) : 0;
+g += `<g transform="translate(${f1(sh)},0)"${bad && T - bad > 0.35 ? ' opacity=".4"' : ''}>` + R(x, 366 + 8, w, 200, '#C7B28E', { rx: 30, st: false }) + R(x, 366, w, 200, ok ? '#BFE3A8' : '#FFFFFF', { rx: 30, sw: ok ? 6 : 4, st: ok ? MINT : OUT });
+g += (q.t === 's' ? J(x + w / 2, 512, o, { fs: 130, c: BROWN }) : q.t === 'k' ? K(x + w / 2, 490, rdKo(o), { fs: rdKo(o).length > 4 ? 34 : 64, c: BROWN }) : J(x + w / 2, 486, o, { fs: Math.min(54, 210 / o.length), c: BROWN })) + `</g>`;
+if (!done && !bad) hit(x, 366, w, 208, () => { const M = SV.miss = SV.miss || {};
+if (o === q.a) { P.pick = o; SND.right(); if (q.t === 'w' || rdCanSay(o)) say(o); cheer('ok', 1090, 190, 1); if (!P.wrong && q.t !== 'w' && M[P.c]) { M[P.c]--; if (!M[P.c]) delete M[P.c]; svSave(); } }
+else { P.bad[o] = T; P.pick = q.a; P.wrong = 1; P.cqMiss++; if (q.t !== 'w') { M[P.c] = (M[P.c] || 0) + 1; svSave(); } SND.wrong(); cheer('bad', 1090, 190); setTimeout(() => { if (P.st === 'cq' && (q.t === 'w' || rdCanSay(q.a))) say(q.a); }, 600); } }); });
+g += rdDots(P.qs.length, P.i, 640, 650);
+if (done) g += (P.wrong ? KJ(250, 640, `정답은 ${q.t === 'w' ? q.a : q.a + ' · ' + rdKo(q.a)}`, { fs: q.t === 'w' ? 26 : 32, c: RED }) : K(190, 640, '맞았어요!', { fs: 40, c: MINT }))
++ rdNextBtn(P.i < P.qs.length - 1 ? '다음' : P.cqMiss ? '낱말 보러 가기' : '도장 받기!');
+return g;
+}
 function rdQuizSay() { const q = P.qs[P.i]; if (rdCanSay(q.a)) say(q.a); }
 function rdNext() {
 SND.tap();
 if (P.st === 'new') rdSet('trace');
 else if (P.st === 'trace') rdSet(P.ws.length ? 'aha' : 'stamp');
 else if (P.st === 'aha') { if (P.i < P.ws.length - 1) { P.i++; rdEnter(); } else rdSet('stamp'); }
+else if (P.st === 'cq') { if (P.i < P.qs.length - 1) { P.i++; rdEnter(); } else if (P.cqMiss && P.ws.length) rdSet('aha'); else { if (!P.cqMiss) P.ws = []; rdSet('stamp'); } }
 else if (P.st === 'quiz') { if (P.i < P.qs.length - 1) { P.i++; rdEnter(); } else { SV.rq[P.ro] = (SV.rq[P.ro] || 0) + 1; svSave(); rdSet('qdone'); SND.cheer(); coinAdd(COIN.quiz, 640, 560, 0.6); } }
 KEY = null;
 }
 function rdTop() {
 const nm = rdRow().n, w = 132 + nm.length * 12;
-let g = R(196, 18, w, 52, INK, { rx: 26, st: CREAM, sw: 3 }) + KJ(196 + w / 2, 54, P.st === 'quiz' || P.st === 'qdone' ? nm + ' 퀴즈' : nm === P.c ? nm : nm + ' · ' + P.c, { fs: 25, c: '#FFD95A' });
+let g = R(196, 18, w, 52, INK, { rx: 26, st: CREAM, sw: 3 }) + KJ(196 + w / 2, 54, P.st === 'quiz' || P.st === 'qdone' ? nm + ' 퀴즈' : P.st === 'cq' ? P.c + ' 퀴즈' : nm === P.c ? nm : nm + ' · ' + P.c, { fs: 25, c: '#FFD95A' });
 if (P.toll) g += R(196, 78, 230, 34, '#DDF3EA', { rx: 17, sw: 2.4, st: MINT }) + K(311, 102, `${P.toll.why} · 상자 ${P.toll.i + 1} / ${P.toll.n}`, { fs: 17, c: '#2F6A5A' });
+if (P.st === 'cq') return g + K(196 + w + 24, 54, `두 번 배운 글자 · 퀴즈 ${P.qs.length}문제`, { fs: 24, c: '#8A6A4A', a: 'start' });
 if (P.st === 'quiz' || P.st === 'qdone' || P.only) return g + (P.only ? K(196 + w + 24, 54, '써 보기', { fs: 25, c: '#8A6A4A', a: 'start' }) : '');
 const si = RD_STEPS.findIndex(s => s[0] === P.st), x0 = Math.max(400, 196 + w + 18);
 RD_STEPS.forEach(([k, ko], i) => { const x = x0 + i * 168, on = i === si, past = i < si && !(k === 'aha' && !P.ws.length);
@@ -1670,8 +1703,8 @@ return g;
 function rdBack() { SND.tap(); if (P.back) go('pad', Object.assign({ tab: 'chart' }, P.back)); else boxOpen(P.ro); }
 const SC_ROUND = {
 key: () => P.st + (P.only ? 'o' : ''), back: rdBg, pen: rdPen,
-fg() { const g = P.st === 'new' ? rdNew() : P.st === 'trace' ? rdTrace() : P.st === 'aha' ? rdAha() : P.st === 'stamp' ? rdStamp() : P.st === 'quiz' ? rdQuiz() : rdQdone();
-const playing = !P.only && (P.st === 'new' || P.st === 'trace' || P.st === 'aha' || P.st === 'quiz' || (P.st === 'stamp' && !P.n));
+fg() { const g = P.st === 'new' ? rdNew() : P.st === 'trace' ? rdTrace() : P.st === 'aha' ? rdAha() : P.st === 'stamp' ? rdStamp() : P.st === 'cq' ? rdCq() : P.st === 'quiz' ? rdQuiz() : rdQdone();
+const playing = !P.only && (P.st === 'new' || P.st === 'trace' || P.st === 'aha' || P.st === 'cq' || P.st === 'quiz' || (P.st === 'stamp' && !P.n));
 const t = P.toll, r = P.ret;
 return g + backBtn(P.only ? '글자표' : t ? '그만' : r ? r[0] : '상자', () => { if (P.only) rdBack(); else if (t) t.back(); else if (r) go(r[1]); else boxOpen(P.ro); }, playing) + sndBtn(); },
 };
@@ -2041,6 +2074,29 @@ const front = [[-36, -78, 0], [38, -58, 1], [34, -100, 2]].map(([sx, sy, i]) => 
 const shorts = [-21.6, 3.4].map(lx => `<rect x="${lx}" y="-37" width="18.2" height="16" rx="4" fill="url(#lxhs)" stroke="${LX_OUT}" stroke-width="2.4"/>`).join('');
 return lxGom(x, y, s, arms, mouth, { back: pat, leg: D_TAN, boot: D_TAN, mid: shorts, body, sleeve: D_TAN, cuff: D_TAN, front });
 }
+const LX_BK = '#26262E', LX_NV = '#1E2444';
+const lxStripe = (id, h = 9) => `<pattern id="${id}" width="10" height="${h}" patternUnits="userSpaceOnUse"><rect width="10" height="${h}" fill="#FFFFFF"/><rect y="0" width="10" height="${h / 2}" fill="${LX_BK}"/></pattern>`;
+const lxDots = (id, bg, dot) => `<pattern id="${id}" width="11" height="11" patternUnits="userSpaceOnUse"><rect width="11" height="11" fill="${bg}"/><circle cx="2.5" cy="2.5" r="1.7" fill="${dot}"/><circle cx="8" cy="8" r="1.7" fill="${dot}"/></pattern>`;
+const lxApple = (k = 1, sew = 0) => `<g transform="scale(${k})"><path d="M0,-6 C-3,-10 -12,-10 -12,-1 C-12,7 -5,11 0,9 C5,11 12,7 12,-1 C12,-10 3,-10 0,-6Z" fill="#C8202C" stroke="#8A1420" stroke-width="1.6" stroke-linejoin="round"/>` + (sew ? `<clipPath id="lxac"><path d="M0,-6 C-3,-10 -12,-10 -12,-1 C-12,7 -5,11 0,9 C5,11 12,7 12,-1 C12,-10 3,-10 0,-6Z"/></clipPath><g clip-path="url(#lxac)" stroke="#E04450" stroke-width=".7" opacity=".7">${Array.from({ length: 12 }, (_, i) => `<path d="M${-16 + i * 2.8},12 L${-8 + i * 2.8},-12"/>`).join('')}</g><path d="M0,-4.4 C-3,-8 -10.4,-8 -10.4,-1 C-10.4,5.6 -4.6,9 0,7.4 C4.6,9 10.4,5.6 10.4,-1 C10.4,-8 3,-8 0,-4.4Z" fill="none" stroke="#F06A72" stroke-width=".7" stroke-dasharray="1.4 1.2"/>` : `<path d="M-8,-1 q1,-4 4,-5" stroke="#F07A80" stroke-width="1.4" fill="none" stroke-linecap="round"/>`) + `<path d="M0,-6 Q0,-10 1,-12" stroke="#5A3A1E" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M1,-11 Q3,-19 10,-19 Q9,-12 1,-11Z" fill="#2E8A50" stroke="#1E6038" stroke-width="1.1" stroke-linejoin="round"/>` + (sew ? `<path d="M2,-12 Q5,-16 9,-18" stroke="#6CC08A" stroke-width=".8" fill="none"/>` : '') + `</g>`;
+const lxBand = col => `<path d="M-25,-110 Q0,-130 25,-110" stroke="${col}" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+function lxSpBear(x, y, s, arms, mouth) {
+const sway = Math.sin(T * 2.4) * 6, tw = i => (0.2 + 0.8 * Math.abs(Math.sin(T * 1.6 + i * 2.1))).toFixed(2);
+const back = lxStripe('lxas', 11);
+const body = `<rect x="-24" y="-74" width="48" height="46" rx="12" fill="url(#lxas)" stroke="${LX_OUT}" stroke-width="2.6"/>`
++ `<g transform="translate(0,-50) rotate(${f1(sway)}) scale(1.15)">${lxApple(0.78, 1)}</g>`;
+const front = [[-36, -80, 0], [38, -60, 1], [36, -98, 2]].map(([sx, sy, i]) => `<g opacity="${tw(i)}" transform="translate(${sx},${f1(sy - 3 * Math.sin(T * 1.6 + i))})">${lxApple(0.42)}</g>`).join('');
+return lxGom(x, y, s, arms, mouth, { back, leg: LX_BK, boot: '#3BB04E', body, sleeve: LX_BK, cuff: '#D8303A', front });
+}
+function lxSpBunny(x, y, s, arms, mouth) {
+const beat = 1 + 0.08 * Math.max(0, Math.sin(T * 4)), tw = i => (0.2 + 0.8 * Math.abs(Math.sin(T * 1.8 + i * 1.7))).toFixed(2), wig = Math.sin(T * 2) * 3;
+const back = lxStripe('lxbs', 9) + lxDots('lxbd', LX_NV, '#FFFFFF');
+const body = `<rect x="-24" y="-74" width="48" height="46" rx="14" fill="${LX_BK}" stroke="${LX_OUT}" stroke-width="2.6"/>`
++ `<g transform="translate(0,-51) scale(${beat.toFixed(3)})"><path d="${Array.from({ length: 10 }, (_, i) => { const a = -Math.PI / 2 + i * Math.PI / 5, q = i % 2 ? 4 : 8; return (i ? 'L' : 'M') + f1(Math.cos(a) * q) + ',' + f1(Math.sin(a) * q); }).join('')}Z" fill="#E6C22E" stroke="#A88A12" stroke-width="2" stroke-linejoin="round"/></g>`;
+const ear = (sx, rot) => `<g transform="translate(${sx},-114) rotate(${f1(rot)})"><path d="M-9,0 C-12,-22 -10,-48 0,-54 C10,-48 12,-22 9,0Z" fill="#F6F5F0" stroke="${LX_OUT}" stroke-width="2.4"/><path d="M-5,-5 C-7,-22 -6,-41 0,-47 C6,-41 7,-22 5,-5Z" fill="url(#lxbd)"/></g>`;
+const hat = ear(-11, -10 + wig) + ear(11, 10 - wig) + lxBand(LX_NV);
+const front = [[-38, -78, 0], [40, -56, 1], [36, -102, 2], [-34, -112, 3]].map(([sx, sy, i]) => `<g opacity="${tw(i)}">${lxStar(sx, sy - 3 * Math.sin(T * 1.6 + i), 4, '#FFE97A', T * 30 + i * 40)}</g>`).join('');
+return lxGom(x, y, s, arms, mouth, { back, leg: 'url(#lxbs)', boot: '#D8303A', body, sleeve: 'url(#lxbs)', cuff: '#8DB0E0', hat, front });
+}
 const WEAR = [
 ...[['pilot', '조종사 옷'], ['crew', '승무원 옷'], ['cater', '요리사 옷'], ['fire', '소방관 옷'], ['mech', '정비사 옷'], ['atc', '관제사 옷'], ['marsh', '유도사 옷'], ['sec', '보안 검색 옷'], ['info', '안내 곰 옷'], ['cust', '세관 곰 옷'], ['fuel', '급유 곰 옷'], ['clean', '청소 곰 옷'], ['bag', '짐 나르는 곰 옷'], ['xmas', '산타 옷'], ['kid', '줄무늬 옷']].map(([j, n]) => ['t_' + j, 'top', n, 'air', wAir(j)]),
 ...['blue', 'red', 'white', 'black', 'ok'].map(c => ['t_h' + c, 'top', OBANG[c].name + ' 두루마기', 'mini', (x, y, s, arms, mouth) => hanbokGom(x, y, { c, s, arms, mouth, shadow: false, T })]),
@@ -2068,6 +2124,7 @@ const WEAR = [
 ['i_brush', 'hand', '붓', 'mark', (hx, hy) => hiAt(hx, hy, W_BRUSH)], ['i_minicar', 'hand', '미니카', 'mark', (hx, hy) => hiAt(hx, hy, W_MINICAR)], ['i_passport', 'hand', '여권', 'air', (hx, hy) => hiAt(hx, hy, W_PASSPORT)],
 ['i_songpyeon', 'hand', '송편', 'geo', (hx, hy) => hiAt(hx, hy, W_SONGPYEON)], ['i_windmill', 'hand', '바람개비', 'mini', (hx, hy) => hiAt(hx, hy, W_WINDMILL)], ['i_fan', 'hand', '둥근 부채', 'mini', (hx, hy) => hiAt(hx, hy, W_FAN)],
 ['t_astro', 'top', '우주 비행사 옷', 'jp', lxAstro, 1, COIN.wear.t_astro], ['t_wizard', 'top', '무지개 마법사 옷', 'jp', lxWizard, 1, COIN.wear.t_wizard], ['t_heart', 'top', '하늘 줄무늬 하트 옷', 'jp', lxHeart, 0, COIN.wear.t_heart],
+['t_spbear', 'top', '특별 곰', 'jp', lxSpBear, 0, COIN.wear.t_spbear], ['t_spbunny', 'top', '특별 토끼', 'jp', lxSpBunny, 1, COIN.wear.t_spbunny],
 ].filter(w => w[4]);
 const WEAR_BY = Object.fromEntries(WEAR.map(w => [w[0], w]));
 function wearSV() { const a = acSV(), w = a.wear = a.wear || {}; w.own = w.own || {}; w.sh = w.sh || {}; w.on = w.on || {}; return w; }
@@ -3566,7 +3623,7 @@ if (new Set(WEAR.map(w => w[0])).size !== WEAR.length) throw new Error('옷장 �
 WEAR.forEach(w => { if (!WEAR_SRC[w[3]] || !WEAR_SLOT.some(q => q[0] === w[1])) throw new Error('옷 ' + w[0]); Object.keys(NY_ARM).forEach(arm => { const g = wearOne(w[0], 100, 100, 1, arm); if (!g || /NaN|undefined/.test(g)) throw new Error('옷 그림 ' + w[0] + ' ' + arm); }); acPrize({ kind: 'wear', id: w[0], sh: 0, nw: 1 }); POP.draw(); });
 if (WEAR.filter(w => w[1] === 'top').length < 20 || WEAR.filter(w => w[1] === 'hat').length < 12 || WEAR.filter(w => w[1] === 'hand').length < 6) throw new Error('옷장이 너무 적음');
 if (!lxHead('').startsWith('<circle cx="-20" cy="-112" r="9"') || !nyamBase(0, 0, 1, 'down').includes(lxHead(''))) throw new Error('비싼 옷 곰 얼굴 = 다른 냠냠곰과 같아야 함');
-if (WEAR.filter(w => w[6]).length !== 3 || WEAR.slice(-3).some(w => !w[6] || w[1] !== 'top' || w[6] !== COIN.wear[w[0]])) throw new Error('옷장 마지막 칸 = 코인으로 사는 옷 셋');
+if (WEAR.filter(w => w[6]).length !== 5 || WEAR.slice(-5).some(w => !w[6] || w[1] !== 'top' || w[6] !== COIN.wear[w[0]])) throw new Error('옷장 마지막 칸 = 코인으로 사는 옷 다섯');
 SV.ac = {}; SV.coin = 10; if (wearBuy('t_astro') || wearHas('t_astro')) throw new Error('코인이 모자라면 못 삼'); SV.coin = COIN.wear.t_astro; if (!wearBuy('t_astro') || SV.coin !== 0 || !wearHas('t_astro')) throw new Error('코인으로 사는 옷'); hcBuy(WEAR_BY.t_heart); POP.draw(); POP.tap(800, 470); POP = null; for (let n = 0; n < 60; n++) if (WEAR_BY[acChoose('wear').id][6]) throw new Error('캡슐에서 코인 옷이 나옴');
 SV.ac = {}; const p1 = acGive('wear'); if (wearOn()[WEAR_BY[p1.id][1]] || !p1.nw || p1.sh) throw new Error('캡슐 = 새 옷을 저절로 안 입음(정한 것 125)'); wearPut(p1.id); if (wearOn()[WEAR_BY[p1.id][1]] !== p1.id) throw new Error('옷장에서 누르면 입음'); wearPut(p1.id); if (wearOn()[WEAR_BY[p1.id][1]]) throw new Error('다시 누르면 벗음');
 WEAR.forEach(w => wearSV().own[w[0]] = 1); if (!acChoose('wear').sh) throw new Error('다 모으면 반짝');
