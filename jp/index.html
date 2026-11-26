@@ -1425,6 +1425,9 @@ const shopLocked = () => !SHOP_OK && !TEST && nextRow() >= 0;
 const shopTopX = () => 318 + 84 + String(coinShown()).length * 14 + 14;
 const SHOP_LEAD = [r => [`${boxName(r)}도 열어 볼까요?`, '글자를 읽으면 상품에 색이 들어와요!'], () => ['흐린 상품을 누르면', '바로 그 글자를 배워요!'], r => ['위에 빨간 단추를 눌러요', `도장 하나에 코인 ${COIN.stamp}개!`], () => ['상자를 열면 식당에서', '오목도 한 판 둘 수 있어요!']];
 function shopNag() { SND.tap(); P.hi = 0; P.say = { x: 1121, y: 352, l: ['먼저 상자 하나', '열어 볼까요?'], t: T }; P.nag = T; }
+function jwNear(x, y, L, k = 1.05) {
+let best = null, bd = 1e9; L.forEach(sl => { const d = Math.hypot(sl.x - x, sl.y - y); if (d < sl.sz * k && d < bd) { bd = d; best = sl; } }); return best;
+}
 const SC_SHOP = {
 key: () => charsDone() + '|' + wordsDone() + '|' + nwCount() + (TEST ? 't' : ''),
 enter() { P.hi = T + 0.3; setTimeout(() => { if (S === 'shop') say('いらっしゃいませ'); }, 400); P.guest = guestPick(); P.gx = guestMore(P.guest); P.hid = hidPick('shop', P.guest && P.guest.who); P.rec = recPick(); P.recNw = nwRecPick(); P.rc = rcptTake(); P.fl = {}; },
@@ -1432,9 +1435,11 @@ back: () => interior(),
 fg() {
 let g = ''; const nr = nextRow(), greet = P.hi && T - P.hi < 2.2, lock = shopLocked();
 const lk = f => { const h0 = HITS.length, s = f(); if (lock) HITS.slice(h0).forEach(o => o.cb = shopNag); return s; };
-lk(() => { CORNERS.forEach(([c, x, y, w, h]) => hit(x, y, w, h, () => { SND.tap(); cornerPop(c); }));
-JW_SLOTS.forEach(sl => { const k = sl.c !== '신상품' && sl.k; if (k) hit(sl.x - sl.sz * 0.55, sl.y - sl.sz * 0.6, sl.sz * 1.1, sl.sz * 1.2, () => { if (guestTake(k, sl)) return; say(k); SND.plop(); P.bump = { k, sl, t: T }; }); }); });
-JW_EMPTY.forEach(sl => hit(sl.x - sl.sz * 0.55, sl.y - sl.sz * 0.6, sl.sz * 1.1, sl.sz * 1.2, () => boxGo(sl.k, ['편의점', 'shop'])));
+const slotTap = sl => { const k = sl.k; if (guestTake(k, sl)) return; say(k); SND.plop(); P.bump = { k, sl, t: T }; }, emptyTap = sl => boxGo(sl.k, ['편의점', 'shop']);
+const near = (x, y) => jwNear(x, y, JW_SLOTS.filter(sl => sl.c !== '신상품' && sl.k).concat(JW_EMPTY), 0.8);
+lk(() => { CORNERS.forEach(([c, x, y, w, h]) => hit(x, y, w, h, (px, py) => { const sl = near(px, py); if (sl) return JW_EMPTY.includes(sl) ? emptyTap(sl) : slotTap(sl); SND.tap(); cornerPop(c); }));
+JW_SLOTS.forEach(sl => { const k = sl.c !== '신상품' && sl.k; if (k) hit(sl.x - sl.sz * 0.55, sl.y - sl.sz * 0.6, sl.sz * 1.1, sl.sz * 1.2, () => slotTap(sl)); }); });
+JW_EMPTY.forEach(sl => hit(sl.x - sl.sz * 0.55, sl.y - sl.sz * 0.6, sl.sz * 1.1, sl.sz * 1.2, () => emptyTap(sl)));
 JW_SLOTS.forEach(sl => { const k = sl.c !== '신상품' && sl.k, f = k && shopFl(k); if (f) g += `<circle cx="${f1(sl.x + sl.sz * 0.42)}" cy="${f1(sl.y + sl.sz * 0.36)}" r="${f1(sl.sz * 0.27)}" fill="#FFE27A" stroke="${OUT}" stroke-width="1.6"/>` + E1(sl.x + sl.sz * 0.42, sl.y + sl.sz * 0.36, JP.fl[f].pic, sl.sz * 0.34); });
 g += nyamBase(1121, 504, 1.25, greet ? 'up' : (T % 9) < 1.6 ? 'wave' : 'fold') + counterDesk(1020, 470, 240, jwItems('계산대'));
 hit(1070, 350, 110, 120, () => { SND.tap(); P.hi = T; say('いらっしゃいませ'); });
@@ -1941,10 +1946,32 @@ return `<path d="M${x - 44},${y + 112} L${x - 36},${y + 4} M${x + 44},${y + 112}
 + (q.hint ? nwSil(x, y + 54, n.pic, 40) + K(x, y + 92, '무엇과 무엇?', { fs: 13, c: '#8A6A4A' }) : E(x, y + 52, n.pic, 34) + J(x, y + 90, n.k, { fs: n.k.length > 6 ? 10 : 14, c: BROWN }));
 }
 function nwShelfFg() {
-const got = nwNewest();
-JW_SLOTS.forEach(sl => { const n = got[sl.i]; if (sl.c === '신상품' && n) hit(sl.x - 22, sl.y - 22, 44, 44, () => { if (guestTake(n.k, sl)) return; SND.plop(); nwCard(n); }); });
+const got = nwNewest(), L = JW_SLOTS.filter(sl => sl.c === '신상품' && got[sl.i]), tap = sl => { const n = got[sl.i]; if (guestTake(n.k, sl)) return; SND.plop(); nwCard(n); };
+hit(NW_SHELF_X - 6, NW_SHELF_Y - 4, 188, 140, (x, y) => { const sl = jwNear(x, y, L, 1.4); if (sl) tap(sl); });
+L.forEach(sl => hit(sl.x - 22, sl.y - 22, 44, 44, () => tap(sl)));
+if (nwWant().length) hit(NW_SHELF_X - 6, NW_SHELF_Y - 40, 188, 176, () => nwBigPop());
 hit(NW_SHELF_X + 20, NW_SHELF_Y + 136, 136, 34, () => { SND.tap(); labOpen(); });
-return '';
+return nwWant().length ? `<rect x="${NW_SHELF_X - 6}" y="${NW_SHELF_Y - 40}" width="188" height="178" rx="14" fill="none" stroke="${HONEY}" stroke-width="${f1(4 + 2 * Math.sin(T * 5))}" opacity=".9"/>` : '';
+}
+const nwWant = () => guestAll().filter(q => q.k && q.nw && !q.done && T >= q.t + 1.6);
+function nwBigPop() {
+const r0 = RT, CW = 190, CH = 124, X0 = 640 - CW * 2, Y0 = 230; SND.pop();
+const cell = i => [X0 + (i % 4) * CW + CW / 2, Y0 + Math.floor(i / 4) * CH + CH / 2];
+POP = { note: 1, nwBig: 1, bad: null, draw() { const u = Math.min(1, (RT - r0) / 0.18), got = nwNewest(), want = nwWant();
+if (!want.length) { POP = null; return ''; }
+let g = R(500, 104, 280, 44, HONEY, { rx: 14, sw: 2.6 }) + K(640, 135, '✨ 신상품 ✨', { fs: 24, c: BROWN });
+g += K(640, 186, '손님이 기다려요: ', { fs: 20, c: '#8A6A4A', a: 'end' }) + want.map((q, j) => J(650 + j * 170, 188, q.k + '?', { fs: 26, c: RED, a: 'start' })).join('');
+for (let i = 0; i < 12; i++) { const [cx, cy] = cell(i), n = got[i], bad = this.bad && this.bad.i === i && RT - this.bad.t < 0.6, sh = bad ? Math.sin((RT - this.bad.t) * 40) * 6 : 0;
+g += R(cx - CW / 2 + 8 + sh, cy - CH / 2 + 6, CW - 16, CH - 12, bad ? '#FFE0DA' : n ? '#FFFFFF' : '#F4EADA', { rx: 18, sw: 2.6, st: bad ? RED : '#C9A86A' }) + (n ? E(cx + sh, cy, n.pic, 72) : `<circle cx="${cx}" cy="${cy}" r="22" fill="none" stroke="#C9A06A" stroke-width="2.4" stroke-dasharray="5 4"/>`); }
+g += K(640, Y0 + CH * 3 + 34, '골라서 손님에게 건네요 · 바깥을 누르면 닫혀요', { fs: 16, c: '#A89880' });
+return popBox(u, 860, 560, g); },
+tap(x, y) { const i = Math.floor((x - X0) / CW) + 4 * Math.floor((y - Y0) / CH), n = nwNewest()[i];
+if (x >= X0 && x < X0 + CW * 4 && y >= Y0 && y < Y0 + CH * 3) { if (!n) return;
+const ok = nwWant().some(q => q.k === n.k), sl = JW_SLOTS.find(s => s.c === '신상품' && s.i === i) || { x: NW_SHELF_X + 88, y: NW_SHELF_Y + 60 };
+if (ok) { POP = null; guestTake(n.k, sl); } else { this.bad = { i, t: RT }; guestTake(n.k, sl); }
+return; }
+if (x > 210 && x < 1070 && y > 80 && y < 640) return;
+POP = null; SND.tap(); } };
 }
 function labFg() {
 hit(872, 420, 148, 260, () => { SND.tap(); labOpen(); });
@@ -3267,16 +3294,20 @@ g += R(570, 206, 130, 44, '#FFF3C4', { rx: 14, sw: 2 }) + E1(600, 229, cor[0], 2
 if (o.h >= 2) g += `<g filter="url(#hqsil)" opacity="${o.h >= 3 ? 0 : 0.5}">${E1(780, 332, w.pic, 92)}</g>` + (o.h < 3 ? K(780, 412, '이런 모양이에요', { fs: 18, c: '#A89880' }) : '');
 if (o.h >= 3) g += E1(700, 330, w.pic, 84) + J(800, 320, o.k, { fs: Math.min(46, 260 / o.k.length), c: BROWN, a: 'start' }) + K(800, 362, w.s, { fs: 26, c: RED, a: 'start' }) + K(800, 396, w.ko, { fs: 20, c: '#8A6A4A', a: 'start' });
 if (o.h < 2) g += K(780, 330, '?', { fs: 80, c: '#E4D8C2' });
-if (o.h < 3) g += btn(570, 452, 210, 62, '힌트 하나 더', () => {}, { fs: 24, col: '#FFFFFF', sh: '#C7B28E' });
+if (o.h < 3) g += btn(570, 452, 210, 62, '📦 힌트 하나 더', () => {}, { fs: 22, col: '#FFFFFF', sh: '#C7B28E' }) + K(675, 538, '상자 하나를 열면 보여요', { fs: 14, c: '#8A6A4A' });
 g += has ? R(800, 452, 230, 62, '#DDF3E4', { rx: 31, sw: 2.6, st: MINT }) + K(915, 479, '냉장고에 있어요!', { fs: 20, c: '#2F6A5A' }) + K(915, 502, '골라서 차려 줘요', { fs: 15, c: '#2F6A5A' })
 : btn(800, 452, 230, 62, '📦 상자 열기 ▶', () => {}, { fs: 23, col: HONEY, sh: '#B8862A' });
 g += K(780, 560, `부탁을 들어주면 코인 ${COIN.req}!`, { fs: 20, c: MINT }) + K(780, 596, '바깥을 누르면 닫혀요', { fs: 15, c: '#A89880' });
 return popBox(u, 980, 560, g); },
 tap(x, y) { const has = hqHas(o.k);
-if (o.h < 3 && x > 570 && x < 780 && y > 452 && y < 520) { o.h++; svSave(); SND.tap(); if (o.h >= 3) say(o.k); return; }
+if (o.h < 3 && x > 570 && x < 780 && y > 452 && y < 520) { POP = null; payGate({ why: '힌트 보기', box: 1, back: () => go('htfam'), then: () => hqHintBack(b[0]) }); return; }
 if (!has && x > 800 && x < 1030 && y > 452 && y < 520) { POP = null; boxGo(o.k, ['가족 여행', 'htfam']); return; }
 if (x > 150 && x < 1130 && y > 80 && y < 640) return;
 POP = null; SND.tap(); } };
+}
+function hqHintBack(w) {
+const o = hqOf(w); if (o && o.h < 3) { o.h++; svSave(); }
+go('htfam'); const si = P.seat.indexOf(GB.findIndex(b => b[0] === w)); if (si >= 0) { hqCard(si); if (o && o.h >= 3) say(o.k); }
 }
 function hqAllPop() {
 const r0 = RT; SND.fanfare(); setTimeout(() => say('いただきます'), 1300);
