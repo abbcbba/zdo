@@ -1,4 +1,4 @@
-const C='22land-r3-fdb414a2e14d', A='22land-assets';
+const C='22land-r3-b95b11cf5205', A='22land-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-4f2768f5-180.png','icon-4f2768f5-192.png','icon-4f2768f5-512.png'];
 const ASSETS=[];
 let filling=null;

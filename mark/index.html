@@ -2276,6 +2276,7 @@ v.addEventListener('pointermove', e => { const p = toGame(e); move(p.x, p.y); })
 v.addEventListener('pointerup', e => { const p = toGame(e); up(p.x, p.y); });
 v.addEventListener('pointercancel', () => { DRAG = null; HOLD = null; });
 document.addEventListener('visibilitychange', () => { if (document.hidden) SND.pause(); else SND.init(); });
+window.addEventListener('pageshow', e => { if (e.persisted) location.reload(); });
 const q0 = typeof qTestStart === 'function' && TEST ? qTestStart() : null;
 go(typeof GAL_ON !== 'undefined' && GAL_ON ? 'gallery' : q0 || (/[?&]farm(&|$)/.test(QS) ? 'farm' : 'village'));
 requestAnimationFrame(frame);
