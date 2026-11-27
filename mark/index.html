@@ -3029,14 +3029,20 @@ g += (qOn() ? '' : scrollBtn() + bookBtn(1218, 666, 'cards')) + nwVillage();
 g += mkPathArrow() + mkAirPlane(ph) + footer();
 return g;
 }
-const PATH_XY = [1212, 290];
+const PATH_ARROWS = [
+{ xy: [90, 128], dir: -1, rel: '../mark2/', abs: 'https://zdogame.com/mark2/', id: 'toMark2', t0: 4.2 },
+{ xy: [1040, 140], dir: 1, rel: '../mini/', abs: 'https://zdogame.com/mini/', id: 'toMini', t0: 0 },
+];
 function twinkle4(cx, cy, s, op) { return `<path d="M${cx},${cy - s} Q${cx + s * 0.18},${cy - s * 0.18} ${cx + s},${cy} Q${cx + s * 0.18},${cy + s * 0.18} ${cx},${cy + s} Q${cx - s * 0.18},${cy + s * 0.18} ${cx - s},${cy} Q${cx - s * 0.18},${cy - s * 0.18} ${cx},${cy - s}Z" fill="#FFF6C8" opacity="${op.toFixed(2)}"/>`; }
 function mkPathArrow() {
-const [x, y] = PATH_XY, ph = (T % 8.5) / 8.5, tw = ph > 0.86 ? Math.sin((ph - 0.86) / 0.14 * Math.PI) : 0, op = 0.34 + 0.5 * tw, sc = 1 + 0.12 * tw;
-hit(x - 44, y - 34, 88, 68, () => { SND.twinkle(); mkSlideTo('../mini/', 'https://zdogame.com/mini/', -1); }, 'toMini');
-const chev = dx => `<path d="M${-10 + dx},-16 L${8 + dx},0 L${-10 + dx},16" fill="none" stroke="#FFFDF4" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`;
-let g = `<g transform="translate(${x},${y}) scale(${sc})" opacity="${op.toFixed(2)}"><ellipse cx="4" cy="0" rx="34" ry="24" fill="#FFFDF4" opacity=".25"/>${chev(-8)}${chev(10)}</g>`;
-if (tw > 0) [[18, -22, 1], [-14, 18, 0.7], [30, 10, 0.55]].forEach(([a, b, k]) => { g += twinkle4(x + a, y + b, 7 * k * tw, 0.9 * tw); });
+let g = '';
+PATH_ARROWS.forEach(A => {
+const [x, y] = A.xy, ph = (((T + A.t0) % 8.5) + 8.5) % 8.5 / 8.5, tw = ph > 0.86 ? Math.sin((ph - 0.86) / 0.14 * Math.PI) : 0, op = 0.34 + 0.5 * tw, sc = 1 + 0.12 * tw;
+hit(x - 44, y - 34, 88, 68, () => { SND.twinkle(); mkSlideTo(A.rel, A.abs, -A.dir); }, A.id);
+const chev = (dx, sh) => `<path d="M${-10 + dx},-16 L${8 + dx},0 L${-10 + dx},16" fill="none" stroke="${sh ? '#3A2414' : '#FFFDF4'}" stroke-width="${sh ? 9 : 7}" stroke-linecap="round" stroke-linejoin="round"${sh ? ' opacity=".35" transform="translate(2,3)"' : ''}/>`;
+g += `<g transform="translate(${x},${y}) scale(${A.dir * sc},${sc})" opacity="${op.toFixed(2)}"><ellipse cx="4" cy="0" rx="34" ry="24" fill="#FFFDF4" opacity=".25"/>${chev(-8, 1)}${chev(10, 1)}${chev(-8)}${chev(10)}</g>`;
+if (tw > 0) [[18, -22, 1], [-14, 18, 0.7], [30, 10, 0.55]].forEach(([a, b, k]) => { g += twinkle4(x + a * A.dir, y + b, 7 * k * tw, 0.9 * tw); });
+});
 return g;
 }
 function mkSlideTo(rel, abs, dir) {

@@ -1,4 +1,4 @@
-const C='mark2-r3-bfe5c720ec09', A='mark2-assets';
+const C='mark2-r3-b578d7cab112', A='mark2-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-ecd0161b-180.png','icon-ecd0161b-192.png','icon-ecd0161b-512.png'];
 const ASSETS=[];
 let filling=null;
