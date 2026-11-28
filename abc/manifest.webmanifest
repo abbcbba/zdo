@@ -1,0 +1,31 @@
+{
+ "name": "텔루구 글자",
+ "short_name": "텔루구 글자",
+ "lang": "ko",
+ "start_url": "./",
+ "scope": "./",
+ "display": "fullscreen",
+ "orientation": "any",
+ "background_color": "#FBF7EE",
+ "theme_color": "#FBF7EE",
+ "icons": [
+  {
+   "src": "icon-32cf9b20-180.png",
+   "sizes": "180x180",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-32cf9b20-192.png",
+   "sizes": "192x192",
+   "type": "image/png",
+   "purpose": "any"
+  },
+  {
+   "src": "icon-32cf9b20-512.png",
+   "sizes": "512x512",
+   "type": "image/png",
+   "purpose": "any"
+  }
+ ]
+}
