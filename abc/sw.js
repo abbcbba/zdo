@@ -1,4 +1,4 @@
-const C='abc-r3-bef37f2710af', A='abc-assets';
+const C='abc-r3-71884fc5382d', A='abc-assets';
 const FILES=['./','index.html','manifest.webmanifest','icon-32cf9b20-180.png','icon-32cf9b20-192.png','icon-32cf9b20-512.png'];
 const ASSETS=[];
 let filling=null;
